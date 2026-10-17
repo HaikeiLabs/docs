@@ -1,0 +1,53 @@
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--color-ground); color: var(--color-content); font: 16px/1.6 var(--font-sans); }
+a { color: var(--color-accent-text); text-underline-offset: .18em; }
+a:hover { color: var(--color-accent-hover); }
+.skip-link { position: absolute; left: -9999px; top: 0; padding: .6rem 1rem; background: var(--color-surface); }
+.skip-link:focus { left: 1rem; z-index: 2; }
+.site-header { display: flex; justify-content: space-between; align-items: center; padding: .9rem clamp(1rem, 3vw, 2.5rem); border-bottom: 1px solid var(--color-line); background: var(--color-surface); }
+.brand { color: var(--color-content); font-weight: 750; text-decoration: none; letter-spacing: -.025em; }
+.header-note { color: var(--color-muted); font-size: .88rem; }
+.layout { display: grid; grid-template-columns: 16.5rem minmax(0, 1fr); max-width: 80rem; margin: 0 auto; min-height: calc(100vh - 3.5rem); }
+.sidebar { padding: 1.5rem 1rem 2rem 1.5rem; border-right: 1px solid var(--color-line); }
+.sidebar h2 { margin: 0 0 .8rem; color: var(--color-faint); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+.nav-product { margin: 1.2rem 0 .35rem; color: var(--color-content); font-size: .88rem; font-weight: 700; }
+.nav-section { margin: .75rem 0 .25rem; color: var(--color-muted); font-size: .75rem; font-weight: 650; }
+.sidebar ul { margin: 0; padding: 0; list-style: none; }
+.sidebar li a { display: block; padding: .35rem .5rem; border-radius: .35rem; color: var(--color-muted); font-size: .88rem; text-decoration: none; }
+.sidebar li a:hover, .sidebar li a[aria-current="page"] { background: var(--color-surface-hover); color: var(--color-accent-text); }
+.content { width: min(100%, 56rem); padding: clamp(1.5rem, 4vw, 3.5rem); }
+.title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: .6rem; }
+h1 { margin: 0; font-size: clamp(1.9rem, 4vw, 2.7rem); line-height: 1.15; letter-spacing: -.04em; }
+.markdown-link { flex: none; margin-top: .35rem; font-size: .85rem; }
+.validated { margin: .65rem 0 2rem; color: var(--color-muted); font-size: .9rem; }
+.prose { max-width: 66ch; }
+.prose h2 { margin: 2.2rem 0 .6rem; font-size: 1.35rem; line-height: 1.25; }
+.prose h3 { margin: 1.5rem 0 .45rem; font-size: 1.08rem; }
+.prose p, .prose ul, .prose ol { margin: .7rem 0 1rem; }
+.prose li + li { margin-top: .3rem; }
+.prose code { padding: .1rem .3rem; border-radius: .25rem; background: var(--color-surface-hover); font: .9em var(--font-mono); overflow-wrap: anywhere; }
+.prose pre { overflow-x: auto; padding: 1rem; border: 1px solid var(--color-line); border-radius: .55rem; background: var(--color-surface); }
+.prose pre code { padding: 0; background: none; }
+.prose blockquote { margin: 1rem 0; padding: .2rem 1rem; border-left: 3px solid var(--color-accent); color: var(--color-muted); }
+.prose table { width: 100%; border-collapse: collapse; }
+.prose th, .prose td { padding: .55rem; border-bottom: 1px solid var(--color-line); text-align: left; }
+.prose img { max-width: 100%; height: auto; }
+.home-intro { max-width: 42rem; margin: 1rem 0 2rem; color: var(--color-muted); font-size: 1.1rem; }
+.home-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .8rem; }
+.home-card { display: block; padding: 1rem; border: 1px solid var(--color-line); border-radius: .6rem; background: var(--color-surface); color: var(--color-content); text-decoration: none; }
+.home-card:hover { border-color: var(--color-accent); }
+.home-card strong { display: block; margin-bottom: .3rem; }
+.home-card span { color: var(--color-muted); font-size: .9rem; }
+.footer { margin-top: 3rem; padding-top: .8rem; border-top: 1px solid var(--color-line); color: var(--color-faint); font-size: .8rem; }
+@media (max-width: 760px) {
+  .layout { display: block; }
+  .sidebar { padding: .8rem 1rem; border-right: 0; border-bottom: 1px solid var(--color-line); }
+  .sidebar h2 { margin-bottom: .2rem; }
+  .sidebar nav { display: flex; gap: .25rem .75rem; overflow-x: auto; align-items: baseline; }
+  .nav-product, .nav-section { display: none; }
+  .sidebar ul { display: flex; gap: .2rem; }
+  .sidebar li { flex: none; }
+  .content { padding: 1.5rem 1rem 3rem; }
+  .title-row { display: block; }
+  .markdown-link { display: inline-block; margin-top: .6rem; }
+}
