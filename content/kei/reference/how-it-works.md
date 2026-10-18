@@ -16,7 +16,7 @@ flowchart TD
     A2["kei policies create<br/>(kei login)"]
   end
   subgraph CP["Kei control plane"]
-    G["Groups & Roles<br/>admins ⊃ members, developer …"]
+    G["Groups & Roles<br/>admins ⊃ developer …"]
     P["Policy<br/>src: group:developer · user:x · harness:claude_code · *<br/>dst: shell:git · skill:wiki · path:/repo<br/>effect: allow|deny · priority"]
     R["Policy revision"]
     B["Policy bundle per installation<br/>version · digest · expiry"]
@@ -40,7 +40,7 @@ flowchart TD
 - Admins create policy in the console or with the Kei CLI, and Kei records each change as a policy revision.
 - Kei distributes a versioned, expiring policy bundle to the machine's single runtime installation.
 - `kei harness sync` translates the bundle into native permissions for the installed harnesses.
-- The runtime evaluates group and user policy sources for governed connector and custom-harness calls. For desktop command policies, a `group:` source renders when it matches one of the bundle subject's groups, and a `user:` source renders when it matches the subject. Automatic re-sync is planned, as shown by the dotted arrow.
+- The runtime evaluates group, user, and `autogroup:member` policy sources for governed calls. For desktop command policies, a `group:` source renders when it matches one of the bundle subject's groups, and a `user:` source renders when it matches that subject. A non-matching source is skipped; policies for user and group sources are not rendered for other subjects. `autogroup:member` resolves at runtime for every organization member and is never stored. Automatic re-sync is planned, as shown by the dotted arrow.
 
 ## Bring your own editor
 
@@ -81,7 +81,7 @@ Kei plans to automatically re-sync harness permissions when a policy bundle chan
 
 ## Learn more
 
-- [How Kei decides: policy priority and precedence](/docs/reference/policy-precedence)
+- [Policy priority and precedence](/content/kei/policies/policy-precedence.html)
 - [Connect your agent](/content/kei/get-started/connect-your-agent.html)
-- [Policies and approvals](/docs/policies-and-approvals)
+- [Policies and approvals](/content/kei/policies/policies-and-approvals.html)
 - [Audit logs](/content/kei/audit/logs.html)
