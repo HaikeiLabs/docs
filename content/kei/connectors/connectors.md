@@ -23,7 +23,7 @@ Connector setup starts after a connector has been added to the workspace. Open *
 
    ![Policies page reached from Grant access, showing the empty workspace policy state](/docs/images/connector-setup/grant-access-policies.png)
 
-The setup rail links to each step so you can return to review or adjust access later. The Grant access step is complete when an applicable policy exists. For broader workspace onboarding, see [Getting started](/docs/getting-started/web-onboarding).
+The setup rail links to each step so you can return to review or adjust access later. The Grant access step is complete when an applicable policy exists. For broader workspace onboarding, start with [Sign in to Kei](/content/kei/get-started/sign-in.html).
 
 ## Per-user connection {#per-user-connection}
 

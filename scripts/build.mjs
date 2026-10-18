@@ -66,9 +66,12 @@ async function markdownFiles(directory, root = directory) {
   return files;
 }
 
-function sectionFor(page) {
+function navGroupFor(page) {
   const parts = page.relativePath.split('/');
-  return parts.length > 2 ? parts[1] : 'Overview';
+  const section = parts.length > 2 ? parts[1] : '';
+  if (parts[0] === 'kei' && section === 'get-started') return 'Get started';
+  if (parts[0] === 'kei' && ['make-and-maintain', 'connect-your-harness', 'runtime'].includes(section)) return 'Make and maintain';
+  return 'Reference';
 }
 
 function pageHref(page) {
@@ -76,17 +79,9 @@ function pageHref(page) {
 }
 
 function sidebar(pages, currentPath = '') {
-  const products = ['kei', 'agentware'];
-  const groups = products.map((product) => {
-    const productPages = pages.filter((page) => page.product === product);
-    const sections = new Map();
-    for (const page of productPages) {
-      const section = page.relativePath === 'skills.md' ? 'Skills' : sectionFor(page);
-      if (!sections.has(section)) sections.set(section, []);
-      sections.get(section).push(page);
-    }
-    const content = [...sections.entries()].map(([section, entries]) => `<div class="nav-section">${escapeHtml(section.replaceAll('-', ' '))}</div><ul>${entries.map((page) => `<li><a href="${pageHref(page)}"${page.relativePath === currentPath ? ' aria-current="page"' : ''}>${escapeHtml(page.title)}</a></li>`).join('')}</ul>`).join('');
-    return `<div class="nav-product">${product === 'kei' ? 'Kei' : 'agentware'}</div>${content}`;
+  const groups = ['Get started', 'Make and maintain', 'Reference'].map((group) => {
+    const entries = pages.filter((page) => navGroupFor(page) === group);
+    return `<div class="nav-section">${group}</div><ul>${entries.map((page) => `<li><a href="${pageHref(page)}"${page.relativePath === currentPath ? ' aria-current="page"' : ''}>${escapeHtml(page.title)}</a></li>`).join('')}</ul>`;
   }).join('');
   return `<aside class="sidebar"><h2>Documentation</h2><nav aria-label="Documentation">${groups}</nav></aside>`;
 }

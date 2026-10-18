@@ -41,3 +41,35 @@ test('build accepts validated pages and writes static HTML with a raw Markdown t
     await rm(paths.root, { recursive: true, force: true });
   }
 });
+
+test('sidebar groups pages as Get started, Make and maintain, and Reference', async () => {
+  const paths = await fixture();
+  try {
+    await mkdir(path.join(paths.contentDir, 'kei', 'get-started'), { recursive: true });
+    await mkdir(path.join(paths.contentDir, 'kei', 'make-and-maintain'), { recursive: true });
+    await mkdir(path.join(paths.contentDir, 'kei', 'reference'), { recursive: true });
+    await writeFile(path.join(paths.contentDir, 'kei/get-started/sign-in.md'), '---\ntitle: Sign in\ntype: read-and-use\nproduct: kei\n---\n\nSign in.\n');
+    await writeFile(path.join(paths.contentDir, 'kei/make-and-maintain/runtime.md'), '---\ntitle: Deploy a runtime\ntype: read-and-use\nproduct: kei\n---\n\nDeploy it.\n');
+    await writeFile(path.join(paths.contentDir, 'kei/reference/cli.md'), '---\ntitle: "Reference: kei CLI"\ntype: reference\nproduct: kei\n---\n\nUse it.\n');
+    const pages = await buildDocs({ ...paths, assetsDir });
+    const html = await readFile(path.join(paths.outputDir, 'index.html'), 'utf8');
+    assert.equal(pages.length, 3);
+    assert.match(html, /<div class="nav-section">Get started<\/div>/);
+    assert.match(html, /<div class="nav-section">Make and maintain<\/div>/);
+    assert.match(html, /<div class="nav-section">Reference<\/div>/);
+    assert.equal((html.match(/class="nav-section"/g) ?? []).length, 3);
+    const groups = [
+      ['Get started', 'href="/content/kei/get-started/sign-in.html"'],
+      ['Make and maintain', 'href="/content/kei/make-and-maintain/runtime.html"'],
+      ['Reference', 'href="/content/kei/reference/cli.html"'],
+    ];
+    for (const [label, link] of groups) {
+      const start = html.indexOf(`<div class="nav-section">${label}</div>`);
+      const next = html.indexOf('<div class="nav-section">', start + 1);
+      const section = html.slice(start, next === -1 ? html.indexOf('</nav>', start) : next);
+      assert.ok(section.includes(link), `${label} should contain ${link}`);
+    }
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});

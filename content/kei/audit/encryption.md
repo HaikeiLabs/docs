@@ -35,6 +35,6 @@ Escrow is off by default and can only be enabled while at least one active custo
 
 ## Manage keys
 
-Open **Settings → Audit encryption** to register a public key, review active and disabled keys, or disable an active key. The browser checks that a key starts with `age1`; the catalog validates that it parses as an age X25519 recipient. Never paste a private identity into the console. See [Audit logs](/docs/audit/logs) for record fields and retention.
+Open **Settings → Audit encryption** to register a public key, review active and disabled keys, or disable an active key. The browser checks that a key starts with `age1`; the catalog validates that it parses as an age X25519 recipient. Never paste a private identity into the console. See [Audit logs](/content/kei/audit/logs.html) for record fields and retention.
 
 The console uses `GET` and `POST /api/v1/organizations/{org}/audit-encryption-keys` to list and register keys, `GET /api/v1/organizations/{org}/audit-encryption-keys/{id}` to read a key, and `POST /api/v1/organizations/{org}/audit-encryption-keys/{id}:disable` to disable one. Escrow uses `GET` and `PATCH /api/v1/organizations/{org}/settings`. The runtime retrieves recipient public keys from `GET /api/v1/runtime/audit-encryption-recipients` using its installation token.

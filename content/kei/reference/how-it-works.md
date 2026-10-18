@@ -71,8 +71,8 @@ flowchart TD
 
 - One installation supports multiple harnesses and sessions on the same developer machine.
 - Supported editors apply eligible Kei-generated native permission settings and make their own native decision (allow, deny, or ask). The audit hook reports activity and does not decide or block calls.
-- SDK (Agentware) integrations use `KeiProxyEvaluator` to call `kei-proxy authorize`, which fails closed when it cannot authorize a request. Start with [Build on the Agentware SDK](https://github.com/HaikeiLabs/agentware/tree/main/docs/getting-started). Use [when to use `kei harness add`](/docs/connect-your-harness/harness-setup#when-to-use-kei-harness-add) to learn when to register an SDK integration and when to use `kei harness sync`.
-- Pi and Open WebUI remain separate harness types with their own integrations; see [Pi setup](/docs/connect-your-harness/harness-setup#pi) and [Open WebUI with Kei](/docs/connect-your-harness/openwebui).
+- SDK (Agentware) integrations use `KeiProxyEvaluator` to call `kei-proxy authorize`, which fails closed when it cannot authorize a request. Start with [Build on the agentware SDK](/content/kei/reference/agentware-sdk.html).
+- Pi and Open WebUI remain separate harness types with their own integrations; see [Pi setup](/content/kei/connect-your-harness/harness-setup.html#pi) and [Open WebUI with Kei](/content/kei/connect-your-harness/openwebui.html).
 - Kei receives audit events with the harness kind and session, and shows activity in Audit Logs and the Agents card.
 
 ## What's planned
@@ -82,6 +82,6 @@ Kei plans to automatically re-sync harness permissions when a policy bundle chan
 ## Learn more
 
 - [How Kei decides: policy priority and precedence](/docs/reference/policy-precedence)
-- [Set up and run your own harness](/docs/connect-your-harness/harness-setup)
+- [Connect your agent](/content/kei/get-started/connect-your-agent.html)
 - [Policies and approvals](/docs/policies-and-approvals)
-- [Audit logs](/docs/audit/logs)
+- [Audit logs](/content/kei/audit/logs.html)
