@@ -81,6 +81,7 @@ Kei plans to automatically re-sync harness permissions when a policy bundle chan
 
 ## Learn more
 
+- [Deterministic guardrails: how Kei compares with other policy models](/content/kei/reference/deterministic-guardrails.html)
 - [Policy priority and precedence](/content/kei/policies/policy-precedence.html)
 - [Connect your agent](/content/kei/get-started/connect-your-agent.html)
 - [Policies and approvals](/content/kei/policies/policies-and-approvals.html)
