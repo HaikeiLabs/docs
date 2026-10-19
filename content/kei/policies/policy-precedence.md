@@ -157,3 +157,7 @@ flowchart TD
 Policy bundles are issued per runtime installation and workspace, so each installation evaluates the policies for its workspace.
 
 For desktop harnesses, Kei renders shell, skill, and path policy effects into native rules: Claude Code gives deny entries precedence over allow entries, Codex represents deny entries as `forbidden`, and OpenCode writes bash entries in its permission configuration. The harness uses those settings to make its own **native decision**. Its hook is report-only. See [Create policies](/content/kei/policies/create-policies.html), [Policies and approvals](/content/kei/policies/policies-and-approvals.html), [How Kei governs coding agents](/content/kei/reference/how-it-works.html), and [Run your own harness with Kei permissions](/content/kei/connect-your-harness/harness-setup.html) for setup and policy context.
+
+## See also
+
+- [Deterministic guardrails: how Kei compares with other policy models](/content/kei/reference/deterministic-guardrails.html)
