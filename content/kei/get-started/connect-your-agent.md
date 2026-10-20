@@ -2,6 +2,7 @@
 title: Connect your agent
 type: read-and-use
 product: kei
+order: 3
 ---
 
 # Connect your agent
