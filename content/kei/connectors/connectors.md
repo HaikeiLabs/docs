@@ -9,21 +9,21 @@ product: kei
 
 Connector setup starts after a connector has been added to the workspace. Open **Data Connections** in the left navigation, choose **Add Connector**, and select a built-in connector or a remote MCP template. Complete its setup form and create it. The connector then has its own setup flow; a connector must exist before its Connect screen can load.
 
-![Connector gallery with built-in providers and a remote MCP template](/docs/images/connector-setup/connectors-gallery.png)
+![Connector gallery with built-in providers and a remote MCP template](/assets/images/connector-setup/connectors-gallery.png)
 
 1. **Connect.** Open the new connector. This setup screen shows the account model and current connection status, then continues to tool review. For a shared OAuth connector, start account consent from **Data Connections → Connect OAuth** (or **Reconnect OAuth** if consent has expired); for other credential types, follow the configured tenant credential-store process. For a per-user connector, each harness user signs in from their harness or uses the kei CLI. Both entry points open the same sign-in page for that connector. The available entry point depends on the harness; see its setup guide for details. Never enter secret values in documentation or screenshots.
 
-   ![Connector Connect step with its status and the next-step button](/docs/images/connector-setup/connector-connect.png)
+   ![Connector Connect step with its status and the next-step button](/assets/images/connector-setup/connector-connect.png)
 
 2. **Approve tools.** Continue to the manifest review, inspect the tools and their descriptions, then approve the manifest when it is appropriate for your workspace.
 
-   ![Connector tool manifest review step](/docs/images/connector-setup/connector-tools.png)
+   ![Connector tool manifest review step](/assets/images/connector-setup/connector-tools.png)
 
 3. **Grant access.** Continue to grant access. Kei opens **Policies** with the connector selected as the destination. If the workspace has no matching policy yet, the page may show **No policies yet**; this is expected and does not mean the connector failed. Create a workspace policy for the intended principal and connector capability/tool. Access is granted only when an applicable policy permits it.
 
-   ![Policies page reached from Grant access, showing the empty workspace policy state](/docs/images/connector-setup/grant-access-policies.png)
+   ![Policies page reached from Grant access, showing the empty workspace policy state](/assets/images/connector-setup/grant-access-policies.png)
 
-The setup rail links to each step so you can return to review or adjust access later. The Grant access step is complete when an applicable policy exists. For broader workspace onboarding, start with [Sign in to Kei](/content/kei/get-started/sign-in.html).
+The setup rail links to each step so you can return to review or adjust access later. The Grant access step is complete when an applicable policy exists. For broader workspace onboarding, start with [Sign in to Kei](/kei/get-started/sign-in).
 
 ## Per-user connection {#per-user-connection}
 

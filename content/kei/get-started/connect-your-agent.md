@@ -8,13 +8,13 @@ product: kei
 
 Choose the agent you want to connect and follow its setup page. This step connects the agent's harness to the runtime on this machine. Installing skills alone does not connect an agent.
 
-- [Claude Code](/content/kei/connect-your-harness/harness-setup.html#claude-code)
-- [Codex](/content/kei/connect-your-harness/harness-setup.html#codex)
-- [OpenCode](/content/kei/connect-your-harness/harness-setup.html#opencode)
-- [Pi](/content/kei/connect-your-harness/harness-setup.html#pi)
-- [Open WebUI](/content/kei/connect-your-harness/openwebui.html)
+- [Claude Code](/kei/connect-your-harness/harness-setup#claude-code)
+- [Codex](/kei/connect-your-harness/harness-setup#codex)
+- [OpenCode](/kei/connect-your-harness/harness-setup#opencode)
+- [Pi](/kei/connect-your-harness/harness-setup#pi)
+- [Open WebUI](/kei/connect-your-harness/openwebui)
 
-If you are building a custom harness, see [Build on the agentware SDK](/content/kei/reference/agentware-sdk.html).
+If you are building a custom harness, see [Build on the agentware SDK](/kei/reference/agentware-sdk).
 
 ## Check it worked
 

@@ -12,3 +12,7 @@ npm run preview
 ```
 
 The preview server serves `dist/` at <http://localhost:4173>.
+
+## Deploy
+
+Deploy with Cloudflare Pages using build command `npm ci && npm run build`, output directory `dist`, and custom domain `docs.haikeilabs.com`.
