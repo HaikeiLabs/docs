@@ -131,3 +131,27 @@ test('build writes clean HTML and Markdown paths with extensionless sidebar link
     await rm(path.resolve('.scratch'), { recursive: true, force: true });
   }
 });
+
+test('built pages ship theme-init before stylesheets, header links, TOC and pager while keeping the URL contract', async () => {
+  const paths = await fixture();
+  try {
+    const page = (title, extra = '') => `---\ntitle: ${title}\ntype: reference\nproduct: kei\n---\n\n## One\n\n## Two\n\n## Three\n\n\`\`\`sh\nkei help\n\`\`\`\n${extra}`;
+    await writeFile(path.join(paths.contentDir, 'kei/setup/a.md'), page('Alpha'));
+    await writeFile(path.join(paths.contentDir, 'kei/setup/b.md'), page('Beta'));
+    await buildDocs({ ...paths, assetsDir });
+    const html = await readFile(path.join(paths.outputDir, 'kei/setup/a.html'), 'utf8');
+    assert.ok(html.indexOf("haikei-theme") < html.indexOf('rel="stylesheet"'));
+    assert.match(html, /href="https:\/\/github\.com\/HaikeiLabs\/docs"/);
+    assert.match(html, /href="\/kei\/setup\/a\.md">View as Markdown/);
+    const header = html.match(/<header class="site-header">[\s\S]*?<\/header>/)[0];
+    assert.match(header, /href="https:\/\/haikeilabs\.com"/);
+    assert.match(header, /href="https:\/\/app\.haikeilabs\.com">Console</);
+    assert.match(header, /href="\/">Docs</);
+    assert.match(html, /class="toc"/);
+    assert.match(html, /class="pager-next" href="\/kei\/setup\/b"/);
+    assert.equal((await stat(path.join(paths.outputDir, 'assets/site.js'))).isFile(), true);
+    assert.equal((await stat(path.join(paths.outputDir, 'kei/setup/a.md'))).isFile(), true);
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
