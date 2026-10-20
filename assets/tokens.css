@@ -33,9 +33,19 @@
   --logo-plane: #047857;
   --logo-front: #07110d;
   --logo-point: #ffffff;
+  /* Docs-only: syntax highlighting. Not in the design-system tokens; derived from
+     emerald/slate already in the palette (no new hue). Dark values keep the
+     mint-for-text rule from spec §07. */
+  --code-comment: #64748b;
+  --code-string: #047857;
+  --code-keyword: #0f172a;
+  --code-flag: #065f46;
+  --code-variable: #475569;
+  --code-number: #334155;
 }
 
 [data-theme="dark"] {
+  color-scheme: dark;
   --color-ground: #07110d;
   --color-surface: #0f1c17;
   --color-field: #0b1712;
@@ -63,4 +73,10 @@
   --logo-plane: #6ee7b7;
   --logo-front: #ffffff;
   --logo-point: #07110d;
+  --code-comment: #8b978f;
+  --code-string: #6ee7b7;
+  --code-keyword: #f6f8f6;
+  --code-flag: #34d399;
+  --code-variable: #a3b1aa;
+  --code-number: #a7f3d0;
 }

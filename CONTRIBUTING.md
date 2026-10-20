@@ -41,3 +41,11 @@ npm run preview
 ```
 
 The preview server serves the generated site at <http://localhost:4173>. Each rendered page has a sibling raw Markdown file for editing, review, and agent consumption.
+
+## Page conventions
+
+- The page `title` is rendered in the header row; a leading `# Title` in the body is dropped.
+- Callouts: start a blockquote with `**Note:**` or `**Warning:**` (`> **Warning:** this deletes the installation.`). Other blockquotes stay plain.
+- Fenced code shows its language as a label. Use `title="file.json"` in the info string to show a filename instead (` ```json title="policy.json" `). Highlighted languages: sh/bash, json, python, dockerfile.
+- Headings get anchors and an "On this page" entry (h2/h3). `{#custom-id}` after a heading sets its id.
+- Prev/next follow the sidebar order.
