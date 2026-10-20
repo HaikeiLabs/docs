@@ -201,6 +201,9 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     await cp(path.join(contentDir, page.relativePath), markdownFile);
   }
   await writeFile(path.join(outputDir, 'index.html'), renderHome(pages));
+  // Page manifest consumed by `kei docs` (HAI-735). Keep this shape stable.
+  const manifest = orderedPages(pages).map((page) => ({ slug: pageHref(page).slice(1), title: page.title, path: pageHref(page), product: page.product }));
+  await writeFile(path.join(outputDir, 'index.json'), `${JSON.stringify(manifest, null, 2)}\n`);
   await writeFile(path.join(outputDir, '404.html'), '<!doctype html><html lang="en"><meta charset="utf-8"><title>Not found · Haikei docs</title><h1>Page not found</h1><p><a href="/">Return to the documentation home.</a></p></html>\n');
   return pages;
 }
