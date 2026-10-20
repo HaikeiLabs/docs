@@ -26,4 +26,4 @@ kei runtime bootstrap
 
 ## Check it worked
 
-The bootstrap command completes successfully and the runtime installation shows a recent heartbeat in Kei. If it does not, see [runtime troubleshooting](/content/kei/runtime/troubleshooting.html).
+The bootstrap command completes successfully and the runtime installation shows a recent heartbeat in Kei. If it does not, see [runtime troubleshooting](/kei/runtime/troubleshooting).

@@ -1,11 +1,41 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { buildDocs } from '../scripts/build.mjs';
 
 const assetsDir = new URL('../assets/', import.meta.url).pathname;
+
+async function htmlFiles(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const file = path.join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...await htmlFiles(file));
+    else if (entry.isFile() && entry.name.endsWith('.html')) files.push(file);
+  }
+  return files;
+}
+
+async function resolvesInternalUrl(url, currentFile, outputDir) {
+  const relativeFile = path.relative(outputDir, currentFile).split(path.sep).join('/');
+  const pageUrl = new URL(`/${relativeFile}`, 'https://docs.haikeilabs.com');
+  const targetUrl = new URL(url, pageUrl);
+  if (targetUrl.origin !== pageUrl.origin) return true;
+  const pathname = decodeURIComponent(targetUrl.pathname);
+  const target = path.resolve(outputDir, `.${pathname}`);
+  if (target !== outputDir && !target.startsWith(`${outputDir}${path.sep}`)) return false;
+  const candidates = [target, `${target}.html`, path.join(target, 'index.html')];
+  for (const candidate of candidates) {
+    try {
+      if ((await stat(candidate)).isFile()) return true;
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+  }
+  return false;
+}
 
 async function fixture() {
   const root = await mkdtemp(path.join(os.tmpdir(), 'haikei-docs-test-'));
@@ -32,8 +62,8 @@ test('build accepts validated pages and writes static HTML with a raw Markdown t
     await writeFile(path.join(paths.contentDir, 'kei/setup/example.md'), source);
     const pages = await buildDocs({ ...paths, assetsDir });
     assert.equal(pages.length, 1);
-    const html = await readFile(path.join(paths.outputDir, 'content/kei/setup/example.html'), 'utf8');
-    const twin = await readFile(path.join(paths.outputDir, 'content/kei/setup/example.md'), 'utf8');
+    const html = await readFile(path.join(paths.outputDir, 'kei/setup/example.html'), 'utf8');
+    const twin = await readFile(path.join(paths.outputDir, 'kei/setup/example.md'), 'utf8');
     assert.match(html, /Last validated 2026-10-17 with kei v0\.1\.32/);
     assert.match(html, /Run <code>kei --version<\/code>/);
     assert.equal(twin, source);
@@ -59,9 +89,9 @@ test('sidebar groups pages as Get started, Make and maintain, and Reference', as
     assert.match(html, /<div class="nav-section">Reference<\/div>/);
     assert.equal((html.match(/class="nav-section"/g) ?? []).length, 3);
     const groups = [
-      ['Get started', 'href="/content/kei/get-started/sign-in.html"'],
-      ['Make and maintain', 'href="/content/kei/make-and-maintain/runtime.html"'],
-      ['Reference', 'href="/content/kei/reference/cli.html"'],
+      ['Get started', 'href="/kei/get-started/sign-in"'],
+      ['Make and maintain', 'href="/kei/make-and-maintain/runtime"'],
+      ['Reference', 'href="/kei/reference/cli"'],
     ];
     for (const [label, link] of groups) {
       const start = html.indexOf(`<div class="nav-section">${label}</div>`);
@@ -71,5 +101,33 @@ test('sidebar groups pages as Get started, Make and maintain, and Reference', as
     }
   } finally {
     await rm(paths.root, { recursive: true, force: true });
+  }
+});
+
+test('build writes clean HTML and Markdown paths with extensionless sidebar links', async () => {
+  const outputDir = path.resolve('.scratch/clean-urls/dist');
+  try {
+    await buildDocs({ outputDir, assetsDir });
+    const htmlPath = path.join(outputDir, 'kei/get-started/sign-in.html');
+    const markdownPath = path.join(outputDir, 'kei/get-started/sign-in.md');
+    const html = await readFile(htmlPath, 'utf8');
+    const sidebar = await readFile(path.join(outputDir, 'index.html'), 'utf8');
+    assert.ok(html);
+    assert.ok(markdownPath);
+    assert.equal(await readFile(markdownPath, 'utf8'), await readFile(path.resolve('content/kei/get-started/sign-in.md'), 'utf8'));
+    await assert.rejects(stat(path.join(outputDir, 'content')), { code: 'ENOENT' });
+    await readFile(path.join(outputDir, '404.html'), 'utf8');
+    assert.match(sidebar, /href="\/kei\/get-started\/sign-in"/);
+    for (const file of await htmlFiles(outputDir)) {
+      const html = await readFile(file, 'utf8');
+      assert.doesNotMatch(html, /href="\/content\//, `${file} contains a /content/ href`);
+      assert.doesNotMatch(html, /href="(?!https?:)[^"]*\.html(?:[?#][^"]*)?"/, `${file} contains an internal .html href`);
+      const urls = [...html.matchAll(/\b(?:href|src)="([^"]*)"/g)].map((match) => match[1]);
+      for (const url of urls) {
+        assert.ok(await resolvesInternalUrl(url, file, outputDir), `${file} has a broken internal URL: ${url}`);
+      }
+    }
+  } finally {
+    await rm(path.resolve('.scratch'), { recursive: true, force: true });
   }
 });

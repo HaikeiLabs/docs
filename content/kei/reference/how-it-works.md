@@ -71,8 +71,8 @@ flowchart TD
 
 - One installation supports multiple harnesses and sessions on the same developer machine.
 - Supported editors apply eligible Kei-generated native permission settings and make their own native decision (allow, deny, or ask). The audit hook reports activity and does not decide or block calls.
-- SDK (Agentware) integrations use `KeiProxyEvaluator` to call `kei-proxy authorize`, which fails closed when it cannot authorize a request. Start with [Build on the agentware SDK](/content/kei/reference/agentware-sdk.html).
-- Pi and Open WebUI remain separate harness types with their own integrations; see [Pi setup](/content/kei/connect-your-harness/harness-setup.html#pi) and [Open WebUI with Kei](/content/kei/connect-your-harness/openwebui.html).
+- SDK (Agentware) integrations use `KeiProxyEvaluator` to call `kei-proxy authorize`, which fails closed when it cannot authorize a request. Start with [Build on the agentware SDK](/kei/reference/agentware-sdk).
+- Pi and Open WebUI remain separate harness types with their own integrations; see [Pi setup](/kei/connect-your-harness/harness-setup#pi) and [Open WebUI with Kei](/kei/connect-your-harness/openwebui).
 - Kei receives audit events with the harness kind and session, and shows activity in Audit Logs and the Agents card.
 
 ## What's planned
@@ -81,8 +81,8 @@ Kei plans to automatically re-sync harness permissions when a policy bundle chan
 
 ## Learn more
 
-- [Deterministic guardrails: how Kei compares with other policy models](/content/kei/reference/deterministic-guardrails.html)
-- [Policy priority and precedence](/content/kei/policies/policy-precedence.html)
-- [Connect your agent](/content/kei/get-started/connect-your-agent.html)
-- [Policies and approvals](/content/kei/policies/policies-and-approvals.html)
-- [Audit logs](/content/kei/audit/logs.html)
+- [Deterministic guardrails: how Kei compares with other policy models](/kei/reference/deterministic-guardrails)
+- [Policy priority and precedence](/kei/policies/policy-precedence)
+- [Connect your agent](/kei/get-started/connect-your-agent)
+- [Policies and approvals](/kei/policies/policies-and-approvals)
+- [Audit logs](/kei/audit/logs)

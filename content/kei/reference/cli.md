@@ -17,7 +17,7 @@ The `kei` CLI is for people administering Kei runtime installations. Use `kei he
 | Preview or apply harness configuration | `kei harness sync --dry-run` / `kei harness sync` |
 | Show the CLI version | `kei --version` |
 
-The CLI does not create organizations, workspaces, groups, users, or policies. Manage those in the web app. Do not pass runtime credentials as command-line arguments. See [Connect this machine](/content/kei/get-started/connect-this-machine.html) for installation instructions.
+The CLI does not create organizations, workspaces, groups, users, or policies. Manage those in the web app. Do not pass runtime credentials as command-line arguments. See [Connect this machine](/kei/get-started/connect-this-machine) for installation instructions.
 
 ## Sign-in troubleshooting
 

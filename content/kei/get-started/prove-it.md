@@ -12,4 +12,4 @@ Open **Audit Logs** and confirm both requests have a decision record. Check the 
 
 ## Check it worked
 
-You can find one allow and one deny for the agent in Audit Logs. If a request is denied unexpectedly, check workspace selection, group membership, the applicable policy, and [runtime troubleshooting](/content/kei/runtime/troubleshooting.html).
+You can find one allow and one deny for the agent in Audit Logs. If a request is denied unexpectedly, check workspace selection, group membership, the applicable policy, and [runtime troubleshooting](/kei/runtime/troubleshooting).

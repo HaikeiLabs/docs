@@ -10,7 +10,8 @@ createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     const relative = pathname === '/' ? 'index.html' : pathname.slice(1);
-    const file = path.resolve(root, relative);
+    let file = path.resolve(root, relative);
+    if (!path.extname(file)) file = `${file}.html`;
     if (!file.startsWith(`${root}${path.sep}`) && file !== path.join(root, 'index.html')) throw new Error('Not found');
     if (!(await stat(file)).isFile()) throw new Error('Not found');
     response.writeHead(200, { 'content-type': types[path.extname(file)] ?? 'application/octet-stream' });

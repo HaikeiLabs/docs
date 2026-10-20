@@ -6,7 +6,7 @@ product: kei
 
 # Create policies
 
-A policy says who may do what, and whether it is allowed or denied. This page walks through writing one: the fields, how Kei orders policies that overlap, which sources and destinations to choose, and what `kei harness sync` writes into a desktop harness. For the full decision model, see [Policy priority and precedence](/content/kei/policies/policy-precedence.html). To grant an agent access through a group, follow [Give a group access](/content/kei/get-started/give-a-group-access.html).
+A policy says who may do what, and whether it is allowed or denied. This page walks through writing one: the fields, how Kei orders policies that overlap, which sources and destinations to choose, and what `kei harness sync` writes into a desktop harness. For the full decision model, see [Policy priority and precedence](/kei/policies/policy-precedence). To grant an agent access through a group, follow [Give a group access](/kei/get-started/give-a-group-access).
 
 Kei does not seed policies. Administrators create policies for their workspace.
 

@@ -75,7 +75,7 @@ function navGroupFor(page) {
 }
 
 function pageHref(page) {
-  return `/content/${page.relativePath.replace(/\.md$/, '.html')}`;
+  return `/${page.relativePath.replace(/\.md$/, '')}`;
 }
 
 function sidebar(pages, currentPath = '') {
@@ -107,11 +107,11 @@ function layout(title, nav, content) {
 }
 
 function renderPage(page, pages) {
-  const outputPath = pageHref(page).slice(1);
+  const outputPath = `${page.relativePath.replace(/\.md$/, '')}.html`;
   const validation = page.validated && page.validated_with
     ? `<p class="validated">Last validated ${escapeHtml(page.validated)} with ${escapeHtml(page.validated_with)}</p>`
     : '';
-  const body = `<div class="title-row"><h1>${escapeHtml(page.title)}</h1><a class="markdown-link" href="/content/${escapeHtml(page.relativePath)}">View as Markdown</a></div>${validation}<article class="prose">${markdown.render(page.body)}</article>`;
+  const body = `<div class="title-row"><h1>${escapeHtml(page.title)}</h1><a class="markdown-link" href="/${escapeHtml(page.relativePath)}">View as Markdown</a></div>${validation}<article class="prose">${markdown.render(page.body)}</article>`;
   return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath), body) };
 }
 
@@ -136,16 +136,18 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   await mkdir(path.join(outputDir, 'assets'), { recursive: true });
   await cp(path.join(assetsDir, 'tokens.css'), path.join(outputDir, 'assets/tokens.css'));
   await cp(path.join(assetsDir, 'site.css'), path.join(outputDir, 'assets/site.css'));
+  await cp(path.join(assetsDir, 'images'), path.join(outputDir, 'assets/images'), { recursive: true });
   for (const page of pages) {
     const { outputPath, html } = renderPage(page, pages);
     const htmlFile = path.join(outputDir, outputPath);
-    const markdownFile = path.join(outputDir, 'content', page.relativePath);
+    const markdownFile = path.join(outputDir, page.relativePath);
     await mkdir(path.dirname(htmlFile), { recursive: true });
     await writeFile(htmlFile, html);
     await mkdir(path.dirname(markdownFile), { recursive: true });
     await cp(path.join(contentDir, page.relativePath), markdownFile);
   }
   await writeFile(path.join(outputDir, 'index.html'), renderHome(pages));
+  await writeFile(path.join(outputDir, '404.html'), '<!doctype html><html lang="en"><meta charset="utf-8"><title>Not found · Haikei docs</title><h1>Page not found</h1><p><a href="/">Return to the documentation home.</a></p></html>\n');
   return pages;
 }
 

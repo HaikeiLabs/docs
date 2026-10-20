@@ -7,15 +7,15 @@ product: kei
 
 Choose the agent or harness you already use, then follow the setup prompt above to connect it to Kei. Kei supports Claude Code, Codex, OpenCode, Pi, Open WebUI, and SDK (Agentware) integrations. This onboarding flow configures an existing harness and can help install the public Kei skills. Installing skills and integrating an agent through the SDK are separate tasks.
 
-For the full browser sequence, including workspace, connector, and policy setup, see [Getting Started: Web Onboarding](/docs/getting-started/web-onboarding). For SDK (Agentware) integrations, see [Build on the Agentware SDK](https://github.com/HaikeiLabs/agentware/tree/main/docs/getting-started).
+For the full browser sequence, including workspace, connector, and policy setup, see [Getting Started: Web Onboarding](/kei/get-started/sign-in). For SDK (Agentware) integrations, see [Build on the Agentware SDK](https://github.com/HaikeiLabs/agentware/tree/main/docs/getting-started).
 
-Installing skills provides coding-agent guidance; it does not deploy a harness. For a local workstation/headless workflow, use `kei setup` and `kei runtime bootstrap` in [CLI authentication and runtime setup](/docs/getting-started/cli-and-runtime). For a deployed service or SDK (Agentware) integration, configure the customer-owned runtime and secret store using [Tenant-side runtime](/docs/runtime/tenant-runtime).
+Installing skills provides coding-agent guidance; it does not deploy a harness. For a local workstation/headless workflow, use `kei setup` and `kei runtime bootstrap` in [CLI authentication and runtime setup](/kei/get-started/connect-this-machine). For a deployed service or SDK (Agentware) integration, configure the customer-owned runtime and secret store using [Tenant-side runtime](/kei/runtime/tenant-runtime).
 
-Use the integration documented for your harness to route governed operations through your tenant-side connector runtime. SDK (Agentware) integrations use `KeiProxyEvaluator`; Pi uses the `kei-lime-pi` extension and local runtime socket; Open WebUI uses its own image and tool packs. The runtime evaluates policy and performs governed connector operations in your environment. See [how the connector runtime enforces policy](/docs/runtime/tenant-runtime). Keep provider credentials and customer data in your tenant environment.
+Use the integration documented for your harness to route governed operations through your tenant-side connector runtime. SDK (Agentware) integrations use `KeiProxyEvaluator`; Pi uses the `kei-lime-pi` extension and local runtime socket; Open WebUI uses its own image and tool packs. The runtime evaluates policy and performs governed connector operations in your environment. See [how the connector runtime enforces policy](/kei/runtime/tenant-runtime). Keep provider credentials and customer data in your tenant environment.
 
 Create and connect agents from **Agents → Add Agent**. The wizard names the agent, assigns an active workspace model profile, creates its runtime installation, and reveals the installation credential once. Use the Connect step for workstation or deployed-service instructions. After setup, manage installation credentials, status, and logs from **Agents → Runtime installations**. The production control-plane URL is `https://app.haikeilabs.com`.
 
-For the getting-started overview, see [Connect your harness](/docs/getting-started/web-onboarding#5-connect-your-harness). For workstation commands, see [CLI authentication and runtime setup](/docs/getting-started/cli-and-runtime). For a deployed service, see [Tenant-side runtime](/docs/runtime/tenant-runtime). If the installation does not receive a heartbeat, follow [runtime heartbeat troubleshooting](/docs/runtime/troubleshooting#runtime-heartbeat-and-audit-health).
+For the getting-started overview, see [Connect your harness](/kei/get-started/sign-in#5-connect-your-harness). For workstation commands, see [CLI authentication and runtime setup](/kei/get-started/connect-this-machine). For a deployed service, see [Tenant-side runtime](/kei/runtime/tenant-runtime). If the installation does not receive a heartbeat, follow [runtime heartbeat troubleshooting](/kei/runtime/troubleshooting#runtime-heartbeat-and-audit-health).
 
 ## Set up your harness
 
@@ -63,7 +63,7 @@ kei bot agents add --installation <INSTALLATION_UUID> --agent <AGENT_UUID> --def
 
 For how Kei policies affect command permissions, what remains under your harness's control, and how to diagnose a bad sync, see [Run your own harness with Kei permissions](#harness-permissions).
 
-See [How it works](/docs/runtime/how-it-works) for how Kei distributes policies to your chosen harness and records audit events.
+See [How it works](/kei/reference/how-it-works) for how Kei distributes policies to your chosen harness and records audit events.
 
 ### Claude Code
 
@@ -75,7 +75,7 @@ The installer installs `kei` in `~/.local/bin`. Then run [`setup-claude-code.sh`
 
 Expected CLI output includes `Logged in to Kei for organization …`, a bootstrap JSON response with `"status":"active"` and `"binding_status":"verified"`, and sync exit code `0`.
 
-![Runtime installation active with verified binding in Agents → Runtime installations](/docs/images/harness-setup/runtime-installation-active.png)
+![Runtime installation active with verified binding in Agents → Runtime installations](/assets/images/harness-setup/runtime-installation-active.png)
 
 ### Codex
 
@@ -97,7 +97,7 @@ The installer installs `kei` in `~/.local/bin`. Then run [`setup-opencode.sh`](h
 
 Expected CLI output includes `Logged in to Kei for organization …`, a bootstrap JSON response with `"status":"active"` and `"binding_status":"verified"`, and sync exit code `0`.
 
-![Diagnostics showing a recent heartbeat, active and synced policy bundle, and configured runtime credential](/docs/images/harness-setup/diagnostics-healthy.png)
+![Diagnostics showing a recent heartbeat, active and synced policy bundle, and configured runtime credential](/assets/images/harness-setup/diagnostics-healthy.png)
 
 ### Pi
 
@@ -111,15 +111,15 @@ pi list
 
 Use `pi install -l` before either package to keep it in the current project's `.pi/settings.json`; otherwise Pi installs it in user settings. Restart Pi or run `/reload`. Review extensions before installing: they execute with the user's full system permissions.
 
-Pair Pi with a local runtime using [CLI authentication and runtime setup](/docs/getting-started/cli-and-runtime). Use `kei-proxy` 0.2.1 or later with the owner-only Unix socket enabled. Pi calls that socket; the daemon holds `KEI_RUNTIME_TOKEN`. Never put the runtime token in Pi's environment, settings, or project files.
+Pair Pi with a local runtime using [CLI authentication and runtime setup](/kei/get-started/connect-this-machine). Use `kei-proxy` 0.2.1 or later with the owner-only Unix socket enabled. Pi calls that socket; the daemon holds `KEI_RUNTIME_TOKEN`. Never put the runtime token in Pi's environment, settings, or project files.
 
 The adapter gates local `read`, `write`, and `edit` calls and provides `kei_connector` for v2 connector tools. Unknown tools fail closed. A connector call requires its exact v2 tool plan, a matching agent binding, and policy in the active bundle; installing the adapter grants none of these. It does not currently implement `web_search` or `search_wiki` in Pi. For those tools, a Pi-side executor and matching runtime registration are required. See the public [`kei-pi-setup` skill](https://github.com/HaikeiLabs/skills/tree/main/skills/kei-pi-setup) for Pi-specific troubleshooting and verification.
 
 ### If you see Not ready
 
-Open **Agents → Runtime installations → Diagnostics** and read the policy bundle reason. Use that reason to follow [runtime troubleshooting](/docs/runtime/troubleshooting). A policy bundle must be active and synced before governed calls can proceed.
+Open **Agents → Runtime installations → Diagnostics** and read the policy bundle reason. Use that reason to follow [runtime troubleshooting](/kei/runtime/troubleshooting). A policy bundle must be active and synced before governed calls can proceed.
 
-![Diagnostics showing a not-ready policy bundle and the reason](/docs/images/harness-setup/policy-bundle-not-ready.png)
+![Diagnostics showing a not-ready policy bundle and the reason](/assets/images/harness-setup/policy-bundle-not-ready.png)
 
 For connectors and SDK (Agentware) integrations, requests without a matching policy or connector binding are denied; Claude Code, Codex, and OpenCode fall back to their own permissions (see [Run your own harness with Kei permissions](#harness-permissions)). Pi's extension blocks denied and unsupported calls. Open WebUI uses its own integration. Review decisions using redacted audit metadata; credentials, payloads, and results must not appear in logs.
 
@@ -141,17 +141,17 @@ Installation connectivity and agent activity describe different things. The inst
 
 If an installation is **Unknown**, the service is not running or its heartbeat is stale. Check it with `kei runtime service status`. A **pending** installation has not sent its first heartbeat yet; pending is a runtime status, not an approval step.
 
-![Agents page showing one connected runtime installation and its recent heartbeat](/docs/images/runtime-heartbeat/agents-connected.png)
+![Agents page showing one connected runtime installation and its recent heartbeat](/assets/images/runtime-heartbeat/agents-connected.png)
 
-![Agents page showing the same installation as unknown with a stale heartbeat](/docs/images/runtime-heartbeat/agents-unknown.png)
+![Agents page showing the same installation as unknown with a stale heartbeat](/assets/images/runtime-heartbeat/agents-unknown.png)
 
-![Agent card showing Last Activity from a recent harness tool call](/docs/images/runtime-heartbeat/agent-last-activity.png)
+![Agent card showing Last Activity from a recent harness tool call](/assets/images/runtime-heartbeat/agent-last-activity.png)
 
-![Diagnostics showing Runtime heartbeat connected](/docs/images/runtime-heartbeat/diagnostics-connected.png)
+![Diagnostics showing Runtime heartbeat connected](/assets/images/runtime-heartbeat/diagnostics-connected.png)
 
 ## Run your own harness with Kei permissions
 
-Read [How Kei decides: policy priority and precedence](/docs/reference/policy-precedence) for policy weights, matching rules, and worked examples.
+Read [How Kei decides: policy priority and precedence](/kei/policies/policy-precedence) for policy weights, matching rules, and worked examples.
 
 For Claude Code, Codex, and OpenCode, Kei can write command policies into each harness's native permission settings. The harness makes its own **native decision** (allow, deny, or ask) from those settings. `kei-proxy` does not decide these prebuilt harness command calls.
 
@@ -192,13 +192,13 @@ You can send a bug report directly from your terminal — no need to leave your 
 
 > **Report through the Kei console** — The **Report a bug** button in the console header (or sidebar on mobile) sends to the same endpoint.
 >
-> <img src="/docs/images/report-bug/console-report-bug-dialog.png"
+> <img src="/assets/images/report-bug/console-report-bug-dialog.png"
 >      alt="Report a bug dialog in the Kei console with a description entered and a screenshot attached"
 >      style="border: 1px solid #d0d7de; border-radius: 8px; margin: 12px 0;">
 
 ### Prerequisites
 
-`kei` CLI version 0.1.20 or later. Run `kei version` to check. Upgrade with `kei upgrade` or re-run the [installer](/docs/getting-started/web-onboarding#install).
+`kei` CLI version 0.1.20 or later. Run `kei version` to check. Upgrade with `kei upgrade` or re-run the [installer](/kei/get-started/sign-in#install).
 
 ### Send a report
 
@@ -238,7 +238,7 @@ kei feedback --session /path/to/transcript.log --description "<what went wrong>"
 2. Secrets — API tokens, passwords, private keys — are redacted before anything leaves your machine.
 3. You see a preview with redaction counts (never the content) and are asked to confirm.
 
-    <img src="/docs/images/report-bug/cli-feedback-preview.png"
+    <img src="/assets/images/report-bug/cli-feedback-preview.png"
          alt="CLI preview of kei feedback --export claude showing the description, evidence file, redaction counts, and the submission confirmation"
          style="border: 1px solid #d0d7de; border-radius: 8px; margin: 12px 0;">
 4. Answering `no` cancels the report and nothing is sent.

@@ -5,15 +5,15 @@ product: kei
 ---
 # Troubleshoot the runtime container
 
-For workstation heartbeat service setup and status, see [Keep your runtime online](/docs/connect-your-harness/harness-setup#keep-your-runtime-online).
+For workstation heartbeat service setup and status, see [Keep your runtime online](/kei/connect-your-harness/harness-setup#keep-your-runtime-online).
 
 Use this page when a container that runs the connector runtime (`kei-proxy`) beside your harness fails to start or never connects. Each entry lists a symptom, its root cause, the fix, and how to verify the fix. Find the entry whose symptom matches your container logs.
 
-For the normal installation steps, see [Tenant-side connector runtime](/docs/runtime/tenant-runtime). For `kei login` and CLI authentication failures, see [Troubleshooting `kei login`](/docs/getting-started/cli-and-runtime#troubleshooting-kei-login).
+For the normal installation steps, see [Tenant-side connector runtime](/kei/runtime/tenant-runtime). For `kei login` and CLI authentication failures, see [Troubleshooting `kei login`](/kei/reference/cli#sign-in-troubleshooting).
 
-For harness command-permission sync and its current limitations, see [Run your own harness with Kei permissions](/docs/connect-your-harness/harness-setup#harness-permissions).
+For harness command-permission sync and its current limitations, see [Run your own harness with Kei permissions](/kei/connect-your-harness/harness-setup#harness-permissions).
 
-To send a bug report from your terminal, see [Report a bug from your harness](/docs/connect-your-harness/harness-setup#report-bug-from-harness).
+To send a bug report from your terminal, see [Report a bug from your harness](/kei/connect-your-harness/harness-setup#report-bug-from-harness).
 
 ## Agent and model readiness
 
@@ -28,7 +28,7 @@ The **Runtime heartbeat and audit health** panel lists the selected organization
 - **Never seen**: no heartbeat has arrived yet. Finish `kei-proxy runtime bootstrap` on the customer's host.
 - **Suspended**: the installation is disabled or revoked.
 
-The fleet freshness, active-installation, and aggregator-lag tiles show **Unavailable** because those metrics are not yet published to the console. If the panel shows **Runtime liveness metrics are unavailable**, the runtime-health request itself failed. See [Runtime liveness panel: endpoint and validation](/docs/runtime-liveness-validation.md) for the endpoint contract and verification.
+The fleet freshness, active-installation, and aggregator-lag tiles show **Unavailable** because those metrics are not yet published to the console. If the panel shows **Runtime liveness metrics are unavailable**, the runtime-health request itself failed. See Runtime liveness panel: endpoint and validation for the endpoint contract and verification.
 
 After the first successful heartbeat, the tenant runtime also checks the assigned model profile against its provider and reports a redacted result. This is separate from heartbeat: a connected runtime can still have an unreachable provider, rejected credential, rate limit, or unexpected provider response. The Connect step shows the result for its installation; check the provider credential in the tenant secret store and inspect the installation logs when the result is not ready.
 

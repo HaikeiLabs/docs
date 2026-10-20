@@ -5,7 +5,7 @@ product: kei
 ---
 # Tenant-side connector runtime
 
-Use the deployed-runtime instructions here for a service, bot, or SDK (Agentware) integration; for a local workstation/headless workflow, follow [CLI authentication and runtime setup](/docs/getting-started/cli-and-runtime). The connector runtime is the local policy decision point for governed tool and data access. It runs in your environment alongside your Kei-enabled harness integration. Agentware SDK middleware sends it the authenticated invoking identity and requested tool, action, resource, and applicable context. The runtime checks those attributes against the active workspace policy before any connector operation. This follows the attribute-based access control (ABAC) model described in [NIST SP 800-162](https://csrc.nist.gov/pubs/sp/800/162/upd2/final): authorization evaluates attributes of the subject, resource, requested operation, and, where relevant, the environment.
+Use the deployed-runtime instructions here for a service, bot, or SDK (Agentware) integration; for a local workstation/headless workflow, follow [CLI authentication and runtime setup](/kei/get-started/connect-this-machine). The connector runtime is the local policy decision point for governed tool and data access. It runs in your environment alongside your Kei-enabled harness integration. Agentware SDK middleware sends it the authenticated invoking identity and requested tool, action, resource, and applicable context. The runtime checks those attributes against the active workspace policy before any connector operation. This follows the attribute-based access control (ABAC) model described in [NIST SP 800-162](https://csrc.nist.gov/pubs/sp/800/162/upd2/final): authorization evaluates attributes of the subject, resource, requested operation, and, where relevant, the environment.
 
 Provider credentials, request payloads, and results stay in your tenant environment. An allowed decision proceeds to the governed connector operation; a denied or invalid request stops before the provider call. Only the decision and redacted audit metadata return to the control plane.
 
@@ -59,9 +59,9 @@ An organization administrator creates a runtime installation in the web app or w
 
 Before the bot accepts work, run `kei-proxy runtime bootstrap`. Keep `kei-proxy runtime heartbeat --interval 1m` running under the container's process supervisor alongside the bot. The bot's agentware middleware invokes the runtime for governed tool calls. Keep provider credentials in the container's protected secret store; never bake secrets into the image or pass them as arguments.
 
-For administrator installation and credential commands, see [CLI authentication and runtime setup](/docs/getting-started/cli-and-runtime). If bootstrap fails inside the container, see [Troubleshoot the runtime container](/docs/runtime/troubleshooting).
+For administrator installation and credential commands, see [CLI authentication and runtime setup](/kei/get-started/connect-this-machine). If bootstrap fails inside the container, see [Troubleshoot the runtime container](/kei/runtime/troubleshooting).
 
-For Open WebUI, the published `openwebui-kei` image already runs the connector runtime in its own container: see [Open WebUI with Kei](/docs/connect-your-harness/openwebui).
+For Open WebUI, the published `openwebui-kei` image already runs the connector runtime in its own container: see [Open WebUI with Kei](/kei/connect-your-harness/openwebui).
 
 ## Install with curl for a local coding harness
 
@@ -77,7 +77,7 @@ kei-proxy help
 
 An administrator creates the runtime installation and stores its runtime credential in a secret manager. Configure the workstation with `kei setup`, then verify and send its first heartbeat with `kei runtime bootstrap`. Keep the runtime token out of prompts, source control, shell history, command arguments, and logs.
 
-Use [Agent setup](/docs/connect-your-harness/harness-setup) to choose the harness and install public Kei skills in that harness. Skills provide reusable instructions; they are a separate step from installing the connector runtime. agentware middleware connects governed tool calls to the local runtime.
+Use [Agent setup](/kei/connect-your-harness/harness-setup) to choose the harness and install public Kei skills in that harness. Skills provide reusable instructions; they are a separate step from installing the connector runtime. agentware middleware connects governed tool calls to the local runtime.
 
 ## Recovery from Failed Credential Creation
 
