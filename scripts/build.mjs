@@ -69,7 +69,8 @@ async function markdownFiles(directory, root = directory) {
 function navGroupFor(page) {
   const parts = page.relativePath.split('/');
   const section = parts.length > 2 ? parts[1] : '';
-  if (parts[0] === 'kei' && section === 'get-started') return 'Get started';
+  if (section === 'get-started') return 'Get started';
+  if (section === 'build') return 'Make and maintain';
   if (parts[0] === 'kei' && ['make-and-maintain', 'connect-your-harness', 'runtime'].includes(section)) return 'Make and maintain';
   return 'Reference';
 }
