@@ -155,3 +155,25 @@ test('built pages ship theme-init before stylesheets, header links, TOC and page
     await rm(paths.root, { recursive: true, force: true });
   }
 });
+
+test('build publishes index.json: one {slug,title,path,product} per page in sidebar order, each with a Markdown twin', async () => {
+  const paths = await fixture();
+  try {
+    await mkdir(path.join(paths.contentDir, 'kei', 'get-started'), { recursive: true });
+    const page = (title) => `---\ntitle: ${title}\ntype: reference\nproduct: kei\n---\n\nBody.\n`;
+    await writeFile(path.join(paths.contentDir, 'kei/setup/runtime.md'), page('Runtime'));
+    await writeFile(path.join(paths.contentDir, 'kei/get-started/sign-in.md'), page('Sign in to Kei'));
+    await buildDocs({ ...paths, assetsDir });
+    const index = JSON.parse(await readFile(path.join(paths.outputDir, 'index.json'), 'utf8'));
+    assert.deepEqual(index, [
+      { slug: 'kei/get-started/sign-in', title: 'Sign in to Kei', path: '/kei/get-started/sign-in', product: 'kei' },
+      { slug: 'kei/setup/runtime', title: 'Runtime', path: '/kei/setup/runtime', product: 'kei' },
+    ]);
+    for (const entry of index) {
+      assert.deepEqual(Object.keys(entry), ['slug', 'title', 'path', 'product']);
+      assert.equal((await stat(path.join(paths.outputDir, `${entry.path}.md`))).isFile(), true);
+    }
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
