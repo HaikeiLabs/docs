@@ -107,7 +107,7 @@ kei policies list --workspace <workspace>
 Each Open WebUI user is identified by Open WebUI's own user ID, whatever SSO you configured. Kei must link that ID to an email-keyed Kei user before the user's calls are allowed. Until then the user is **unlinked** and every governed call is refused.
 
 - **Claim link (any SSO).** The first time an unlinked user triggers a governed tool, the connector shows them a one-time claim link as an Open WebUI notification, to that user only. They open it, sign in to Kei, and ask again. The link is never in the chat, the model's context, or a log.
-- **Entra directory sync.** With Microsoft Entra, Kei can create your users and groups from the Entra app's role assignments, one Kei group per app role value:
+- **Entra directory sync.** With Microsoft Entra, Kei can create your users and groups from app-role assignments or one security group's direct user members. To sync a security group, use the [Entra security group runbook](directory-sync) and set its object ID with `--group-id`. To sync app-role assignments, use:
 
 ```bash
 kei directory-sync set --tenant-id <tenant-guid> --client-id <sync-app-guid> --app-id <app-guid> \
