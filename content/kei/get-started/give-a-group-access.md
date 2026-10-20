@@ -15,3 +15,5 @@ Keep access narrow. An agent being connected to a runtime does not give it permi
 ## Check it worked
 
 Confirm the agent is listed in the intended group and that the group's policy covers the operation you plan to try. For a policy example, see [Create policies](/kei/policies/create-policies). For policy behavior, see [Policy priority and precedence](/kei/policies/policy-precedence).
+
+Stuck? See [Troubleshoot setup](/kei/get-started/troubleshooting).

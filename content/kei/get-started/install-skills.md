@@ -31,3 +31,5 @@ Alternatively, Claude Code and Codex can use the [plugin marketplace instruction
 ## Check it worked
 
 Ask your agent to list the Kei skills it can use. Continue with [Connect this machine](/kei/get-started/connect-this-machine) to install the runtime tools and connect a runtime installation.
+
+Stuck? See [Troubleshoot setup](/kei/get-started/troubleshooting).
