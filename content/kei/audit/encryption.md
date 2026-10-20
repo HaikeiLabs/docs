@@ -2,6 +2,8 @@
 title: Audit tool-argument encryption
 type: read-and-use
 product: kei
+nav_group: Make and maintain
+nav_order: 16
 ---
 # Audit tool-argument encryption
 

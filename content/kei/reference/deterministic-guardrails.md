@@ -2,6 +2,7 @@
 title: Deterministic guardrails
 type: reference
 product: kei
+nav_group: Reference
 ---
 
 # Deterministic guardrails

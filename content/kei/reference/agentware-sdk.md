@@ -2,6 +2,7 @@
 title: Build on the Agentware SDK
 type: reference
 product: kei
+nav_group: Reference
 ---
 # Build on the Agentware SDK
 

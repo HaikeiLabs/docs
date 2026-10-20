@@ -2,6 +2,8 @@
 title: Set up a local Kei runtime for an Agentware SDK harness
 type: read-and-use
 product: agentware
+nav_group: Make and maintain
+nav_order: 6
 ---
 
 This guide connects a custom Go, Python, or TypeScript harness to a local `kei-proxy` daemon. The daemon is the runtime and policy enforcement point; Kei stores installation and harness metadata. Provider payloads, customer content, and credentials stay out of the control plane.

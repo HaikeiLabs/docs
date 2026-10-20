@@ -2,7 +2,8 @@
 title: Sign in to Kei
 type: read-and-use
 product: kei
-order: 1
+nav_group: Get started
+nav_order: 1
 ---
 
 # Sign in to Kei

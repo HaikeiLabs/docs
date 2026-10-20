@@ -2,6 +2,8 @@
 title: Build on Agentware
 type: read-and-use
 product: agentware
+nav_group: Make and maintain
+nav_order: 2
 ---
 
 Use the Agentware SDK to add Kei governance to a custom agent harness. Agentware provides the middleware, audit, guardrails, and Kei policy integration; Kei is the metadata-only control plane that holds registration, policy, and audit metadata. Provider payloads, customer content, and credentials never enter Kei.

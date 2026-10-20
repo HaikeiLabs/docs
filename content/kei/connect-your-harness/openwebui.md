@@ -2,6 +2,8 @@
 title: Set up Open WebUI with Kei
 type: read-and-use
 product: kei
+nav_group: Make and maintain
+nav_order: 9
 ---
 # Set up Open WebUI with Kei
 

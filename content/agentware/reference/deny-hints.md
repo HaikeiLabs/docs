@@ -2,6 +2,7 @@
 title: Deny reason codes and hints
 type: reference
 product: agentware
+nav_group: Reference
 ---
 
 Every deny response from `kei-proxy` carries a `reason_code` that explains why the tool call was denied, and an actionable `hint` describing the next step a developer should take. The SDK surfaces both fields unchanged from the runtime response.

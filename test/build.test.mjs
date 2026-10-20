@@ -78,8 +78,8 @@ test('sidebar groups pages as Get started, Make and maintain, and Reference', as
     await mkdir(path.join(paths.contentDir, 'kei', 'get-started'), { recursive: true });
     await mkdir(path.join(paths.contentDir, 'kei', 'make-and-maintain'), { recursive: true });
     await mkdir(path.join(paths.contentDir, 'kei', 'reference'), { recursive: true });
-    await writeFile(path.join(paths.contentDir, 'kei/get-started/sign-in.md'), '---\ntitle: Sign in\ntype: read-and-use\nproduct: kei\n---\n\nSign in.\n');
-    await writeFile(path.join(paths.contentDir, 'kei/make-and-maintain/runtime.md'), '---\ntitle: Deploy a runtime\ntype: read-and-use\nproduct: kei\n---\n\nDeploy it.\n');
+    await writeFile(path.join(paths.contentDir, 'kei/get-started/sign-in.md'), '---\ntitle: Sign in\ntype: read-and-use\nproduct: kei\nnav_group: Get started\nnav_order: 1\n---\n\nSign in.\n');
+    await writeFile(path.join(paths.contentDir, 'kei/make-and-maintain/runtime.md'), '---\ntitle: Deploy a runtime\ntype: read-and-use\nproduct: kei\nnav_group: Make and maintain\nnav_order: 1\n---\n\nDeploy it.\n');
     await writeFile(path.join(paths.contentDir, 'kei/reference/cli.md'), '---\ntitle: "Reference: kei CLI"\ntype: reference\nproduct: kei\n---\n\nUse it.\n');
     const pages = await buildDocs({ ...paths, assetsDir });
     const html = await readFile(path.join(paths.outputDir, 'index.html'), 'utf8');
@@ -99,6 +99,27 @@ test('sidebar groups pages as Get started, Make and maintain, and Reference', as
       const section = html.slice(start, next === -1 ? html.indexOf('</nav>', start) : next);
       assert.ok(section.includes(link), `${label} should contain ${link}`);
     }
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
+
+test('navigation uses explicit groups and order, defaulting unconfigured pages to Reference by path', async () => {
+  const paths = await fixture();
+  try {
+    await mkdir(path.join(paths.contentDir, 'agentware', 'build'), { recursive: true });
+    const page = (title, nav = '') => `---\ntitle: ${title}\ntype: reference\nproduct: agentware\n${nav}---\n\nBody.\n`;
+    await writeFile(path.join(paths.contentDir, 'agentware/build/z-first.md'), page('First', 'nav_group: Make and maintain\nnav_order: 1\n'));
+    await writeFile(path.join(paths.contentDir, 'agentware/build/a-second.md'), page('Second', 'nav_group: Make and maintain\nnav_order: 2\n'));
+    await writeFile(path.join(paths.contentDir, 'agentware/build/b-default.md'), page('Default'));
+    await buildDocs({ ...paths, assetsDir });
+    const html = await readFile(path.join(paths.outputDir, 'index.html'), 'utf8');
+    const first = html.indexOf('href="/agentware/build/z-first"');
+    const second = html.indexOf('href="/agentware/build/a-second"');
+    const defaultPage = html.indexOf('href="/agentware/build/b-default"');
+    assert.ok(first >= 0 && second > first, 'nav_order controls order even when paths sort differently');
+    const reference = html.indexOf('<div class="nav-section">Reference</div>');
+    assert.ok(defaultPage > reference, 'pages without nav_group default to Reference');
   } finally {
     await rm(paths.root, { recursive: true, force: true });
   }
@@ -182,7 +203,7 @@ test('Get started sidebar, prev/next chain and manifest follow the order field, 
   const paths = await fixture();
   try {
     await mkdir(path.join(paths.contentDir, 'kei', 'get-started'), { recursive: true });
-    const page = (title, order) => `---\ntitle: ${title}\ntype: read-and-use\nproduct: kei\n${order ? `order: ${order}\n` : ''}---\n\nBody.\n`;
+    const page = (title, order) => `---\ntitle: ${title}\ntype: read-and-use\nproduct: kei\nnav_group: Get started\n${order ? `order: ${order}\n` : ''}---\n\nBody.\n`;
     // Alphabetical by title would be Alpha, Bravo, Charlie, Delta, Echo.
     await writeFile(path.join(paths.contentDir, 'kei/get-started/echo.md'), page('Echo', 1));
     await writeFile(path.join(paths.contentDir, 'kei/get-started/delta.md'), page('Delta', 2));

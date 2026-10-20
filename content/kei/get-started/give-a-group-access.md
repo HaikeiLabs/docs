@@ -2,7 +2,8 @@
 title: Give a group access
 type: read-and-use
 product: kei
-order: 4
+nav_group: Get started
+nav_order: 4
 ---
 
 # Give a group access

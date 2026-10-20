@@ -2,6 +2,8 @@
 title: Policies and approvals
 type: reference
 product: kei
+nav_group: Make and maintain
+nav_order: 13
 ---
 
 # Policies and permission requests
