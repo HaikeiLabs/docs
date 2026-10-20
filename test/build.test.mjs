@@ -212,3 +212,21 @@ test('build rejects an order that is not a positive integer', async () => {
     await rm(paths.root, { recursive: true, force: true });
   }
 });
+
+test('header and footer link the Discord community, opening safely in a new tab', async () => {
+  const paths = await fixture();
+  try {
+    await writeFile(path.join(paths.contentDir, 'kei/setup/a.md'), '---\ntitle: Alpha\ntype: reference\nproduct: kei\n---\n\nBody.\n');
+    await buildDocs({ ...paths, assetsDir });
+    for (const file of ['kei/setup/a.html', 'index.html']) {
+      const html = await readFile(path.join(paths.outputDir, file), 'utf8');
+      const header = html.match(/<header class="site-header">[\s\S]*?<\/header>/)[0];
+      assert.match(header, /<a [^>]*href="https:\/\/discord\.gg\/g6QaTYWXDa"[^>]*target="_blank"[^>]*rel="noopener noreferrer"[^>]*aria-label="Haikei on Discord"/);
+      const footer = html.match(/<footer class="footer">[\s\S]*?<\/footer>/)[0];
+      assert.match(footer.replace(/<[^>]+>/g, ''), /Questions\? Join the developer community on Discord\./);
+      assert.match(footer, /href="https:\/\/discord\.gg\/g6QaTYWXDa" target="_blank" rel="noopener noreferrer"/);
+    }
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});

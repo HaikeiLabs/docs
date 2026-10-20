@@ -8,6 +8,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const markdown = createMarkdown();
 const siteUrl = 'https://haikeilabs.com';
 const consoleUrl = 'https://app.haikeilabs.com';
+const discordUrl = 'https://discord.gg/g6QaTYWXDa';
 const repoUrl = 'https://github.com/HaikeiLabs/docs';
 const allowedTypes = new Set(['read-and-use', 'make-and-maintain', 'reference']);
 const allowedProducts = new Set(['kei', 'agentware']);
@@ -102,6 +103,7 @@ function sidebar(pages, currentPath = '') {
   return `<aside class="sidebar" id="site-nav"><nav aria-label="Documentation">${groups}</nav></aside>`;
 }
 
+const discordMark = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M19.54 0c1.2 0 2.18.98 2.18 2.18v19.64c0 1.2-.98 2.18-2.18 2.18H4.46a2.18 2.18 0 0 1-2.18-2.18V2.18C2.28.98 3.26 0 4.46 0h15.08Zm-2.2 5.14a17.4 17.4 0 0 0-4.36-1.35l-.53 1.08a16.2 16.2 0 0 0-4.9 0l-.53-1.08a17.4 17.4 0 0 0-4.36 1.35C-.1 9.25-.87 13.26-.48 17.22a17.5 17.5 0 0 0 5.35 2.7l1.3-1.76c-.72-.26-1.4-.6-2.03-1.02l.5-.38c3.9 1.83 8.6 1.83 12.45 0l.5.38c-.63.42-1.31.76-2.03 1.02l1.3 1.76a17.5 17.5 0 0 0 5.35-2.7c.46-4.6-.79-8.57-2.84-12.08ZM8.1 15.04c-1.15 0-2.1-1.05-2.1-2.34s.92-2.34 2.1-2.34 2.1 1.05 2.1 2.34-.93 2.34-2.1 2.34Zm7.8 0c-1.15 0-2.1-1.05-2.1-2.34s.92-2.34 2.1-2.34 2.1 1.05 2.1 2.34-.92 2.34-2.1 2.34Z"/></svg>';
 const logoMark = '<svg class="logo" width="28" height="28" viewBox="0 0 32 32" role="img" aria-label="Haikei Labs"><rect x="9.5" y="9.5" width="13" height="13" rx="1.4" fill="var(--logo-plane)"/><rect x="1" y="1" width="21.5" height="21.5" rx="2.2" fill="none" stroke="var(--logo-plane)" stroke-width="2.1"/><rect x="9.5" y="9.5" width="21.5" height="21.5" rx="2.2" fill="none" stroke="var(--logo-front)" stroke-width="2.1"/><circle cx="13.3" cy="13.3" r="1.65" fill="var(--logo-point)"/><circle cx="18.7" cy="13.3" r="1.65" fill="var(--logo-point)"/><circle cx="13.3" cy="18.7" r="1.65" fill="var(--logo-point)"/><circle cx="18.7" cy="18.7" r="1.65" fill="var(--logo-point)"/></svg>';
 const githubMark = '<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>';
 // Inline before any stylesheet so a stored dark preference never flashes light.
@@ -144,10 +146,11 @@ function layout(title, nav, content, { toc = '' } = {}) {
     <a class="docs-label" href="/">Docs</a>
     <span class="header-spacer"></span>
     <a class="header-link" href="${consoleUrl}">Console</a>
+    <a class="icon-link" href="${discordUrl}" target="_blank" rel="noopener noreferrer" aria-label="Haikei on Discord">${discordMark}</a>
     <a class="icon-link" href="${repoUrl}" aria-label="Haikei docs on GitHub">${githubMark}</a>
     <button class="theme-toggle" type="button" aria-label="Switch color theme"></button>
   </header>
-  <div class="layout">${nav}<main id="main" class="content">${content}<footer class="footer">Public guidance for people building and using agents with Kei.</footer></main>${toc}</div>
+  <div class="layout">${nav}<main id="main" class="content">${content}<footer class="footer"><p>Public guidance for people building and using agents with Kei.</p><p>Questions? Join the developer community on <a href="${discordUrl}" target="_blank" rel="noopener noreferrer">Discord</a>.</p></footer></main>${toc}</div>
 </body>
 </html>
 `;
