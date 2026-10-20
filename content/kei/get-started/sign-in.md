@@ -2,6 +2,7 @@
 title: Sign in to Kei
 type: read-and-use
 product: kei
+order: 1
 ---
 
 # Sign in to Kei

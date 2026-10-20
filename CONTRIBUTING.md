@@ -49,3 +49,4 @@ The preview server serves the generated site at <http://localhost:4173>. Each re
 - Fenced code shows its language as a label. Use `title="file.json"` in the info string to show a filename instead (` ```json title="policy.json" `). Highlighted languages: sh/bash, json, python, dockerfile.
 - Headings get anchors and an "On this page" entry (h2/h3). `{#custom-id}` after a heading sets its id.
 - Prev/next follow the sidebar order.
+- Order: add `order: <positive integer>` to front matter to place a page in its sidebar group. Ordered pages come first, ascending; pages without `order` follow, sorted by title. The sidebar, prev/next links, home page and `index.json` all use this order. Get started is a journey: sign-in 1, connect-this-machine 2, connect-your-agent 3, give-a-group-access 4, install-skills 5, prove-it 6.

@@ -2,6 +2,7 @@
 title: Give a group access
 type: read-and-use
 product: kei
+order: 4
 ---
 
 # Give a group access

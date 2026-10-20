@@ -51,6 +51,7 @@ function validatePage(relativePath, raw) {
   if ((validated || validatedWith) && (!validIsoDate(validated) || !/^kei v\d+\.\d+\.\d+$/.test(validatedWith))) {
     throw new Error(`${relativePath}: validated must be a real YYYY-MM-DD date and validated_with must match kei vX.Y.Z`);
   }
+  if (data.order !== undefined && !(Number.isInteger(data.order) && data.order > 0)) throw new Error(`${relativePath}: order must be a positive integer`);
   return { ...data, validated, validated_with: validatedWith, body: parsed.content, relativePath };
 }
 
@@ -80,13 +81,22 @@ function pageHref(page) {
 
 const navGroups = ['Get started', 'Make and maintain', 'Reference'];
 
+// Pages with an `order` come first in that order; the rest follow, sorted by title.
+function byOrderThenTitle(a, b) {
+  return (a.order ?? Infinity) - (b.order ?? Infinity) || a.title.localeCompare(b.title);
+}
+
+function groupEntries(pages, group) {
+  return pages.filter((page) => navGroupFor(page) === group).sort(byOrderThenTitle);
+}
+
 function orderedPages(pages) {
-  return navGroups.flatMap((group) => pages.filter((page) => navGroupFor(page) === group));
+  return navGroups.flatMap((group) => groupEntries(pages, group));
 }
 
 function sidebar(pages, currentPath = '') {
   const groups = navGroups.map((group) => {
-    const entries = pages.filter((page) => navGroupFor(page) === group);
+    const entries = groupEntries(pages, group);
     return `<div class="nav-section">${group}</div><ul>${entries.map((page) => `<li><a href="${pageHref(page)}"${page.relativePath === currentPath ? ' aria-current="page"' : ''}>${escapeHtml(page.title)}</a></li>`).join('')}</ul>`;
   }).join('');
   return `<aside class="sidebar" id="site-nav"><nav aria-label="Documentation">${groups}</nav></aside>`;
@@ -166,7 +176,7 @@ function renderPage(page, pages) {
 
 function renderHome(pages) {
   const sections = navGroups.map((group) => {
-    const cards = pages.filter((page) => navGroupFor(page) === group)
+    const cards = groupEntries(pages, group)
       .map((page) => `<a class="home-card" href="${pageHref(page)}"><strong>${escapeHtml(page.title)}</strong><span>${escapeHtml(page.product)}</span></a>`).join('');
     return `<section><h2>${group}</h2><div class="home-grid">${cards}</div></section>`;
   }).join('');

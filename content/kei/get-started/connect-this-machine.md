@@ -2,6 +2,7 @@
 title: Connect this machine
 type: read-and-use
 product: kei
+order: 2
 ---
 
 # Connect this machine

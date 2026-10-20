@@ -177,3 +177,38 @@ test('build publishes index.json: one {slug,title,path,product} per page in side
     await rm(paths.root, { recursive: true, force: true });
   }
 });
+
+test('Get started sidebar, prev/next chain and manifest follow the order field, then title', async () => {
+  const paths = await fixture();
+  try {
+    await mkdir(path.join(paths.contentDir, 'kei', 'get-started'), { recursive: true });
+    const page = (title, order) => `---\ntitle: ${title}\ntype: read-and-use\nproduct: kei\n${order ? `order: ${order}\n` : ''}---\n\nBody.\n`;
+    // Alphabetical by title would be Alpha, Bravo, Charlie, Delta, Echo.
+    await writeFile(path.join(paths.contentDir, 'kei/get-started/echo.md'), page('Echo', 1));
+    await writeFile(path.join(paths.contentDir, 'kei/get-started/delta.md'), page('Delta', 2));
+    await writeFile(path.join(paths.contentDir, 'kei/get-started/charlie.md'), page('Charlie', 3));
+    await writeFile(path.join(paths.contentDir, 'kei/get-started/bravo.md'), page('Bravo'));
+    await writeFile(path.join(paths.contentDir, 'kei/get-started/alpha.md'), page('Alpha'));
+    await buildDocs({ ...paths, assetsDir });
+    const html = await readFile(path.join(paths.outputDir, 'kei/get-started/delta.html'), 'utf8');
+    const sidebar = [...html.match(/<aside class="sidebar"[\s\S]*?<\/aside>/)[0].matchAll(/<li><a href="([^"]+)"/g)].map((m) => m[1]);
+    const expected = ['echo', 'delta', 'charlie', 'alpha', 'bravo'].map((slug) => `/kei/get-started/${slug}`);
+    assert.deepEqual(sidebar, expected);
+    assert.match(html, /class="pager-prev" href="\/kei\/get-started\/echo"/);
+    assert.match(html, /class="pager-next" href="\/kei\/get-started\/charlie"/);
+    const index = JSON.parse(await readFile(path.join(paths.outputDir, 'index.json'), 'utf8'));
+    assert.deepEqual(index.map((entry) => entry.path), expected);
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
+
+test('build rejects an order that is not a positive integer', async () => {
+  const paths = await fixture();
+  try {
+    await writeFile(path.join(paths.contentDir, 'kei/setup/a.md'), '---\ntitle: A\ntype: reference\nproduct: kei\norder: first\n---\n\nBody.\n');
+    await assert.rejects(buildDocs({ ...paths, assetsDir }), /order must be a positive integer/);
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});

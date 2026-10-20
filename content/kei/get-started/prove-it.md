@@ -2,6 +2,7 @@
 title: Prove access with an allow and a deny
 type: read-and-use
 product: kei
+order: 6
 ---
 
 # Prove access with an allow and a deny
