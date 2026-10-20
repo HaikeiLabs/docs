@@ -17,3 +17,5 @@ You need an organization owner or admin to complete setup that creates a runtime
 The web app opens to your organization and the intended workspace. Confirm the workspace name before continuing.
 
 For Kei CLI sign-in errors, see [CLI sign-in troubleshooting](/kei/reference/cli#sign-in-troubleshooting).
+
+Stuck? See [Troubleshoot setup](/kei/get-started/troubleshooting).
