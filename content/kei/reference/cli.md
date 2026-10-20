@@ -2,6 +2,7 @@
 title: "Reference: kei CLI"
 type: reference
 product: kei
+nav_group: Reference
 ---
 
 # Reference: kei CLI

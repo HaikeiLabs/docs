@@ -2,6 +2,8 @@
 title: Tenant-side connector runtime
 type: read-and-use
 product: kei
+nav_group: Make and maintain
+nav_order: 10
 ---
 # Tenant-side connector runtime
 

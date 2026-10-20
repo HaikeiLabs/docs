@@ -2,6 +2,8 @@
 title: Set up a Go harness
 type: read-and-use
 product: agentware
+nav_group: Make and maintain
+nav_order: 3
 ---
 
 Add Kei governance to a Go agent harness using the `runtimesocket` client. The socket client sends each tool call to `kei-proxy authorize` over the local Unix socket and returns the decision.

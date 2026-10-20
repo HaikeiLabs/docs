@@ -2,6 +2,8 @@
 title: Audit logs
 type: read-and-use
 product: kei
+nav_group: Make and maintain
+nav_order: 15
 ---
 # Audit logs
 

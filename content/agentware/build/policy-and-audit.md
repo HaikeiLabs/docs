@@ -2,6 +2,8 @@
 title: Policy and audit for Agentware SDK harnesses
 type: read-and-use
 product: agentware
+nav_group: Make and maintain
+nav_order: 7
 ---
 
 An Agentware SDK harness sends every governed tool call through `kei-proxy authorize`. The proxy evaluates the active policy and returns an allow or deny decision; every decision is recorded in the Kei audit log.

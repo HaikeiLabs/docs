@@ -2,6 +2,7 @@
 title: Kei terms
 type: reference
 product: kei
+nav_group: Reference
 ---
 
 ## Agent

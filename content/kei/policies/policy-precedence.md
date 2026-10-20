@@ -2,6 +2,8 @@
 title: Policy priority and precedence
 type: reference
 product: kei
+nav_group: Make and maintain
+nav_order: 14
 ---
 
 # How Kei decides: policy priority and precedence

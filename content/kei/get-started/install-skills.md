@@ -2,7 +2,8 @@
 title: Install Kei skills in your agent
 type: read-and-use
 product: kei
-order: 5
+nav_group: Get started
+nav_order: 5
 ---
 
 # Install Kei skills in your agent

@@ -2,6 +2,7 @@
 title: How Kei governs coding agents
 type: read-and-use
 product: kei
+nav_group: Reference
 ---
 # How Kei governs coding agents
 

@@ -2,6 +2,8 @@
 title: Troubleshoot the runtime container
 type: read-and-use
 product: kei
+nav_group: Make and maintain
+nav_order: 11
 ---
 # Troubleshoot the runtime container
 

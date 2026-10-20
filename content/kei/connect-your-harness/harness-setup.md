@@ -2,6 +2,8 @@
 title: Connect a harness to an agent
 type: read-and-use
 product: kei
+nav_group: Make and maintain
+nav_order: 8
 ---
 # Connect a harness to an agent
 

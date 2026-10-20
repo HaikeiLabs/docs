@@ -2,7 +2,8 @@
 title: Connect your agent
 type: read-and-use
 product: kei
-order: 3
+nav_group: Get started
+nav_order: 3
 ---
 
 # Connect your agent

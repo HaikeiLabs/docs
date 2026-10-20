@@ -11,6 +11,7 @@ const consoleUrl = 'https://app.haikeilabs.com';
 const repoUrl = 'https://github.com/HaikeiLabs/docs';
 const allowedTypes = new Set(['read-and-use', 'make-and-maintain', 'reference']);
 const allowedProducts = new Set(['kei', 'agentware']);
+const navGroups = ['Get started', 'Make and maintain', 'Reference'];
 
 function isoDate(value) {
   if (value instanceof Date && !Number.isNaN(value.valueOf())) return value.toISOString().slice(0, 10);
@@ -38,6 +39,8 @@ function validatePage(relativePath, raw) {
   }
   if (!allowedTypes.has(data.type)) throw new Error(`${relativePath}: type must be read-and-use, make-and-maintain, or reference`);
   if (!allowedProducts.has(data.product)) throw new Error(`${relativePath}: product must be kei or agentware`);
+  if (data.nav_group !== undefined && !navGroups.includes(data.nav_group)) throw new Error(`${relativePath}: nav_group must be Get started, Make and maintain, or Reference`);
+  if (data.nav_order !== undefined && (!Number.isInteger(data.nav_order) || data.nav_order < 0)) throw new Error(`${relativePath}: nav_order must be a non-negative integer`);
   const parts = relativePath.split('/');
   if (['kei', 'agentware'].includes(parts[0]) && parts.length !== 3) throw new Error(`${relativePath}: pages must use content/${parts[0]}/<section>/<slug>.md`);
   if (parts[0] === 'kei' && data.product !== 'kei') throw new Error(`${relativePath}: Kei pages require product: kei`);
@@ -52,7 +55,7 @@ function validatePage(relativePath, raw) {
     throw new Error(`${relativePath}: validated must be a real YYYY-MM-DD date and validated_with must match kei vX.Y.Z`);
   }
   if (data.order !== undefined && !(Number.isInteger(data.order) && data.order > 0)) throw new Error(`${relativePath}: order must be a positive integer`);
-  return { ...data, validated, validated_with: validatedWith, body: parsed.content, relativePath };
+  return { ...data, nav_group: data.nav_group ?? 'Reference', nav_order: data.nav_order, validated, validated_with: validatedWith, body: parsed.content, relativePath };
 }
 
 async function markdownFiles(directory, root = directory) {
@@ -66,37 +69,20 @@ async function markdownFiles(directory, root = directory) {
   return files;
 }
 
-function navGroupFor(page) {
-  const parts = page.relativePath.split('/');
-  const section = parts.length > 2 ? parts[1] : '';
-  if (section === 'get-started') return 'Get started';
-  if (section === 'build') return 'Make and maintain';
-  if (parts[0] === 'kei' && ['make-and-maintain', 'connect-your-harness', 'runtime'].includes(section)) return 'Make and maintain';
-  return 'Reference';
-}
-
 function pageHref(page) {
   return `/${page.relativePath.replace(/\.md$/, '')}`;
 }
 
-const navGroups = ['Get started', 'Make and maintain', 'Reference'];
-
-// Pages with an `order` come first in that order; the rest follow, sorted by title.
-function byOrderThenTitle(a, b) {
-  return (a.order ?? Infinity) - (b.order ?? Infinity) || a.title.localeCompare(b.title);
-}
-
-function groupEntries(pages, group) {
-  return pages.filter((page) => navGroupFor(page) === group).sort(byOrderThenTitle);
-}
-
+// Explicit nav_order is preferred; the legacy `order` field remains supported during migration.
 function orderedPages(pages) {
-  return navGroups.flatMap((group) => groupEntries(pages, group));
+  return navGroups.flatMap((group) => pages
+    .filter((page) => page.nav_group === group)
+    .sort((a, b) => (a.nav_order ?? a.order ?? Number.MAX_SAFE_INTEGER) - (b.nav_order ?? b.order ?? Number.MAX_SAFE_INTEGER) || a.relativePath.localeCompare(b.relativePath)));
 }
 
 function sidebar(pages, currentPath = '') {
   const groups = navGroups.map((group) => {
-    const entries = groupEntries(pages, group);
+    const entries = orderedPages(pages).filter((page) => page.nav_group === group);
     return `<div class="nav-section">${group}</div><ul>${entries.map((page) => `<li><a href="${pageHref(page)}"${page.relativePath === currentPath ? ' aria-current="page"' : ''}>${escapeHtml(page.title)}</a></li>`).join('')}</ul>`;
   }).join('');
   return `<aside class="sidebar" id="site-nav"><nav aria-label="Documentation">${groups}</nav></aside>`;
@@ -176,7 +162,7 @@ function renderPage(page, pages) {
 
 function renderHome(pages) {
   const sections = navGroups.map((group) => {
-    const cards = groupEntries(pages, group)
+    const cards = orderedPages(pages).filter((page) => page.nav_group === group)
       .map((page) => `<a class="home-card" href="${pageHref(page)}"><strong>${escapeHtml(page.title)}</strong><span>${escapeHtml(page.product)}</span></a>`).join('');
     return `<section><h2>${group}</h2><div class="home-grid">${cards}</div></section>`;
   }).join('');
@@ -194,6 +180,12 @@ export async function loadDocs(contentDir = path.join(repoRoot, 'content')) {
 }
 
 export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), outputDir = path.join(repoRoot, 'dist'), assetsDir = path.join(repoRoot, 'assets') } = {}) {
+  markdown.renderer.rules.link_open = (tokens, index, options, env, self) => {
+    const token = tokens[index];
+    const href = token.attrGet('href');
+    if (href?.startsWith('/content/')) token.attrSet('href', href.replace(/^\/content\//, '/').replace(/\.html(?=([?#]|$))/, ''));
+    return self.renderToken(tokens, index, options);
+  };
   const pages = await loadDocs(contentDir);
   await rm(outputDir, { recursive: true, force: true });
   await mkdir(path.join(outputDir, 'assets'), { recursive: true });
