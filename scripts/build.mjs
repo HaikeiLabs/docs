@@ -107,7 +107,7 @@ const themeInit = `(function () {
   document.documentElement.classList.add('js')
 })()`;
 
-function layout(title, nav, content, { toc = '' } = {}) {
+function layout(title, nav, content, { toc = '', mermaid = false } = {}) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -122,6 +122,7 @@ function layout(title, nav, content, { toc = '' } = {}) {
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
   <link rel="stylesheet" href="/assets/tokens.css">
   <link rel="stylesheet" href="/assets/site.css">
+  ${mermaid ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js" defer></script>' : ''}
   <script src="/assets/site.js" defer></script>
 </head>
 <body>
@@ -160,7 +161,7 @@ function renderPage(page, pages) {
   const rendered = markdown.render(stripLeadingTitle(page.body), env);
   const links = `<a class="markdown-link" href="/${escapeHtml(page.relativePath)}">View as Markdown</a><a class="markdown-link" href="${repoUrl}/edit/main/content/${escapeHtml(page.relativePath)}">Edit on GitHub</a>`;
   const body = `<div class="title-row"><h1>${escapeHtml(page.title)}</h1><div class="page-links">${links}</div></div>${validation}<article class="prose">${rendered}</article>${pager(orderedPages(pages), page)}`;
-  return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath), body, { toc: renderToc(env.toc) }) };
+  return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"') }) };
 }
 
 function renderHome(pages) {

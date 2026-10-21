@@ -177,6 +177,29 @@ test('built pages ship theme-init before stylesheets, header links, TOC and page
   }
 });
 
+test('Mermaid pages render diagram containers and load the pinned renderer while raw Markdown stays unchanged', async () => {
+  const paths = await fixture();
+  try {
+    const source = '---\ntitle: Mermaid example\ntype: reference\nproduct: kei\n---\n\n```mermaid\ngraph TD\n  A[Policy] --> B[Allow]\n```\n';
+    const plain = '---\ntitle: Plain example\ntype: reference\nproduct: kei\n---\n\n```sh\necho hello\n```\n';
+    await writeFile(path.join(paths.contentDir, 'kei/setup/diagram.md'), source);
+    await writeFile(path.join(paths.contentDir, 'kei/setup/plain.md'), plain);
+    await buildDocs({ ...paths, assetsDir });
+    const diagram = await readFile(path.join(paths.outputDir, 'kei/setup/diagram.html'), 'utf8');
+    const ordinary = await readFile(path.join(paths.outputDir, 'kei/setup/plain.html'), 'utf8');
+    assert.match(diagram, /<pre class="mermaid">[\s\S]*A\[Policy\] --&gt; B\[Allow\]/);
+    assert.match(diagram, /https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/mermaid\/10\.9\.1\/mermaid\.min\.js/);
+    const siteJs = await readFile(path.join(paths.outputDir, 'assets/site.js'), 'utf8');
+    assert.match(siteJs, /mermaid\.initialize\(/);
+    assert.match(siteJs, /primaryColor: '#d1fae5'/);
+    assert.match(siteJs, /primaryColor: '#064e3b'/);
+    assert.doesNotMatch(ordinary, /mermaid(?:\.min\.js|\.initialize)/);
+    assert.equal(await readFile(path.join(paths.outputDir, 'kei/setup/diagram.md'), 'utf8'), source);
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
+
 test('build publishes index.json: one {slug,title,path,product} per page in sidebar order, each with a Markdown twin', async () => {
   const paths = await fixture();
   try {
