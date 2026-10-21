@@ -153,7 +153,7 @@ If an installation is **Unknown**, the service is not running or its heartbeat i
 
 ## Run your own harness with Kei permissions
 
-Read [How Kei decides: policy priority and precedence](/kei/policies/policy-precedence) for policy weights, matching rules, and worked examples.
+Read [How Kei decides](/kei/reference/how-kei-decides) for policy weights, matching rules, and worked examples.
 
 For Claude Code, Codex, and OpenCode, Kei can write command policies into each harness's native permission settings. The harness makes its own **native decision** (allow, deny, or ask) from those settings. `kei-proxy` does not decide these prebuilt harness command calls.
 
