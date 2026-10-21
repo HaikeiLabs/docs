@@ -129,6 +129,10 @@ function fencePlugin(md) {
   md.renderer.rules.fence = (tokens, i) => {
     const token = tokens[i];
     const { lang, title } = parseInfo(token.info);
+    if (lang.toLowerCase() === 'mermaid') {
+      const source = token.content.trim();
+      return `<div class="mermaid-wrap" data-source="${escapeHtml(source)}"><pre class="mermaid">${escapeHtml(source)}</pre></div>\n`;
+    }
     const label = title || lang || 'text';
     const body = highlight(token.content.replace(/\n$/, ''), lang);
     return `<div class="code-block"><div class="code-head"><span class="code-label${title ? ' is-file' : ''}">${escapeHtml(label)}</span><button class="copy" type="button" aria-label="Copy ${escapeHtml(label)} code">Copy</button></div><pre tabindex="0"><code${lang ? ` class="language-${escapeHtml(lang)}"` : ''}>${body}</code></pre></div>\n`;
