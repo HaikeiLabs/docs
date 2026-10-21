@@ -41,4 +41,4 @@ Kei policies do not yet support conditions such as time windows or transaction a
 - [Amazon Verified Permissions](https://docs.aws.amazon.com/verifiedpermissions/latest/userguide/what-is-avp.html) and [Policy in Amazon Bedrock AgentCore](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/policy.html)
 - [OpenAPPA](https://www.openappa.com/), its [paper](https://arxiv.org/abs/2607.24625), and its [reported benchmarks](https://www.openappa.com/evaluation)
 - [Open Policy Agent](https://www.openpolicyagent.org/)
-- [Policy priority and precedence in Kei](/kei/policies/policy-precedence)
+- [How Kei decides](/kei/reference/how-kei-decides)
