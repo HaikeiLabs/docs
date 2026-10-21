@@ -140,6 +140,12 @@ kei harness sync --harness custom --manifest tools.json
 
 The manifest is tool metadata, not a credential store or permission grant. The proxy and Kei policy determine whether a call is allowed. Keep credentials and customer payloads out of it.
 
+### After tool registration
+
+A registered tool does not become authorizable immediately. The runtime's policy refresher polls the control plane for a new bundle (the catalog sends a `refresh.poll_interval_seconds` of 60; the runtime clamps it to 30–300 seconds, with jitter), and the tool is authorized only once the active bundle lists it. Until then, authorize calls for the tool are denied; against kei-proxy v0.3.0 with a v2 bundle, for example, with `reason_code: preflight_required`.
+
+Session-based SDK flows open a session with `PUT /v1/session` for a `(source, external_id)` pair. If that pair is not a linked identity in the active bundle, the call is denied with `reason_code: subject_unlinked`. Once the person is linked to the installation, the identity reaches the runtime with the next bundle refresh.
+
 ## Create a group and policies
 
 In the selected workspace in the Kei console, open **Groups** → **Create Group**, create a group for this run, then add the agent's user to that group. Open **Policies**, choose **New policy** (or **Create your first grant** when the workspace has no policies), and create two tool-call policies for the group:
