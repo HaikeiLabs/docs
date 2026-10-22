@@ -8,6 +8,7 @@
   },
   "scripts": {
     "check:frontmatter": "node scripts/check-frontmatter.mjs",
+    "check:links": "node scripts/check-links.mjs",
     "build": "node scripts/build.mjs",
     "test": "node --test",
     "preview": "node scripts/preview.mjs"

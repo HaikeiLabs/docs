@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import YAML from 'yaml';
 import { createMarkdown, escapeHtml, neighbours, renderToc, stripLeadingTitle } from './render.mjs';
+import { checkBuiltRoutes, checkLinks } from './check-links.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const markdown = createMarkdown();
@@ -191,6 +192,7 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     return self.renderToken(tokens, index, options);
   };
   const pages = await loadDocs(contentDir);
+  await checkLinks(contentDir);
   await rm(outputDir, { recursive: true, force: true });
   await mkdir(path.join(outputDir, 'assets'), { recursive: true });
   await cp(path.join(assetsDir, 'tokens.css'), path.join(outputDir, 'assets/tokens.css'));
@@ -206,11 +208,26 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     await mkdir(path.dirname(markdownFile), { recursive: true });
     await cp(path.join(contentDir, page.relativePath), markdownFile);
   }
+  const overview = pages.find((page) => page.relativePath === 'agentware/build/overview.md');
+  if (!overview) throw new Error('Missing content/agentware/build/overview.md required by Agentware section routes');
+  const overviewHtml = await readFile(path.join(outputDir, 'agentware/build/overview.html'), 'utf8');
+  await mkdir(path.join(outputDir, 'agentware/build'), { recursive: true });
+  await writeFile(path.join(outputDir, 'agentware/build/index.html'), overviewHtml);
+  await mkdir(path.join(outputDir, 'agentware'), { recursive: true });
+  await writeFile(path.join(outputDir, 'agentware/index.html'), overviewHtml);
+  await writeFile(path.join(outputDir, '_redirects'), [
+    '/agentware /agentware/build/overview 301',
+    '/agentware/build /agentware/build/overview 301',
+    '/agentware/build/quickstart /agentware/build/overview 301',
+    '/agentware/build/quickstart/ /agentware/build/overview 301',
+    '',
+  ].join('\n'));
   await writeFile(path.join(outputDir, 'index.html'), renderHome(pages));
   // Page manifest consumed by `kei docs` (HAI-735). Keep this shape stable.
   const manifest = orderedPages(pages).map((page) => ({ slug: pageHref(page).slice(1), title: page.title, path: pageHref(page), product: page.product }));
   await writeFile(path.join(outputDir, 'index.json'), `${JSON.stringify(manifest, null, 2)}\n`);
   await writeFile(path.join(outputDir, '404.html'), '<!doctype html><html lang="en"><meta charset="utf-8"><title>Not found · Haikei docs</title><h1>Page not found</h1><p><a href="/">Return to the documentation home.</a></p></html>\n');
+  await checkBuiltRoutes(outputDir);
   return pages;
 }
 
