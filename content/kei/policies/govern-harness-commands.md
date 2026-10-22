@@ -4,13 +4,24 @@ type: make-and-maintain
 product: kei
 nav_group: Make and maintain
 nav_order: 15
-validated: 2026-10-21
-validated_with: kei v0.2.5
+validated: 2026-10-22
+validated_with: kei v0.2.11
 ---
 
 # Govern harness commands
 
 Kei can control which shell commands, skills, and file paths each desktop harness (Claude Code, Codex, OpenCode) may access. These policies are written into each harness's native permission settings by `kei harness sync`.
+
+## Codex rendering limits
+
+Codex rules enforce only `shell:` destinations. Codex rules do not encode group membership: a group-sourced shell policy is rendered only when that group matches the subject in the policy bundle. A group-sourced policy that does not match the bundle subject is not rendered into Codex rules.
+
+| Harness | Policy source | Enforced in native harness rules? |
+| --- | --- | --- |
+| Codex | `*` or `harness:codex` with a `shell:` destination | Yes, after `kei harness sync` |
+| Codex | `group:<name>` with a `shell:` destination | Only when the named group matches the bundle subject; group membership is not encoded in the rule |
+| Codex | `user:` or `email:` with a `shell:` destination | Only when it matches the bundle subject |
+| Codex | Any source with a `skill:` or `path:` destination | No; Codex renders only `shell:` policies |
 
 ## Command policies
 
