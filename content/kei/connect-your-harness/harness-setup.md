@@ -113,9 +113,9 @@ pi list
 
 Use `pi install -l` before either package to keep it in the current project's `.pi/settings.json`; otherwise Pi installs it in user settings. Restart Pi or run `/reload`. Review extensions before installing: they execute with the user's full system permissions.
 
-Pair Pi with a local runtime using [CLI authentication and runtime setup](/kei/get-started/connect-this-machine). Use `kei-proxy` 0.2.1 or later with the owner-only Unix socket enabled. Pi calls that socket; the daemon holds `KEI_RUNTIME_TOKEN`. Never put the runtime token in Pi's environment, settings, or project files.
+Pair Pi with a local runtime using [CLI authentication and runtime setup](/kei/get-started/connect-this-machine). The unmatched behavior requires `kei-proxy` 0.3.7 or later with the owner-only Unix socket enabled. Update the Pi extension with `pi update git:github.com/HaikeiLabs/kei-lime-pi`; plain `pi update` updates Pi itself, not the extension. Pi calls the local runtime through that socket.
 
-The adapter gates local `read`, `write`, and `edit` calls and provides `kei_connector` for v2 connector tools. Unknown tools fail closed. A connector call requires its exact v2 tool plan, a matching agent binding, and policy in the active bundle; installing the adapter grants none of these. It does not currently implement `web_search` or `search_wiki` in Pi. For those tools, a Pi-side executor and matching runtime registration are required. See the public [`kei-pi-setup` skill](https://github.com/HaikeiLabs/skills/tree/main/skills/kei-pi-setup) for Pi-specific troubleshooting and verification.
+The adapter gates Pi's built-in `read`, `write`, `edit`, and `bash` calls. Kei permits and denies are enforced. When no Kei policy matches a built-in call, the extension defers to Pi's own native decision, the same way Claude Code, Codex, and OpenCode fall back to their own permissions. Connector calls through `kei_connector`, explicit denies, unsupported shell syntax, and unreachable or malformed runtime responses still block. A connector call requires its exact v2 tool plan, a matching agent binding, and policy in the active bundle; installing the adapter grants none of these. It does not currently implement `web_search` or `search_wiki` in Pi. For those tools, a Pi-side executor and matching runtime registration are required. See the public [`kei-pi-setup` skill](https://github.com/HaikeiLabs/skills/tree/main/skills/kei-pi-setup) for Pi-specific troubleshooting and verification.
 
 ### If you see Not ready
 
@@ -123,7 +123,7 @@ Open **Agents → Runtime installations → Diagnostics** and read the policy bu
 
 ![Diagnostics showing a not-ready policy bundle and the reason](/assets/images/harness-setup/policy-bundle-not-ready.png)
 
-For connectors and SDK (Agentware) integrations, requests without a matching policy or connector binding are denied; Claude Code, Codex, and OpenCode fall back to their own permissions (see [Run your own harness with Kei permissions](#harness-permissions)). Pi's extension blocks denied and unsupported calls. Open WebUI uses its own integration. Review decisions using redacted audit metadata; credentials, payloads, and results must not appear in logs.
+For connector calls and SDK (Agentware) integrations, requests without a matching policy or connector binding are denied; Claude Code, Codex, OpenCode, and Pi built-in tools fall back to their own permissions when no policy matches (see [Run your own harness with Kei permissions](#harness-permissions)). Explicit denies and unsupported Pi calls remain blocked. Open WebUI uses its own integration. Review decisions using redacted audit metadata; credentials, payloads, and results must not appear in logs.
 
 ## Keep your runtime online
 
@@ -168,6 +168,8 @@ Kei policies can match shell commands (`shell:`), skills (`skill:`), or paths (`
 Kei also installs `PreToolUse` and `PostToolUse` hooks for reporting tool calls to the audit pipeline. The hooks always exit with code `0`; they only report and never decide or block a call. The harness's native permission settings determine the native decision.
 
 When no Kei policy matches a command in one of these prebuilt harnesses, the harness makes its own native decision from your existing entries and permission mode, which is usually **ask**.
+
+Pi has no native permission file. Its extension asks the local runtime about each built-in call over the owner-only Unix socket; only an unmatched call defers to Pi's own decision.
 
 SDK (Agentware) integrations do not have these native permission files. Their governed calls are evaluated by `kei-proxy`; a call with no matching policy is denied. Connector calls also go through `kei-proxy` and fail closed when no policy matches.
 

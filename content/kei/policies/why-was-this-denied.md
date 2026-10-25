@@ -49,6 +49,8 @@ This lets you verify a denial without making the actual call.
 | A command asks for confirmation instead of running | No matching deny; no matching allow either. The harness used its default (ask) mode. An admin can add an allow policy. |
 | Everything is denied on a new harness | The policy bundle may not be synced yet. Run `kei harness sync`. |
 
+For a Pi built-in tool denied with `preflight_required` or `no_matching_policy`, run `kei upgrade` (`kei` 0.2.16 or later, with `kei-proxy` 0.3.7 or later), restart the `kei-proxy serve` daemon so it uses the new binary, update the extension with `pi update git:github.com/HaikeiLabs/kei-lime-pi`, then restart Pi or run `/reload`. On macOS, if the daemon was installed with launchd, restart it with `launchctl kickstart -k gui/$(id -u)/com.haikeilabs.kei-proxy-serve`; otherwise restart `kei-proxy serve`. A Pi session started before the extension update still has the old extension. After updating, an unmatched built-in call defers to Pi's native decision. Compound shell commands such as `ls && whoami` remain blocked with `unsupported_shell_syntax`, and explicit denies remain blocked with `policy_deny`.
+
 ## What to do next
 
 - If you need access, see [Ask for access](/kei/policies/ask-for-access).
