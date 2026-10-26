@@ -8,6 +8,13 @@ nav_order: 2
 
 Use the Agentware SDK to add Kei governance to a custom agent harness. Agentware provides the middleware, audit, guardrails, and Kei policy integration; Kei is the metadata-only control plane that holds registration, policy, and audit metadata. Provider payloads, customer content, and credentials never enter Kei.
 
+Agentware implements the **kei-connector-contracts** platform specification.
+Contracts defines the tool definition schemas, call template validator, and
+capability declarations; agentware imports those types, validates templates,
+registers tools, and builds provider calls. For the full story of how
+contracts, agentware, and the runtime fit together, see
+[Contracts, Agentware, and how to build a custom connector](/kei/reference/contracts-vs-agentware).
+
 For a first look at what agentware does, see [Govern an agent with agentware](/content/agentware/getting-started/overview.html).
 
 ## Six harness types
