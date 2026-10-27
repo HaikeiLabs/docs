@@ -65,16 +65,14 @@ To see the effective policies for a group, open the group detail in the console 
 
 ## Autogroups
 
-Autogroups are virtual groups whose membership is determined at runtime from the caller's organization role and agent status. Use `autogroup:` as a policy source — it works like a regular group but is never stored.
+Autogroups are virtual groups whose membership is determined at runtime from the caller's organization role. Use `autogroup:` as a policy source — it works like a regular group but is never stored.
 
 | Autogroup | Who is included | Resolved from |
 | --------- | --------------- | ------------- |
 | `autogroup:member` | Every organization member | Always present |
-| `autogroup:admin` | Members with the admin role | Organization role |
-| `autogroup:owner` | Members with the owner role | Organization role |
-| `autogroup:agent` | Registered agents | Agent membership flag |
+| `autogroup:admin` | Workspace admins and owners | Organization role |
 
-A caller always resolves to at least `autogroup:member`. Additional autogroups are added based on roles and agent status.
+These are the only two autogroups. A caller always resolves to at least `autogroup:member`; admins and owners also resolve to `autogroup:admin`. For policy, the organization Owner counts as an admin — Owner and Admin differ only in the console. To grant access to agents or service principals, add them to a custom group and use `group:<name>` as the source.
 
 ### Create a policy with an autogroup source
 
