@@ -37,7 +37,7 @@ Bring up an Agentware SDK harness in this order:
 1. **Install the Kei CLI and sign in** — `curl -fsSL https://haikeilabs.com/install.sh | sh`, then `kei login`. You need an organization owner or admin to approve the device authorization flow.
 2. **Create a runtime installation** — `kei bot init` creates pending installation metadata and provisions a runtime credential. The credential is shown once; deliver it directly into your approved secret manager.
 3. **Register the harness** — `kei harness add --kind custom --installation INSTALLATION_ID` registers the SDK harness. The CLI resolves the assigned agent for that installation.
-4. **Register tools** — Use `ToolSpec` with a `harness_executor` route over the runtime socket (`POST /v1/tools:register`), or maintain a `tools.json` manifest and sync it with `kei harness sync --harness custom --manifest tools.json`. The manifest is tool metadata, not a permission grant.
+4. **Register tools** — Use `ToolSpec` with a `harness_executor` route over the runtime socket (`POST /v1/tools:register`), or maintain a `tools.json` manifest and sync it with `kei harness sync --harness custom --manifest tools.json`. The manifest is tool metadata, not a permission grant. For Open WebUI, see [tool specs from a deployment-provided file](/content/kei/connect-your-harness/openwebui.html#3-tool-implementations-and-definitions).
 5. **Start the runtime daemon** — `kei-proxy serve` runs the policy enforcement point on a local Unix socket. The SDK discovers it through `KEI_RUNTIME_SOCKET_PATH`.
 6. **Run the harness** — Each governed tool call goes through `kei-proxy authorize`. An explicit allow lets the tool run; a deny returns `reason_code` and `hint`; a socket or protocol failure fails closed.
 
