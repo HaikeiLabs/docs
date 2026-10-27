@@ -206,3 +206,51 @@ kei groups list --workspace <workspace-name> --json
 ```
 
 If the problem persists after refreshing, report it in the [Haikei Discord community](https://discord.gg/g6QaTYWXDa).
+
+---
+
+## Sessions do not appear in the console
+
+**Symptom:** The machine is connected, but no sessions show up in the console. `kei doctor` reports a `WARN` for the heartbeat check with `no heartbeat time recorded`.
+
+**Cause:** Active sessions need a working heartbeat and hooks — the `PASS` lines in `kei doctor`. The runtime heartbeat did not reach the control plane. Typical causes seen in the logs: the runtime identity request returned `401` because the installation credential is not accepted, or `kei runtime heartbeat` is refused because another `kei-proxy` process owns the runtime state directory (`kei-proxy serve` already reports heartbeats, so run only that one). The audit collector can also log `flush returned status 400` and keep a growing spool.
+
+**Fix:** Run `kei doctor` and `kei runtime service status`:
+
+```sh
+kei doctor
+kei runtime service status
+```
+
+Check the `kei-runtime.log` and `kei-proxy-serve.log` files in your Logs directory for the heartbeat error, and make sure only one process owns the runtime state directory. If the log shows `401`, sign in again and check the installation:
+
+```sh
+kei login
+kei bot status --installation <installation-id>
+```
+
+Restart the harness session after fixing. Sessions appear once `kei doctor` reports `PASS` for the heartbeat and hook checks.
+
+---
+
+## Sign-in on a phone fails with invalid OAuth state
+
+**Symptom:** Signing in on a phone fails with an `invalid OAuth state` error.
+
+**Cause:** The sign-in began in one browser context and the callback returned in another, so the state cookie was missing. This happens when the provider app takes over the flow, in an in-app browser or private mode, when cross-site tracking prevention blocks the cookie, or when the page is reloaded or opened in a second tab.
+
+**Fix:** Close all Haikei tabs, then use one normal tab in the phone's default browser. Open the sign-in page, finish the provider screens in that same tab without going back or reloading, and decline the provider app prompt if one appears. Then open the CLI activation link in the same tab.
+
+For a remote machine, use `--no-browser`, which prints a URL and a code to open on any device and approve:
+
+```sh
+kei login --no-browser
+```
+
+If sign-in keeps failing after this, submit a bug report:
+
+```sh
+kei feedback --description "Sign-in on a phone fails with invalid OAuth state"
+```
+
+Descriptions only — do not attach transcripts unless asked.
