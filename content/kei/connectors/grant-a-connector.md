@@ -115,7 +115,7 @@ If the test fails, check the connector configuration, credential reference, and 
 
 ## 4. Grant access with a policy
 
-Create a policy that allows a group to use the connector's capabilities:
+Create a policy that allows a group to use the connector's capabilities. A connector binding only wires the connector into a workspace; access to it comes from a policy:
 
 ```bash
 kei policy create \

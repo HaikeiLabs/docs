@@ -43,14 +43,14 @@ Each policy has a source (`src`), destination (`dst`), effect, priority, and ena
 
 | Field     | What it means | Examples |
 | --------- | ------------- | -------- |
-| `src`     | Who the policy applies to: `*`, `user:<id>`, `email:<address>`, `group:<name>`, `org:<role>`, `agent:<id>`, `harness:<kind>`, or `autogroup:<name>` | `group:developers`, `harness:claude_code`, `autogroup:member` |
+| `src`     | Who the policy applies to: `*`, `group:<name>` (or a bare group name), `harness:<kind>`, or `autogroup:member` / `autogroup:admin`. Custom groups hold users, agents, and service principals | `group:developers`, `harness:claude_code`, `autogroup:member` |
 | `dst`     | What it matches: `*`, `shell:<prefix>`, `skill:<name>`, `path:<glob>`, `capability:<name>`, `connector:<id>`, `tool:<name>`, or `mcp:<name>` | `shell:git push`, `skill:wiki`, `path:/repo/**`, `capability:pull_request.read`, `connector:issues-service` |
 | `effect`  | The outcome if the policy decides: **allow** (`permit`) or **deny** (`deny`) | `deny` |
 | `priority` | An integer weight. A higher number wins. | `100` |
 | `enabled` | Whether the policy participates in a decision | `true` or `false` |
 
 - `*` as a source matches any principal. `*` as a target matches any destination.
-- `user:<id>` uses the stable Kei user ID. `email:<address>` is a legacy source form matched against the email associated with that resolved user — never an email supplied by the caller.
+- A policy names groups, not individuals. A direct subject appears only in an access grant, by ID; a policy never names an email address, and organization role is not a policy source. See [Who a policy can name](/kei/reference/policy-file-syntax#who-a-policy-can-name).
 - Groups are scoped to a workspace. Members inherit policies from groups the group nests; cycles are rejected, and the maximum nesting depth is bounded.
 
 ## How policies are collected and ordered

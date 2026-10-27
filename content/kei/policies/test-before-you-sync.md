@@ -40,7 +40,7 @@ kei policy test --as autogroup:member "capability:pull_request.read"
 kei policy test --as group:engineering "shell:deploy"
 ```
 
-The `--as` flag accepts any valid source pattern: `user:<id>`, `group:<name>`, `autogroup:<name>`, `harness:<kind>`, `email:<address>`, or `*`.
+The `--as` flag accepts a source pattern: `group:<name>`, `autogroup:member`, `autogroup:admin`, `harness:<kind>`, or `*`. Policies name groups, so test a person or agent through a group they belong to.
 
 ## Preview harness sync changes
 

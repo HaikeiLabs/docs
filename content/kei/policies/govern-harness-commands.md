@@ -20,7 +20,7 @@ Codex rules enforce only `shell:` destinations. Codex rules do not encode group 
 | --- | --- | --- |
 | Codex | `*` or `harness:codex` with a `shell:` destination | Yes, after `kei harness sync` |
 | Codex | `group:<name>` with a `shell:` destination | Only when the named group matches the bundle subject; group membership is not encoded in the rule |
-| Codex | `user:` or `email:` with a `shell:` destination | Only when it matches the bundle subject |
+| Codex | `autogroup:member` or `autogroup:admin` with a `shell:` destination | Only when the subject's role matches the autogroup |
 | Codex | Any source with a `skill:` or `path:` destination | No; Codex renders only `shell:` policies |
 
 ## Command policies

@@ -14,15 +14,21 @@ This page describes the source and target patterns you use when creating a Kei p
 
 The `src` field identifies who the policy applies to. The wildcard `*` matches every principal.
 
+## Who a policy can name
+
+A policy source is a group: `group:<name>` (or a bare group name), or one of the two built-in autogroups, `autogroup:member` and `autogroup:admin`. Put the people and software you want to cover into a custom group:
+
+- A custom group holds users, agents, and service principals. Add a principal to the group once; every policy that names the group then covers it.
+- A direct subject is named only in an access grant, and only by its ID — never in a standing policy.
+- A policy never names an email address. The console and CLI show emails, and resolve them to IDs when you pick a person.
+- Organization role is not a policy source. Roles are managed in the console; use `autogroup:admin` to cover workspace admins and owners.
+- When several policies match, any matching deny wins. A connector binding only wires a connector into a workspace; access comes from a policy.
+
 | Syntax | Kind | Example | What it matches |
 | ------ | ---- | ------- | --------------- |
 | `*` | any | `*` | Every principal |
 | `group:<name>` | group | `group:developers` | Members of the named group (bare names also resolve as groups) |
 | `autogroup:<name>` | autogroup | `autogroup:member` | Organization role-based membership — see [Autogroups](/kei/reference/autogroups) |
-| `user:<id>` | user | `user:98a1b2c3` | A specific Kei user by their stable user ID |
-| `email:<address>` | email | `email:alice@example.com` | A specific user by email address (legacy form; matched against the email associated with the resolved user) |
-| `org:<role>` | org | `org:admin` | Anyone holding the named organization role |
-| `agent:<id>` | agent | `agent:a1b2c3d4` | A specific registered agent |
 | `harness:<kind>` | harness | `harness:claude_code` | Sessions running in the named harness kind |
 
 > **Bare names** without a scheme prefix are treated as `group:<name>`. For example, `developers` is equivalent to `group:developers`.
@@ -42,7 +48,7 @@ See [Autogroups](/kei/reference/autogroups) for details on the resolved set and 
 
 ### How source patterns are matched
 
-For `kei policy create` (standing rules), the `--group` flag accepts a group name or an `autogroup:` prefix. User, email, and agent sources belong to access grants, not standing rules:
+For `kei policy create` (standing rules), the `--group` flag accepts a group name or an `autogroup:` prefix. Users, agents, and service principals reach a standing rule through a custom group; a direct subject belongs in an access grant, by ID:
 
 ```
 kei policy create --group developers --allow "shell:git"
@@ -125,9 +131,9 @@ An integer from 0 to 2147483647. Higher values win when multiple policies match 
 | ------------- | ------------------ |
 | `*` (bare wildcard) | `*` (same) |
 | Bare group name | `group:<name>` |
-| `email:<address>` (for source) | Still accepted; use `group:` or `user:` for new policies |
+| `email:<address>`, `user:<id>`, `agent:<id>`, `org:<role>` (for source) | Do not use on new policies; put the principal in a custom group and name `group:<name>` |
 
-The `email:` source form is the only legacy source still accepted. Uses the email associated with the resolved user — never an email supplied by the caller.
+Existing policies with these forms keep working until they are migrated to groups. An `email:` form is matched against the email of the resolved user — never an email supplied by the caller.
 
 ## Learn more
 
