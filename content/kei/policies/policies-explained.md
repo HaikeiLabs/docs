@@ -8,13 +8,13 @@ nav_order: 5
 
 # Policies, explained
 
-A policy is a rule that says **who** (a person, group, or agent) may do **what** (run a shell command, invoke a tool, or use a connector capability) and whether it is **allowed** or **denied**.
+A policy is a rule that says **who** (a group) may do **what** (run a shell command, invoke a tool, or use a connector capability) and whether it is **allowed** or **denied**.
 
 Kei uses policies to make deterministic authorization decisions for agent tool calls. Unlike an AI model judging each request, Kei matches the request against a fixed set of rules and returns a predictable result. For the full decision model, see [How Kei decides](/kei/reference/how-kei-decides).
 
 ## Key concepts
 
-- **Source** — who the policy applies to, such as a group, a user, or every organization member.
+- **Source** — who the policy applies to: a group, or `autogroup:member` (every member) or `autogroup:admin` (admins and owners). Custom groups hold users, agents, and service principals; a policy never names an individual or an email.
 - **Destination** — what the policy controls, such as a shell command prefix, a tool name, or a connector capability.
 - **Effect** — allow or deny.
 - **Priority** — when multiple policies match, the highest-priority policy wins.

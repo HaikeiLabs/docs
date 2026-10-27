@@ -67,9 +67,8 @@ Only `shell:`, `skill:`, and `path:` policies with a matching source render into
 - A `*` source renders for every harness.
 - A `harness:<kind>` source renders for the named harness kind.
 - A `group:<name>` source renders when it matches one of the bundle subject's groups.
-- A `user:<id>` or `email:<address>` source renders when it matches the bundle subject.
-- An `autogroup:<name>` source resolves at runtime and renders when the subject's role matches.
-- An `org:<role>` source renders when the bundle subject holds that role.
+- An `autogroup:member` or `autogroup:admin` source resolves at runtime and renders when the subject's role matches.
+- Policies written before the group-only rule with a `user:<id>`, `email:<address>`, or `org:<role>` source render only when they match the bundle subject. New policies name a group instead.
 
 When a source does not match, its policy is **skipped** — it does not render into the harness at all. This means a skipped deny never becomes an allow, and a lower-precedence allow it would have overlapped is withheld, causing the harness to use its native ask.
 
