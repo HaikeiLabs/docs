@@ -34,9 +34,9 @@ The `src` field identifies who the policy applies to. The wildcard `*` matches e
 | Autogroup | Included when |
 | --------- | ------------- |
 | `autogroup:member` | Always — every workspace member |
-| `autogroup:admin` | The user has the admin role |
-| `autogroup:owner` | The user has the owner role |
-| `autogroup:agent` | The caller is a registered agent |
+| `autogroup:admin` | The user is a workspace admin or owner (the Owner counts as admin for policy) |
+
+There is no `autogroup:owner` or `autogroup:agent`. Put agents and service principals in a custom group and use `group:<name>`.
 
 See [Autogroups](/kei/reference/autogroups) for details on the resolved set and hierarchy.
 

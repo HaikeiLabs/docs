@@ -102,9 +102,7 @@ For example, a `user:alice` deny for `shell:git push --force` only renders when 
 | `group:developers` | Bundle subjects who are members of the developers group |
 | `user:98a1b2c3` | The specific user |
 | `autogroup:member` | Every bundle subject |
-| `autogroup:admin` | Bundle subjects with the admin role |
-| `autogroup:owner` | Bundle subjects with the owner role |
-| `autogroup:agent` | Agent callers |
+| `autogroup:admin` | Bundle subjects who are workspace admins or owners |
 
 ## Learn more
 
