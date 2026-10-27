@@ -154,7 +154,7 @@ The image runs as user `kei`, **UID 10001, GID 10001**. Set your platform's cont
 | `KEI_RUNTIME_TOKEN` | yes | The runtime credential, from your secret manager |
 | `KEI_RUNTIME_CONTROL_PLANE_URL` | yes | The Kei control plane base URL |
 | `WEBUI_SECRET_KEY` | yes | Open WebUI's secret key, from your secret manager. Without it the supervisor refuses to start. Replicas must share it |
-| `KEI_OPENWEBUI_TOOL_PACKS` | with a pack | Comma-separated pack modules, e.g. `acme_orders`. Usually set in your layer's Dockerfile |
+| `KEI_OPENWEBUI_TOOLS_FILE` | no | Path inside the container to an Agentware `kei.tool-manifest/v3` YAML file. Supply it during deployment and mount or inject it read-only |
 | `KEI_PROXY_EGRESS_PROXY` | no | An HTTP proxy for `kei-proxy`'s calls to Kei, e.g. `http://localhost:1055`. Given to `kei-proxy` and the boot tool sync only, never to Open WebUI |
 | `KEI_PROXY_NO_PROXY` | no | Hosts that bypass that proxy, e.g. `169.254.169.254`, plus the Kei control plane host if it is public |
 | `KEI_PROXY_AUDIT` | recommended | `kei-proxy`'s audit spool path. Put it on a mounted volume, so a killed container doesn't lose unshipped records |
@@ -165,55 +165,33 @@ The image already sets `ENABLE_OPENAI_API=false`, `ENABLE_OLLAMA_API=false` and 
 
 On a fresh database there is no Open WebUI admin yet. The container starts, waits for the first admin to sign up, then installs the Kei functions. Until then nobody can chat, because there is no model provider.
 
-## 3. Tool packs
+## 3. Tool implementations and definitions
 
-Your own tools ship as a Python package, a **tool pack**, layered on the image at build time. Nothing installs at runtime.
+To provide tool specs from a file, set `KEI_OPENWEBUI_TOOLS_FILE` to the file path inside the
+container. Your deployment CI/CD can generate or retrieve the file during deployment and mount it
+read-only, or use the platform's equivalent file injection. Keep it outside the image. The plugin
+reads and registers it once at boot; changes take effect after restart.
 
-```dockerfile
-FROM public.ecr.aws/o1a1k4g0/openwebui-kei@sha256:<digest>
-USER root
-RUN pip install --no-cache-dir acme-orders==<version>
-USER kei
-ENV KEI_OPENWEBUI_TOOL_PACKS=acme_orders
-```
+Use Agentware's existing [`kei.tool-manifest/v3` format](https://github.com/HaikeiLabs/agentware/blob/main/docs/tool-manifest-v3.md)
+and [shared fixture](https://github.com/HaikeiLabs/agentware/blob/main/fixtures/kei/tool-manifest.v3.json).
+The [Acme example](https://github.com/HaikeiLabs/kei-openwebui/blob/main/examples/tools.example.yaml)
+shows two harness-routed tools. The plugin supports `haikeilabs-agentware >=0.13,<0.14`.
 
-Build it for `linux/amd64` and deploy your layer by its own digest.
+When `KEI_OPENWEBUI_TOOLS_FILE` is set, this file is the only definition source; the generated
+catalog and `tool_definitions` entry points are ignored. When unset, existing behavior is unchanged.
+The loader fails boot on a missing or unreadable file, invalid YAML or manifest, an empty or duplicate
+tool list, an unavailable service implementation, or an unknown `method`. It safe-loads exactly one
+document, rejects anchors, aliases, merge keys, custom tags and duplicate mapping keys, and refuses
+files over 256 KiB. A tool-file update requires a restart.
 
-### 3.1 Declare the tools as plain data
-
-The pack's top-level module declares `TOOLKITS`. Each toolkit's `tools` list declares the governed tools as plain data. The pack never imports `kei_openwebui`.
-
-```python
-# acme_orders/__init__.py
-TOOLKITS = [
-    {
-        "id": "acme_orders",
-        "name": "Acme: orders",
-        "module": "acme_orders.tools",
-        "description": "Lists and cancels Acme orders.",
-        "source": "acme",
-        "tools": [
-            {"name": "acme.orders.list_orders", "access": "read", "required_capabilities": ["orders.read"]},
-            {"name": "acme.orders.cancel_order", "access": "write", "required_capabilities": ["orders.write"]},
-        ],
-    },
-]
-```
-
-- `name` and `access` (`read` or `write`) are required. The field rules are in [release.md](https://github.com/HaikeiLabs/kei-openwebui/blob/main/docs/release.md#layer-a-tool-pack).
-- **The name is the action.** Kei is asked about `tool:<name>`, and your policy's `--dst-pattern` must use the same name. The `Tools` method must pass that same name to `Governor.run`. Name each tool `<method>` or `<prefix>.<method>` after its method (`acme.orders.list_orders` → `list_orders`). From v0.1.3, a declaration whose method has a different name says so in `method` (`{"name": "acme.orders.get_order", "access": "read", "method": "orders_get"}`).
-- A malformed declaration, or a name declared twice, stops the container and names the pack and entry. A pack that doesn't import stops it too.
-
-### 3.2 The boot tool sync
-
-Kei's policy bundle only lists tools registered for the installation. At every boot, once `kei-proxy` is ready and before Open WebUI serves, the image sends the packs' manifest to `PUT $KEI_RUNTIME_CONTROL_PLANE_URL/api/v1/runtime/tools` with the runtime token. You configure nothing else.
-
-- The PUT replaces the installation's registered tools, so a restart converges Kei on the current packs and a dropped tool is unregistered.
-- No packs configured: the sync is skipped (`tool sync skipped: no tool packs configured`).
-- Packs configured but no tools exported: the container refuses to start rather than send an empty list, which would unregister every tool (`tool sync refused: ... its manifest has no tools`).
-- Kei refuses, or the control plane is unreachable: the sync retries 5 times over about 15 s, then the container exits with `registering the tool packs' tools with Kei failed; refusing to start Open WebUI`.
-
-It fails closed: Open WebUI never serves tools Kei can't govern. The tools reach `kei-proxy` on its next bundle poll, within about a minute.
+When the variable is unset, the base image uses the tool catalog generated from the contracts
+checkout's `schemas/*.tool-definition.v1.json` at image build. A definition change in this mode takes
+effect after rebuilding and redeploying the image. In either mode, execution remains in separately
+installed Python packages. Each service package exposes its `Tools` class as a
+`kei_openwebui.tool_implementations` entry point named for the definition's `service`. Boot resolves
+the implementation, seeds the tools, and syncs their names to Kei. Missing or invalid implementations
+stop the container before Open WebUI serves. Missing implementations or a failed tool sync fail boot
+closed, so Open WebUI never serves tools Kei cannot govern.
 
 ## 4. Verify
 
@@ -260,8 +238,8 @@ printf 'header = "Authorization: Bearer %s"\n' "$KEI_RUNTIME_TOKEN" | \
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| A tool call is refused `tool is not registered in the policy bundle` (`tool_not_registered`) | Kei hasn't got the tool: an image older than v0.1.1, no `KEI_OPENWEBUI_TOOL_PACKS`, a name that differs from what the method sends, or the bundle hasn't refreshed yet | Check the boot log for `tool sync: registered N tool(s)`, compare `--export-manifest` names with the refused name, wait one bundle poll and check `policy show`. A permit doesn't help until the tool is registered. See [release.md](https://github.com/HaikeiLabs/kei-openwebui/blob/main/docs/release.md#troubleshooting-tool-is-not-registered-in-the-policy-bundle) |
-| The container won't start: `tool sync refused: KEI_OPENWEBUI_TOOL_PACKS=... is set but its manifest has no tools` | The pack declares no governed tools (no `tools` list), or the image is older than v0.1.2 and doesn't read plain-data `tools` | Add a `tools` list to each toolkit, and use v0.1.2 or later |
+| A tool call is refused `tool is not registered in the policy bundle` (`tool_not_registered`) | Kei hasn't got the tool: the definition or implementation is missing, a tool sync failed, or the bundle hasn't refreshed yet | Check the boot log for `tool sync: registered N tool(s)`, compare the registered names with the refused name, wait one bundle poll and check `policy show`. A permit doesn't help until the tool is registered. See [release.md](https://github.com/HaikeiLabs/kei-openwebui/blob/main/docs/release.md#troubleshooting-tool-is-not-registered-in-the-policy-bundle) |
+| The container won't start because the configured tool file is invalid or cannot be loaded | The file is missing, unreadable, invalid, empty or names an unavailable implementation or method | Correct the manifest and restart; the loader fails closed before Open WebUI serves |
 | The container won't start: `tool sync with Kei failed: PUT /api/v1/runtime/tools failed after 5 attempt(s): HTTP 401 ...` | The runtime token is wrong, or was rotated | Put the current credential in the secret manager and restart |
 | The same, with `HTTP 404` | `KEI_RUNTIME_CONTROL_PLANE_URL` is wrong (for example it ends in `/api/v1`), or the control plane doesn't serve the tool sync route | Use the base URL with no path. If it is right, ask Haikei |
 | The same, with `HTTP 409` | A tool name is already registered in the workspace by an admin or another installation | Rename the tool, or remove the other registration in the console |
