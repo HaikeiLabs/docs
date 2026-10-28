@@ -16,3 +16,7 @@ This page has moved. See **[How Kei decides](/kei/reference/how-kei-decides)** f
 - At the same priority, deny wins over allow.
 - If no enabled policy matches, desktop harnesses use their native mode (usually ask); SDK and connector calls fail closed.
 - See [How Kei decides](/kei/reference/how-kei-decides) for the full reference.
+
+![Expanded policy details showing an autogroup member deny covering an engineering grant](/assets/images/policy-docs/policy-detail-deny-overrides.png)
+
+*The member deny covers an overlapping engineering grant.*

@@ -30,6 +30,10 @@ This page walks through creating your first Kei policy. Policies control who may
 6. Under **Advanced**, set **Priority** to `50`.
 7. Click **Save**.
 
+![Create policy form with engineering selected and the Group, Member, and Admin source choices open](/assets/images/policy-docs/create-policy-who.png)
+
+*The Who field offers Group, Member, and Admin sources.*
+
 ### With the CLI
 
 ```bash
