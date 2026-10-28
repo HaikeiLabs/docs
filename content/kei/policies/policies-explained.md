@@ -22,7 +22,7 @@ Kei uses policies to make deterministic authorization decisions for agent tool c
 ## How policies work
 
 1. An admin or owner creates a policy in the console or with the Kei CLI.
-2. Kei distributes the policy to each developer machine's runtime installation.
+2. Kei distributes the policy to each developer machine's runtime installation as a policy bundle ([how bundles reach a runtime](/kei/reference/how-policy-bundles-reach-a-runtime)).
 3. When an agent makes a call, Kei checks matching policies in priority order.
 4. The first matching policy decides — allow or deny.
 
@@ -49,3 +49,4 @@ Desktop harnesses (Claude Code, Codex, OpenCode) receive the policy as native pe
 - [What can I do here?](/kei/policies/what-can-i-do-here) — your next steps based on your role
 - [Ask for access](/kei/policies/ask-for-access) — request access to a workspace or capability
 - [Why was this denied?](/kei/policies/why-was-this-denied) — understanding denials
+- [How policy bundles reach a runtime](/kei/reference/how-policy-bundles-reach-a-runtime) — how a policy gets to each machine
