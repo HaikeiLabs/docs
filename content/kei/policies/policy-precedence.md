@@ -8,11 +8,26 @@ nav_order: 14
 
 # Policy priority and precedence
 
-This page has moved. See **[How Kei decides](/kei/reference/how-kei-decides)** for the current reference on policy precedence, including the priority-based model, matching rules, worked examples, and a note on the planned deny-wins model.
+Kei decides with **deny-overrides**, and policies no longer have a priority. This page keeps its old address; the full reference is **[How Kei decides](/kei/reference/how-kei-decides)**.
 
-## Summary of key points
+## Summary
 
-- Kei uses a priority-based evaluation model: higher-priority policies win.
-- At the same priority, deny wins over allow.
+- When several enabled policies match a request, any matching deny wins, however many allows also match and whatever order the policies were created in.
+- If no policy denies and at least one allow matches, the request is allowed.
 - If no enabled policy matches, desktop harnesses use their native mode (usually ask); SDK and connector calls fail closed.
-- See [How Kei decides](/kei/reference/how-kei-decides) for the full reference.
+- To make an exception to a broad allow, add a narrower deny. There is no priority to set.
+
+```mermaid
+flowchart TD
+  A["Request"] --> B{"Does any matching<br/>policy deny?"}
+  B -->|"yes"| C["Deny"]
+  B -->|"no"| D{"Does any matching<br/>policy allow?"}
+  D -->|"yes"| E["Allow"]
+  D -->|"no"| F["Nothing matched:<br/>fail closed, or the harness's own mode"]
+  classDef deny stroke-width:3px
+  classDef warn stroke:#b45309,stroke-width:2px
+  class C deny
+  class F warn
+```
+
+See [How Kei decides](/kei/reference/how-kei-decides) for worked examples and the comparison with the earlier priority model.

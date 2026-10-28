@@ -18,7 +18,7 @@ flowchart TD
   end
   subgraph CP["Kei control plane"]
     G["Groups & Roles<br/>admins ⊃ developer …"]
-    P["Policy<br/>src: group:developer · user:x · harness:claude_code · *<br/>dst: shell:git · skill:wiki · path:/repo<br/>effect: allow|deny · priority"]
+    P["Policy<br/>src: group:developer · user:x · harness:claude_code · *<br/>dst: shell:git · skill:wiki · path:/repo<br/>effect: allow|deny"]
     R["Policy revision"]
     B["Policy bundle per installation<br/>version · digest · expiry"]
   end

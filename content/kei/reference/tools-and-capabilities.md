@@ -62,7 +62,7 @@ A tool call can declare **required capabilities** — a set of capabilities the 
 
 ### Precedence interactions
 
-- Each capability is evaluated separately using the full precedence ordering (priority, then deny-before-allow, then policy ID).
+- Each capability is evaluated separately with deny-overrides: a matching deny on that capability wins over every matching allow.
 - A tool-call allow never overrides a deny effect on one of its required capabilities.
 - A deny on any single required capability blocks the entire tool call.
 - Unmatched capabilities (no matching policy) follow the default — denied for SDK/connector calls, native decision for desktop harnesses.
@@ -71,10 +71,10 @@ A tool call can declare **required capabilities** — a set of capabilities the 
 
 Consider a tool call that requires both `capability:pull_request.read` and `capability:pull_request.write`:
 
-| Policy | Effect | Priority |
-| ------ | ------ | -------: |
-| `capability:pull_request.read` | allow | 50 |
-| `capability:pull_request.write` | deny | 50 |
+| Policy | Effect |
+| ------ | ------ |
+| `capability:pull_request.read` | allow |
+| `capability:pull_request.write` | deny |
 
 Result: the tool call is **denied** because `capability:pull_request.write` is denied, even though `capability:pull_request.read` is allowed.
 
