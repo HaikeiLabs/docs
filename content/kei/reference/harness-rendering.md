@@ -85,7 +85,7 @@ MCP tools declared in a connector are matched by `mcp:<name>` target patterns. T
 A policy whose source does not match the bundle subject is skipped entirely. This is important for deny policies:
 
 - **If a deny policy is skipped** because its source does not match, the deny never renders. This is correct — the deny should not apply to that subject.
-- **If an allow policy is skipped** because its source does not match, a deny at a lower priority may still render if its source matches and it was not overlapping the skipped allow.
+- **If an allow policy is skipped** because its source does not match, a deny whose source matches may still render, as long as it does not overlap the skipped allow.
 
 For example, a `user:alice` deny for `shell:git push --force` only renders when Alice is the bundle subject. Bob never sees that deny, so he can push if another allow covers him.
 

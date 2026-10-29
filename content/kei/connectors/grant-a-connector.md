@@ -145,7 +145,7 @@ kei policy create \
   --workspace my-workspace
 ```
 
-Policies are evaluated by priority, highest first; at the same priority a deny wins. See [How Kei decides](/kei/reference/how-kei-decides).
+When several policies match, any matching deny wins over every allow. See [How Kei decides](/kei/reference/how-kei-decides).
 
 ## Check it worked
 

@@ -72,14 +72,14 @@ Paths use glob patterns for absolute, lexically cleaned paths. `*` matches withi
 
 ## Skipped-deny behavior
 
-A policy whose source does not match the bundle subject is skipped. If a deny is skipped, it does not render. If a higher-priority deny that overlaps an allow is skipped, the allow is also withheld so the harness asks instead of silently allowing.
+A policy whose source does not match the bundle subject is skipped. If a deny is skipped, it does not render. If a deny that overlaps an allow is skipped, the allow is also withheld so the harness asks instead of silently allowing.
 
 For example:
 
-| Source | Destination | Effect | Priority |
-| ------ | ----------- | ------ | -------: |
-| `group:admins` | `shell:git push --force` | deny | 100 |
-| `*` | `shell:git` | allow | 10 |
+| Source | Destination | Effect |
+| ------ | ----------- | ------ |
+| `group:admins` | `shell:git push --force` | deny |
+| `*` | `shell:git` | allow |
 
 When the subject is not in `admins`, the deny is skipped. The allow would let `git push --force` run without asking, so sync withholds it too. The harness asks before any `git` command.
 
@@ -120,7 +120,7 @@ kei policy test --as group:developers "shell:git push --force" --workspace my-wo
 
 - Use `kei harness sync --dry-run` before every sync to preview changes.
 - Read every `not rendered` line in the dry-run output — it indicates a policy that was skipped.
-- Give deny policies a higher priority than the allows they should override.
+- Express exceptions as denies. A matching deny wins over every allow, so you do not set a priority.
 - Prefer group- and user-based sources over harness-specific sources unless the rule genuinely differs per harness.
 
 ## Learn more

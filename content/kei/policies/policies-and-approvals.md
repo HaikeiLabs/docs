@@ -8,7 +8,7 @@ nav_order: 13
 
 # Policies and approvals
 
-Policies decide whether an agent can use a connector capability, run a shell command, invoke a skill, or access a file path. Each policy has an allow or deny effect, and Kei evaluates matching policies by priority to produce a deterministic decision.
+Policies decide whether an agent can use a connector capability, run a shell command, invoke a skill, or access a file path. Each policy has an allow or deny effect, and Kei evaluates matching policies with deny-overrides to produce a deterministic decision: any matching deny wins.
 
 **New pages with task-oriented guidance:**
 

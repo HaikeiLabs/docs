@@ -93,14 +93,15 @@ kei policy create \
 
 This creates a standing rule that denies `git push --force` for every organization member.
 
-### Recommended priority convention
+### Layering allows and denies
 
-| Layer | Priority | Example |
-| ----- | -------- | ------- |
-| Guardrail denies | 100 | `shell:git push --force` deny for `autogroup:member` |
-| Harness-wide allows | 50 | `shell:git` allow for `*` |
-| Role or group allows | 20 | `shell:git log` allow for `group:junior-devs` |
-| Baseline | 10 | `shell:git` allow for `autogroup:member` |
+Kei decides with deny-overrides, so there is no priority to choose. Write the broad rule as an allow and the exceptions as denies:
+
+| Layer | Example |
+| ----- | ------- |
+| Baseline allow | `shell:git` allow for `autogroup:member` |
+| Group allow | `shell:git log` allow for `group:junior-devs` |
+| Guardrail deny | `shell:git push --force` deny for `autogroup:member` |
 
 ## Check it worked
 
