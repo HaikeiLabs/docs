@@ -119,7 +119,7 @@ The UI and documentation display Allow and Deny. The API and CLI accept `permit`
 
 ## Priority
 
-An integer from 0 to 2147483647. Higher values win when multiple policies match the same request. See [How Kei decides — recommended convention](/kei/reference/how-kei-decides#choosing-precedence) for suggested priority layering.
+Policies have no priority. Kei decides with deny-overrides: when several policies match, any matching deny wins. An older client may still send `priority` on create or update; the value is accepted and ignored. See [How Kei decides](/kei/reference/how-kei-decides).
 
 ## Enabled
 

@@ -39,12 +39,11 @@ Use an `autogroup:` source in any policy `src` pattern. The `--group` flag of `k
 # Allow every member to use basic git commands
 kei policy create --group autogroup:member --allow "shell:git log"
 
-# Deny dangerous operations for regular members but allow for admins
-kei policy create --group autogroup:member --deny "shell:git push --force"
-kei policy create --group autogroup:admin --allow "shell:git push --force"
+# Deny a dangerous operation for everyone in a group
+kei policy create --group contractors --deny "shell:git push --force"
 ```
 
-> **Note:** `autogroup:member` resolves for every caller, including admins and owners. If you want a policy to apply only to non-admin members, use a deny for `autogroup:member` and an allow for `autogroup:admin` at a higher priority. See [How Kei decides — choosing priorities](/kei/reference/how-kei-decides#choosing-precedence).
+> **Warning:** `autogroup:member` resolves for every caller, including admins and owners. Kei decides with deny-overrides, so an allow for `autogroup:admin` cannot lift a deny for `autogroup:member`. To exempt admins, deny a custom group that does not contain them instead of `autogroup:member`. See [How Kei decides](/kei/reference/how-kei-decides).
 
 ## How autogroups differ from regular groups
 

@@ -17,14 +17,14 @@ Kei uses policies to make deterministic authorization decisions for agent tool c
 - **Source** — who the policy applies to: a group, or `autogroup:member` (every member) or `autogroup:admin` (admins and owners). Custom groups hold users, agents, and service principals; a policy never names an individual or an email.
 - **Destination** — what the policy controls, such as a shell command prefix, a tool name, or a connector capability.
 - **Effect** — allow or deny.
-- **Priority** — when multiple policies match, the highest-priority policy wins.
+- **Deny-overrides** — when multiple policies match, any matching deny wins over every allow.
 
 ## How policies work
 
 1. An admin or owner creates a policy in the console or with the Kei CLI.
 2. Kei distributes the policy to each developer machine's runtime installation as a policy bundle ([how bundles reach a runtime](/kei/reference/how-policy-bundles-reach-a-runtime)).
-3. When an agent makes a call, Kei checks matching policies in priority order.
-4. The first matching policy decides — allow or deny.
+3. When an agent makes a call, Kei checks the matching policies.
+4. If any matching policy denies, the call is denied. Otherwise, if one allows, it is allowed. With no match, the call fails closed or uses the harness's own mode.
 
 Desktop harnesses (Claude Code, Codex, OpenCode) receive the policy as native permission settings. The harness makes its own decision from those settings. SDK (Agentware) integrations and connector calls go through `kei-proxy authorize`, which evaluates the policy bundle and returns a decision.
 

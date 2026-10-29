@@ -7,7 +7,7 @@ nav_group: Reference
 
 # Deterministic guardrails
 
-Kei policies are deterministic guardrails for tool-call authorization. A fixed rule engine makes the decision; the agent's model does not. Given the same policy, subject, and call, the result is the same because matching policies are ordered by priority (highest first), deny before allow at equal priority, then policy ID. This makes a narrow, higher-priority rule able to override a broad rule; deny wins a tie.
+Kei policies are deterministic guardrails for tool-call authorization. A fixed rule engine makes the decision; the agent's model does not. Given the same policy, subject, and call, the result is the same because Kei decides with deny-overrides: any matching deny wins over every matching allow, whatever the order. This makes a narrow deny able to override a broad allow.
 
 ## Where Kei enforces policy
 
@@ -19,7 +19,7 @@ These systems address different parts of agent security. The table summarizes th
 
 | Model | Default | Conflict resolution | Conditions and context | Formal analysis | Enforcement point |
 | --- | --- | --- | --- | --- | --- |
-| **Kei** | Unmatched SDK and connector calls deny; unmatched desktop calls use the harness mode, usually ask | Priority descending, deny before allow on a tie, then policy ID | Identity, groups, harness, and registered tool, capability, resource, or connector targets | No policy analyzer or formal verification today | `kei-proxy authorize`, or rules synced to native desktop harness settings |
+| **Kei** | Unmatched SDK and connector calls deny; unmatched desktop calls use the harness mode, usually ask | Deny-overrides: any matching deny wins | Identity, groups, harness, and registered tool, capability, resource, or connector targets | No policy analyzer or formal verification today | `kei-proxy authorize`, or rules synced to native desktop harness settings |
 | **Cedar** | Default deny | Any matching `forbid` overrides `permit`; policy order does not matter | Principal, action, resource, and supplied context, including conditions validated against a schema | Schema validation; Cedar documents a formal proof of validator soundness | Application integration, Amazon Verified Permissions, or an AgentCore gateway |
 | **OPA / Rego** | Defined by the policy author; no universal allow/deny default | The policy author defines how results such as `allow` and `deny` combine | Rego evaluates structured input and data; the application supplies relevant context | Rego supports schema-based type checking; no single policy analysis model is imposed | OPA API, embedded library, or WebAssembly; the integrating application enforces the result |
 | **OpenAPPA** | Its configured label and flow rules govern each action | Algebraic information-flow labels accumulate across a trajectory; it can return policy-based remedy plans | Data origin, audience, trust, action history, and policy configuration; reusable batteries cover tool sets | Its paper states formal safety invariants; its site describes validation and benchmarks | Pre-call and result checks in hooks or protocol gateways; child branches can confine untrusted reads |

@@ -27,8 +27,7 @@ This page walks through creating your first Kei policy. Policies control who may
 3. Set **Who** to a group name, such as `developers`.
 4. Set **What** to `shell:git`.
 5. Set **Effect** to **Allow**.
-6. Under **Advanced**, set **Priority** to `50`.
-7. Click **Save**.
+6. Click **Save**.
 
 ### With the CLI
 
@@ -50,8 +49,7 @@ This creates a policy that allows members of the `developers` group to run any `
 3. Set **Who** to `developers`.
 4. Set **What** to `shell:git push --force`.
 5. Set **Effect** to **Deny**.
-6. Set **Priority** to `100`.
-7. Click **Save**.
+6. Click **Save**.
 
 ### With the CLI
 
@@ -62,7 +60,7 @@ kei policy create \
   --workspace my-workspace
 ```
 
-The higher priority (`100`) ensures the deny overrides the broader `git` allow from the first policy.
+Kei decides with deny-overrides, so this deny overrides the broader `git` allow from the first policy. There is no priority to set.
 
 ## Check it worked
 
@@ -101,7 +99,7 @@ kei harness sync
 ## Best practices
 
 - Start with people and groups as sources. Add `harness:` only when a rule needs to differ by harness kind.
-- Give each rule a distinct priority. Use higher values for guardrail denies and lower values for baseline allows.
+- Write broad allows and narrow denies. A matching deny always wins, so a deny is the way to carve an exception out of an allow.
 - Use `kei policy test` before syncing to verify the decision logic.
 - Run `kei harness sync --dry-run` to preview what will be written to each harness before applying.
 
