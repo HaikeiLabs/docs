@@ -29,6 +29,10 @@ This page walks through creating your first Kei policy. Policies control who may
 5. Set **Effect** to **Allow**.
 6. Click **Save**.
 
+![Create policy form with engineering selected and the Group, Member, and Admin source choices open](/assets/images/policy-docs/create-policy-who.png)
+
+*The Who field offers Group, Member, and Admin sources.*
+
 ### With the CLI
 
 ```bash

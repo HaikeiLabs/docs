@@ -30,4 +30,8 @@ flowchart TD
   class F warn
 ```
 
+![Expanded policy details showing an autogroup member deny covering an engineering grant](/assets/images/policy-docs/policy-detail-deny-overrides.png)
+
+*The member deny covers an overlapping engineering grant.*
+
 See [How Kei decides](/kei/reference/how-kei-decides) for worked examples and the comparison with the earlier priority model.

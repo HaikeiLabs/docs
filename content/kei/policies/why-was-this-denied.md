@@ -14,6 +14,10 @@ When a tool call or command is denied, you can investigate the reason using Kei'
 
 The audit log records every policy decision. Each entry includes:
 
+![Audit decision details showing a force push denied by autogroup:member and the overlapping engineering grant](/assets/images/policy-docs/audit-denied-decision.png)
+
+*The audit record names the deciding policy and why it applied.*
+
 - **Decided by** — the policy that made the decision
 - **Outranked** — other matching policies that lost or were disabled
 - **Decision** — allow or deny

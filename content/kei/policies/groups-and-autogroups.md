@@ -26,6 +26,10 @@ A group is a named collection of users within a workspace. Policies with a `grou
 4. Add members by selecting users.
 5. Click **Save**.
 
+![Engineering group detail with example members and the policies that use the group](/assets/images/policy-docs/group-detail-engineering.png)
+
+*The group drawer shows its members and related policies.*
+
 **With the CLI:**
 
 ```bash
@@ -73,6 +77,10 @@ Autogroups are virtual groups whose membership is determined at runtime from the
 | `autogroup:admin` | Workspace admins and owners | Organization role |
 
 These are the only two autogroups. A caller always resolves to at least `autogroup:member`; admins and owners also resolve to `autogroup:admin`. For policy, the organization Owner counts as an admin — Owner and Admin differ only in the console. To grant access to agents or service principals, add them to a custom group and use `group:<name>` as the source.
+
+![Definitions autogroups table listing autogroup:member and autogroup:admin](/assets/images/policy-docs/autogroup-member.png)
+
+*Member and admin are virtual sources derived from workspace roles.*
 
 ### Create a policy with an autogroup source
 
