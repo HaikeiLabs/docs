@@ -43,7 +43,7 @@ This lets you verify a denial without making the actual call.
 
 | Symptom | Likely cause |
 | ------- | ------------ |
-| A command you expect to work is denied | A higher-priority deny policy matches the request. Check the audit log for the **Decided by** policy. |
+| A command you expect to work is denied | A deny policy matches the request. A matching deny wins over every allow. Check the audit log for the **Decided by** policy. |
 | A tool call is denied on a connector | The connector capability is not allowed by any policy for your user or group. Ask an admin to add a policy. |
 | A command is denied for a teammate but works for you | A group- or user-specific policy applies to them. Check if you are in the same group. |
 | A command asks for confirmation instead of running | No matching deny; no matching allow either. The harness used its default (ask) mode. An admin can add an allow policy. |
@@ -54,7 +54,7 @@ For a Pi built-in tool denied with `preflight_required` or `no_matching_policy`,
 ## What to do next
 
 - If you need access, see [Ask for access](/kei/policies/ask-for-access).
-- If you are an admin and the denial is unexpected, review the matching policies and priorities in the console or with `kei policy list`. See [How Kei decides](/kei/reference/how-kei-decides) for the precedence model.
+- If you are an admin and the denial is unexpected, review the matching policies in the console or with `kei policy list`. See [How Kei decides](/kei/reference/how-kei-decides) for the precedence model.
 - If the denial is from a disabled policy, the admin can enable it in the console.
 
 ## Learn more
