@@ -27,6 +27,12 @@ Connector setup starts after a connector has been added to the workspace. Open *
 
 The setup rail links to each step so you can return to review or adjust access later. The Grant access step is complete when an applicable policy exists. For broader workspace onboarding, start with [Sign in to Kei](/kei/get-started/sign-in).
 
+## Linear {#linear}
+
+Kei-managed Linear connectors use a shared Linear account. Before connecting, create a Linear OAuth application in **Settings → API → OAuth applications → New** and set its callback URL to `https://app.haikeilabs.com/auth/linear-callback`. This URL is a redirect target; opening it directly without an OAuth response shows “missing code or state,” which is expected.
+
+In the Kei console, open the Linear connector and choose **Connect shared account**. Sign in to Linear and authorize the app using the account the workspace should use. Contact your Kei administrator if the connector is not configured for OAuth yet.
+
 ## Per-user connection {#per-user-connection}
 
 Each harness user can sign in from their harness or use the kei CLI. Both entry points open the same sign-in page for the connector. Which entry point is available depends on the harness; follow that harness's setup guide for its sign-in steps.
