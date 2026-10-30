@@ -22,6 +22,18 @@ The SDK (Agentware) integration uses `KeiProxyEvaluator` → `kei-proxy authoriz
 
 No matching policy results in a deny. See the [Create policies](/content/kei/policies/create-policies.html) guide for how to write policies, choose sources and destinations, and understand precedence.
 
+## Exit codes
+
+The one-shot `kei-proxy authorize` command uses its exit status as part of the CLI contract:
+
+| Exit code | Meaning |
+| --- | --- |
+| `0` | The call is permitted. |
+| `1` | The call is denied, including a policy-state denial such as `policy_bundle_missing`. The JSON decision is printed to stdout. |
+| `2` | An error stopped the call before any decision (bad flags, missing input such as `--tool` or `KEI_RUNTIME_TOKEN`, or a runtime failure). Nothing is written to stdout. |
+
+SDK clients treat any exit code other than `0` as no-permit and fail closed.
+
 ## Audit lineage and data boundaries
 
 Record each authorization outcome with its harness or framework and the invoking user preserved through delegation. Keep the decision and its reason available for audit. Do not log the runtime token or other credentials.
