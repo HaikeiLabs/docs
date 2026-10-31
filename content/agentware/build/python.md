@@ -1,4 +1,5 @@
 ---
+description: Install the Agentware Python SDK and run an offline harness that demonstrates allowed and denied tool calls.
 title: Set up a Python harness
 type: read-and-use
 product: agentware
@@ -8,7 +9,7 @@ nav_order: 4
 
 Add Kei governance to a Python agent harness. The SDK provides the `KeiProxySocketAuthorizeClient` and optional helper types for assembling a harness.
 
-Compatible versions: agentware 0.11.0, kei-proxy v0.3.0, kei-cli 0.2.0. For the full API reference, see the [Python package source](https://github.com/haikeilabs/agentware/tree/main/python).
+For Kei compatibility with your installed SDK version, check the [Agentware compatibility table](https://github.com/HaikeiLabs/agentware#compatibility). For the full API reference, see the [Python package source](https://github.com/haikeilabs/agentware/tree/main/python).
 
 ## Install
 
@@ -18,9 +19,9 @@ pip install haikeilabs-agentware
 
 Requires Python 3.10 or later.
 
-## Prerequisites
+## Prerequisites for a real runtime
 
-Run `kei-proxy serve` beside the harness and set `KEI_RUNTIME_SOCKET_PATH` and `KEI_RUNTIME_TOKEN` in the harness process environment. The daemon owns the user session and policy decision. Do not put the token in code, arguments, or logs.
+The fake example below does not need Kei. For a real integration, run `kei-proxy serve` beside the harness and set `KEI_RUNTIME_SOCKET_PATH` and `KEI_RUNTIME_TOKEN` in the harness process environment. The daemon owns the user session and policy decision. Do not put the token in code, arguments, or logs.
 
 ## Run the allow and deny example
 

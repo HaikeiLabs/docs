@@ -8,6 +8,7 @@ import { checkBuiltRoutes, checkLinks } from './check-links.mjs';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const markdown = createMarkdown();
 const siteUrl = 'https://haikeilabs.com';
+const docsUrl = 'https://docs.haikeilabs.com';
 const consoleUrl = 'https://app.haikeilabs.com';
 const discordUrl = 'https://discord.gg/g6QaTYWXDa';
 const repoUrl = 'https://github.com/HaikeiLabs/docs';
@@ -39,6 +40,7 @@ function validatePage(relativePath, raw) {
   for (const key of ['title', 'type', 'product']) {
     if (typeof data[key] !== 'string' || !data[key].trim()) throw new Error(`${relativePath}: front matter requires a non-empty ${key}`);
   }
+  if (data.description !== undefined && (typeof data.description !== 'string' || !data.description.trim())) throw new Error(`${relativePath}: description must be a non-empty string`);
   if (!allowedTypes.has(data.type)) throw new Error(`${relativePath}: type must be read-and-use, make-and-maintain, or reference`);
   if (!allowedProducts.has(data.product)) throw new Error(`${relativePath}: product must be kei or agentware`);
   if (data.nav_group !== undefined && !navGroups.includes(data.nav_group)) throw new Error(`${relativePath}: nav_group must be Get started, Make and maintain, or Reference`);
@@ -108,13 +110,14 @@ const themeInit = `(function () {
   document.documentElement.classList.add('js')
 })()`;
 
-function layout(title, nav, content, { toc = '', mermaid = false } = {}) {
+function layout(title, nav, content, { toc = '', mermaid = false, description = 'Guides for building with Agentware, Kei, and Haikei Skills.', canonical = '/' } = {}) {
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Public documentation for Kei, agentware, and the Haikei skills.">
+  <meta name="description" content="${escapeHtml(description)}">
+  <link rel="canonical" href="${escapeHtml(`${docsUrl}${canonical}`)}">
   <title>${escapeHtml(title)} · Haikei docs</title>
   <script>${themeInit}</script>
   <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
@@ -162,7 +165,7 @@ function renderPage(page, pages) {
   const rendered = markdown.render(stripLeadingTitle(page.body), env);
   const links = `<a class="markdown-link" href="/${escapeHtml(page.relativePath)}">View as Markdown</a><a class="markdown-link" href="${repoUrl}/edit/main/content/${escapeHtml(page.relativePath)}">Edit on GitHub</a>`;
   const body = `<div class="title-row"><h1>${escapeHtml(page.title)}</h1><div class="page-links">${links}</div></div>${validation}<article class="prose">${rendered}</article>${pager(orderedPages(pages), page)}`;
-  return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"') }) };
+  return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"'), description: page.description?.trim() ?? `${page.title} | Haikei documentation for ${page.product}.`, canonical: pageHref(page) }) };
 }
 
 function renderHome(pages) {
@@ -223,6 +226,9 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     '',
   ].join('\n'));
   await writeFile(path.join(outputDir, 'index.html'), renderHome(pages));
+  const sitemapUrls = ['/', ...pages.map(pageHref)];
+  await writeFile(path.join(outputDir, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map((url) => `  <url><loc>${escapeHtml(`${docsUrl}${url}`)}</loc></url>`).join('\n')}\n</urlset>\n`);
+  await writeFile(path.join(outputDir, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${docsUrl}/sitemap.xml\n`);
   // Page manifest consumed by `kei docs` (HAI-735). Keep this shape stable.
   const manifest = orderedPages(pages).map((page) => ({ slug: pageHref(page).slice(1), title: page.title, path: pageHref(page), product: page.product }));
   await writeFile(path.join(outputDir, 'index.json'), `${JSON.stringify(manifest, null, 2)}\n`);
