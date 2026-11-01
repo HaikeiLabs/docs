@@ -42,6 +42,8 @@ async function fixture() {
   const contentDir = path.join(root, 'content');
   const outputDir = path.join(root, 'dist');
   await mkdir(path.join(contentDir, 'kei', 'setup'), { recursive: true });
+  await mkdir(path.join(contentDir, 'agentware', 'build'), { recursive: true });
+  await writeFile(path.join(contentDir, 'agentware/build/overview.md'), '---\ntitle: Agentware\ntype: reference\nproduct: agentware\n---\n\nOverview.\n');
   return { root, contentDir, outputDir };
 }
 
@@ -55,13 +57,47 @@ test('build fails when a make-and-maintain page has no validation metadata', asy
   }
 });
 
+test('build rejects a missing Agentware overview and broken internal links', async () => {
+  const paths = await fixture();
+  try {
+    await rm(path.join(paths.contentDir, 'agentware/build/overview.md'));
+    await writeFile(path.join(paths.contentDir, 'kei/setup/example.md'), '---\ntitle: Example\ntype: reference\nproduct: kei\n---\n\n[Missing](/kei/setup/missing)\n');
+    await assert.rejects(buildDocs({ ...paths, assetsDir }), (error) => {
+      assert.match(error.message, /require content\/agentware\/build\/overview\.md/);
+      assert.match(error.message, /\/kei\/setup\/missing/);
+      return true;
+    });
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
+
+test('static pages expose escaped descriptions, canonical URLs, sitemap and robots', async () => {
+  const paths = await fixture();
+  try {
+    await writeFile(path.join(paths.contentDir, 'kei/setup/example.md'), '---\ntitle: Example\ndescription: "Build & test <tools> safely"\ntype: reference\nproduct: kei\n---\n\nBody.\n');
+    await buildDocs({ ...paths, assetsDir });
+    const html = await readFile(path.join(paths.outputDir, 'kei/setup/example.html'), 'utf8');
+    assert.match(html, /<meta name="description" content="Build &amp; test &lt;tools&gt; safely">/);
+    assert.match(html, /<link rel="canonical" href="https:\/\/docs\.haikeilabs\.com\/kei\/setup\/example">/);
+    const alias = await readFile(path.join(paths.outputDir, 'agentware/index.html'), 'utf8');
+    assert.match(alias, /rel="canonical" href="https:\/\/docs\.haikeilabs\.com\/agentware\/build\/overview"/);
+    const sitemap = await readFile(path.join(paths.outputDir, 'sitemap.xml'), 'utf8');
+    assert.match(sitemap, /<loc>https:\/\/docs\.haikeilabs\.com\/kei\/setup\/example<\/loc>/);
+    assert.doesNotMatch(sitemap, /\.md<\/loc>|\.html<\/loc>|\/agentware<\/loc>/);
+    assert.match(await readFile(path.join(paths.outputDir, 'robots.txt'), 'utf8'), /Sitemap: https:\/\/docs\.haikeilabs\.com\/sitemap\.xml/);
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
+
 test('build accepts validated pages and writes static HTML with a raw Markdown twin', async () => {
   const paths = await fixture();
   try {
     const source = '---\ntitle: Example\ntype: make-and-maintain\nproduct: kei\nvalidated: 2026-10-17\nvalidated_with: kei v0.1.32\n---\n\nRun `kei --version`.\n';
     await writeFile(path.join(paths.contentDir, 'kei/setup/example.md'), source);
     const pages = await buildDocs({ ...paths, assetsDir });
-    assert.equal(pages.length, 1);
+    assert.equal(pages.length, 2);
     const html = await readFile(path.join(paths.outputDir, 'kei/setup/example.html'), 'utf8');
     const twin = await readFile(path.join(paths.outputDir, 'kei/setup/example.md'), 'utf8');
     assert.match(html, /Last validated 2026-10-17 with kei v0\.1\.32/);
@@ -83,7 +119,7 @@ test('sidebar groups pages as Get started, Make and maintain, and Reference', as
     await writeFile(path.join(paths.contentDir, 'kei/reference/cli.md'), '---\ntitle: "Reference: kei CLI"\ntype: reference\nproduct: kei\n---\n\nUse it.\n');
     const pages = await buildDocs({ ...paths, assetsDir });
     const html = await readFile(path.join(paths.outputDir, 'index.html'), 'utf8');
-    assert.equal(pages.length, 3);
+    assert.equal(pages.length, 4);
     assert.match(html, /<div class="nav-section">Get started<\/div>/);
     assert.match(html, /<div class="nav-section">Make and maintain<\/div>/);
     assert.match(html, /<div class="nav-section">Reference<\/div>/);
@@ -210,6 +246,7 @@ test('build publishes index.json: one {slug,title,path,product} per page in side
     await buildDocs({ ...paths, assetsDir });
     const index = JSON.parse(await readFile(path.join(paths.outputDir, 'index.json'), 'utf8'));
     assert.deepEqual(index, [
+      { slug: 'agentware/build/overview', title: 'Agentware', path: '/agentware/build/overview', product: 'agentware' },
       { slug: 'kei/get-started/sign-in', title: 'Sign in to Kei', path: '/kei/get-started/sign-in', product: 'kei' },
       { slug: 'kei/setup/runtime', title: 'Runtime', path: '/kei/setup/runtime', product: 'kei' },
     ]);
@@ -237,11 +274,11 @@ test('Get started sidebar, prev/next chain and manifest follow the order field, 
     const html = await readFile(path.join(paths.outputDir, 'kei/get-started/delta.html'), 'utf8');
     const sidebar = [...html.match(/<aside class="sidebar"[\s\S]*?<\/aside>/)[0].matchAll(/<li><a href="([^"]+)"/g)].map((m) => m[1]);
     const expected = ['echo', 'delta', 'charlie', 'alpha', 'bravo'].map((slug) => `/kei/get-started/${slug}`);
-    assert.deepEqual(sidebar, expected);
+    assert.deepEqual(sidebar.filter((href) => href.startsWith('/kei/')), expected);
     assert.match(html, /class="pager-prev" href="\/kei\/get-started\/echo"/);
     assert.match(html, /class="pager-next" href="\/kei\/get-started\/charlie"/);
     const index = JSON.parse(await readFile(path.join(paths.outputDir, 'index.json'), 'utf8'));
-    assert.deepEqual(index.map((entry) => entry.path), expected);
+    assert.deepEqual(index.map((entry) => entry.path).filter((href) => href.startsWith('/kei/')), expected);
   } finally {
     await rm(paths.root, { recursive: true, force: true });
   }
