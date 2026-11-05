@@ -8,7 +8,7 @@ nav_order: 6
 
 This guide connects a custom Go, Python, or TypeScript harness to a local `kei-proxy` daemon. The daemon is the runtime and policy enforcement point; Kei stores installation and harness metadata. Provider payloads, customer content, and credentials stay out of the control plane.
 
-Compatible versions: agentware 0.11.0, kei-proxy v0.3.0, kei-cli 0.2.0.
+For the Agentware, kei-proxy and kei-cli versions that work together, see [Compatible versions](/content/agentware/build/overview.html#compatible-versions).
 
 ## Prerequisites
 
@@ -124,7 +124,7 @@ kei harness add --kind custom --installation INSTALLATION_ID
 
 ### Register tools over the runtime socket
 
-Agentware 0.11.0 can register tools directly with `kei-proxy` over its Unix socket. Use `ToolSpec` with an explicit `harness_executor` route; the tool name must match the name your harness authorizes. The socket API is available in `kei-proxy` v0.3.0 at `POST /v1/tools:register`.
+From Agentware 0.11.0, you can register tools directly with `kei-proxy` over its Unix socket. Use `ToolSpec` with an explicit `harness_executor` route; the tool name must match the name your harness authorizes. The socket API is `POST /v1/tools:register`, available in `kei-proxy` v0.3.0 or later.
 
 See the language-specific setup pages for code examples:
 
@@ -142,7 +142,7 @@ The manifest is tool metadata, not a credential store or permission grant. The p
 
 ### After tool registration
 
-A registered tool does not become authorizable immediately. The runtime's policy refresher polls the control plane for a new bundle (the catalog sends a `refresh.poll_interval_seconds` of 60; the runtime clamps it to 30–300 seconds, with jitter), and the tool is authorized only once the active bundle lists it. Until then, authorize calls for the tool are denied; against kei-proxy v0.3.0 with a v2 bundle, for example, with `reason_code: preflight_required`.
+A registered tool does not become authorizable immediately. The runtime's policy refresher polls the control plane for a new bundle (the catalog sends a `refresh.poll_interval_seconds` of 60; the runtime clamps it to 30–300 seconds, with jitter), and the tool is authorized only once the active bundle lists it. Until then, authorize calls for the tool are denied; against kei-proxy v0.3.0 or later with a v2 bundle, for example, with `reason_code: preflight_required`.
 
 Session-based SDK flows open a session with `PUT /v1/session` for a `(source, external_id)` pair. If that pair is not a linked identity in the active bundle, the call is denied with `reason_code: subject_unlinked`. Once the person is linked to the installation, the identity reaches the runtime with the next bundle refresh.
 

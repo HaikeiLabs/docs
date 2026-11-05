@@ -550,7 +550,7 @@ my-harness/
 The `go.mod` depends only on agentware:
 
 ```
-require github.com/haikeilabs/agentware/go v0.11.0
+require github.com/haikeilabs/agentware/go v0.16.0
 ```
 
 No direct dependency on `kei-connector-contracts` is needed — agentware wraps
