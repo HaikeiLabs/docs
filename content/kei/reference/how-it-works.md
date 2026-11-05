@@ -1,5 +1,6 @@
 ---
 title: How Kei governs coding agents
+description: "How Kei puts guardrails on coding agents across Claude Code, Codex, OpenCode, Pi, Open WebUI, and Agentware agents."
 type: read-and-use
 product: kei
 nav_group: Reference

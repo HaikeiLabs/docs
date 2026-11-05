@@ -1,5 +1,6 @@
 ---
 title: Govern an agent with agentware
+description: "Use Agentware middleware to put one control point around your agent's tool calls: check requests, apply guardrails, and send protected calls to Kei."
 type: read-and-use
 product: agentware
 nav_group: Reference

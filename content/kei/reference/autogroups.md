@@ -1,5 +1,6 @@
 ---
 title: Autogroups
+description: "Reference for Kei autogroups: virtual groups such as autogroup:member and autogroup:admin, resolved from the caller's organization role."
 type: reference
 product: kei
 nav_group: Reference

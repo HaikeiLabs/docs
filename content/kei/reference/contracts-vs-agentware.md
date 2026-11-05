@@ -1,5 +1,6 @@
 ---
 title: Contracts, Agentware, and how to build a custom connector
+description: "How kei-connector-contracts, Agentware, and connectors fit together, and how to build a custom connector."
 type: reference
 product: kei
 nav_group: Reference

@@ -1,5 +1,6 @@
 ---
 title: Troubleshoot setup
+description: "Fix the most common problems in Kei setup. Each entry gives the symptom, the cause, and the fix."
 type: read-and-use
 product: kei
 nav_group: Get started

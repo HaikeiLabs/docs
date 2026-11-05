@@ -1,5 +1,6 @@
 ---
 title: Your first policy
+description: "Create your first Kei policy step by step in the console or with the kei CLI. Requires the owner or admin role."
 type: make-and-maintain
 product: kei
 nav_group: Make and maintain

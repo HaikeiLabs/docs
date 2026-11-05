@@ -1,5 +1,6 @@
 ---
 title: Policy file syntax
+description: "Reference for the source and target patterns in a Kei policy: groups, autogroups, wildcards, and target kinds."
 type: reference
 product: kei
 nav_group: Reference
