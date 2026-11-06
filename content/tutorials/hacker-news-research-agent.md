@@ -104,7 +104,9 @@ Add a tool to the registry in `agent.ts`, give it a name, description and input 
 
 ### Add permissions and audit
 
-The local policy in this tutorial is a guardrail you wrote and run yourself. To have Kei make the allow and deny decisions instead, add Kei policies to the agent. See [Policy and audit for Agentware SDK harnesses](/agentware/build/policy-and-audit) for how `kei-proxy` checks each tool call and records the decision in the audit log.
+The local policy in this tutorial is a guardrail you wrote and run yourself. Next: [add permissions and audit](/tutorials/add-permissions-and-audit) — read the audit record this agent produces, then move the allow and deny decisions to Kei policies, so `kei-proxy` checks each tool call and someone else manages the rules.
+
+Go deeper: [Policy and audit for Agentware SDK harnesses](/agentware/build/policy-and-audit), for how the runtime checks each call and records the decision in the audit log.
 
 ### Build it in Go
 
