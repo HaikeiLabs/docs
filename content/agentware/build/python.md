@@ -3,8 +3,8 @@ description: Install the Agentware Python SDK and run an offline harness that de
 title: Set up a Python harness
 type: read-and-use
 product: agentware
-nav_group: Make and maintain
-nav_order: 4
+nav_group: Start here
+nav_order: 7
 ---
 
 Add Kei policies to a Python agent harness. Kei policies are deterministic guardrails for the tool calls your agent can make. The SDK provides the `KeiProxySocketAuthorizeClient` and optional helper types for assembling a harness.

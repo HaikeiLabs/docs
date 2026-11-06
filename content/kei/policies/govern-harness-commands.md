@@ -3,10 +3,10 @@ title: Govern harness commands
 description: "Control which shell commands, skills, and file paths Claude Code, Codex, and OpenCode may use, rendered into native settings by kei harness sync."
 type: make-and-maintain
 product: kei
-nav_group: Make and maintain
-nav_order: 15
 validated: 2026-10-22
 validated_with: kei v0.2.11
+nav_group: Make and maintain
+nav_order: 12
 ---
 
 # Govern harness commands

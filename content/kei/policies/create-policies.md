@@ -4,7 +4,7 @@ description: "Create Kei policies in the console or with the kei CLI: who may do
 type: reference
 product: kei
 nav_group: Make and maintain
-nav_order: 12
+nav_order: 8
 ---
 
 # Create policies

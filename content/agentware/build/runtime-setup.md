@@ -4,7 +4,7 @@ description: "Connect a Go, Python, or TypeScript agent to a local kei-proxy dae
 type: read-and-use
 product: agentware
 nav_group: Make and maintain
-nav_order: 6
+nav_order: 2
 ---
 
 This guide connects a custom Go, Python, or TypeScript harness to a local `kei-proxy` daemon. The daemon is the runtime and policy enforcement point; Kei stores installation and harness metadata. Provider payloads, customer content, and credentials stay out of the control plane.

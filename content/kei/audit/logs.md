@@ -4,7 +4,7 @@ description: "Review Kei decision and admin records in the audit log: what each 
 type: read-and-use
 product: kei
 nav_group: Make and maintain
-nav_order: 15
+nav_order: 16
 ---
 # Audit logs
 

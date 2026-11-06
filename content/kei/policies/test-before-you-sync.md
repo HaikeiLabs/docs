@@ -3,10 +3,10 @@ title: Test before you sync
 description: "Test policy changes with kei policy test and preview them with kei harness sync --dry-run before they reach your coding agents."
 type: make-and-maintain
 product: kei
-nav_group: Make and maintain
-nav_order: 17
 validated: 2026-10-21
 validated_with: kei v0.2.5
+nav_group: Make and maintain
+nav_order: 13
 ---
 
 # Test before you sync

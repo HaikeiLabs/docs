@@ -4,7 +4,7 @@ description: "A tool call or command was denied and you need access. Learn how K
 type: read-and-use
 product: kei
 nav_group: Get started
-nav_order: 7
+nav_order: 10
 ---
 
 # Ask for access

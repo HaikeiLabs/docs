@@ -3,10 +3,10 @@ title: Grant a connector
 description: "Create a connector with the kei CLI and give a group access to use it. Requires the owner or admin role."
 type: make-and-maintain
 product: kei
-nav_group: Make and maintain
-nav_order: 18
 validated: 2026-10-22
 validated_with: kei v0.2.10
+nav_group: Make and maintain
+nav_order: 15
 ---
 
 # Grant a connector

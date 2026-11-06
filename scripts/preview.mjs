@@ -9,7 +9,7 @@ const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=
 createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
-    const relative = pathname === '/' ? 'index.html' : pathname.slice(1);
+    const relative = pathname.endsWith('/') ? `${pathname.slice(1)}index.html` : pathname.slice(1);
     let file = path.resolve(root, relative);
     if (!path.extname(file)) file = `${file}.html`;
     if (!file.startsWith(`${root}${path.sep}`) && file !== path.join(root, 'index.html')) throw new Error('Not found');

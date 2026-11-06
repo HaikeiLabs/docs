@@ -4,7 +4,7 @@ description: "How kei-proxy checks each tool call from an Agentware agent agains
 type: read-and-use
 product: agentware
 nav_group: Make and maintain
-nav_order: 7
+nav_order: 3
 ---
 
 An Agentware SDK harness sends every protected tool call through `kei-proxy authorize`. The proxy evaluates the active policy and returns an allow or deny decision; every decision is recorded in the Kei audit log.

@@ -4,7 +4,7 @@ description: "Run Open WebUI with the openwebui-kei image so Kei checks and audi
 type: read-and-use
 product: kei
 nav_group: Make and maintain
-nav_order: 9
+nav_order: 2
 ---
 # Set up Open WebUI with Kei
 

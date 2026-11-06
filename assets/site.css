@@ -16,6 +16,12 @@ a:hover { color: var(--color-accent-hover); }
 .docs-label { text-decoration: none; padding: .1rem .55rem; border: 1px solid var(--color-line-strong); border-radius: 9999px; color: var(--color-muted); font: 500 .75rem/1.4 var(--font-mono); letter-spacing: .04em; }
 .docs-label:hover { border-color: var(--color-accent-text); color: var(--color-accent-text); }
 .header-spacer { flex: 1; }
+/* Global nav: the same links on every page. In the header on wide screens, at the top of the menu on narrow ones. */
+.global-nav { display: flex; align-items: center; gap: .1rem; margin-left: .5rem; }
+.global-nav a, .sidebar-global a { padding: .3rem .55rem; border-radius: .5rem; color: var(--color-muted); font-size: .875rem; font-weight: 500; text-decoration: none; white-space: nowrap; }
+.global-nav a:hover, .sidebar-global a:hover { background: var(--color-surface-hover); color: var(--color-content); }
+.global-nav a[aria-current], .sidebar-global a[aria-current] { color: var(--color-accent-text); }
+.sidebar-global { display: none; }
 .header-link { padding: 0 .5rem; color: var(--color-muted); font-size: .875rem; font-weight: 500; text-decoration: none; }
 .header-link:hover { color: var(--color-accent-text); }
 .icon-link, .theme-toggle, .nav-toggle { display: inline-flex; align-items: center; justify-content: center; min-width: 2.25rem; height: 2.25rem; padding: 0 .75rem; border: 1px solid var(--color-line); border-radius: 9999px; background: transparent; color: var(--color-muted); font: 500 .8rem var(--font-sans); cursor: pointer; text-decoration: none; }
@@ -30,8 +36,10 @@ a:hover { color: var(--color-accent-hover); }
 /* Three-column layout: nav, content, on this page */
 .layout { display: grid; grid-template-columns: 16rem minmax(0, 1fr) 14rem; gap: 0 clamp(1.5rem, 3vw, 3rem); max-width: 84rem; margin: 0 auto; padding: 0 clamp(1rem, 3vw, 2rem); }
 .sidebar { position: sticky; top: 3.5rem; align-self: start; max-height: calc(100vh - 3.5rem); overflow-y: auto; padding: 2rem 0; }
-.nav-section { margin: 1.5rem 0 .4rem; color: var(--color-content); font-size: .8125rem; font-weight: 600; }
-.nav-section:first-child { margin-top: 0; }
+.nav-product { margin: 2rem 0 .25rem; color: var(--color-content); font-size: .9375rem; font-weight: 600; letter-spacing: -.01em; }
+.nav-product:first-child { margin-top: 0; }
+.nav-section { margin: 1rem 0 .4rem; color: var(--color-muted); font-size: .8125rem; font-weight: 600; }
+.nav-product + .nav-section { margin-top: .5rem; }
 .sidebar ul { margin: 0; padding: 0; list-style: none; }
 .sidebar li a { display: block; padding: .3rem .75rem; border-left: 1px solid var(--color-line); color: var(--color-muted); font-size: .875rem; line-height: 1.5; text-decoration: none; }
 .sidebar li a:hover { border-left-color: var(--color-line-strong); color: var(--color-content); }
@@ -104,6 +112,21 @@ h1 { margin: 0; font-size: clamp(1.9rem, 4vw, 2.5rem); font-weight: 600; line-he
 .home-intro { max-width: 40rem; margin: 1rem 0 0; color: var(--color-muted); font-size: 1.25rem; line-height: 1.6; }
 .content > section { margin-top: 2.5rem; }
 .content > section > h2 { margin: 0 0 .9rem; font-size: 1.125rem; font-weight: 600; }
+/* Two paths: equal weight, side by side; each card's first action is the filled one. */
+.path-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; max-width: 52rem; margin-top: 2.25rem; }
+.path-card { display: flex; flex-direction: column; padding: 1.5rem 1.5rem 1.35rem; border: 1px solid var(--color-line); border-top: 3px solid var(--color-accent); border-radius: .75rem; background: var(--color-surface); }
+.path-eyebrow { margin: 0 0 .35rem; color: var(--color-faint); font-size: .8125rem; font-weight: 500; }
+.path-card h2 { margin: 0 0 .6rem; font-size: 1.375rem; font-weight: 600; line-height: 1.25; letter-spacing: -.025em; }
+.path-card > p:not(.path-eyebrow) { flex: 1; margin: 0 0 1.25rem; color: var(--color-muted); line-height: 1.6; }
+.path-actions { display: flex; flex-direction: column; align-items: flex-start; gap: .45rem; margin: 0; padding: 0; list-style: none; font-size: .9375rem; font-weight: 500; }
+.path-actions .path-primary { display: inline-block; margin-bottom: .35rem; padding: .5rem 1rem; border-radius: 9999px; background: var(--color-accent); color: var(--color-on-accent); text-decoration: none; }
+.path-actions .path-primary:hover { background: var(--color-accent-hover); color: var(--color-on-accent); }
+.tutorial-list { display: grid; gap: .75rem; margin: 1.5rem 0 0; padding: 0; list-style: none; }
+.prose .tutorial-list li + li { margin-top: 0; }
+.tutorial-list a { display: flex; flex-direction: column; gap: .25rem; padding: 1rem 1.1rem; border: 1px solid var(--color-line); border-radius: .75rem; background: var(--color-surface); color: var(--color-content); text-decoration: none; }
+.tutorial-list a:hover { border-color: var(--color-accent-text); }
+.tutorial-list strong { color: var(--color-accent-text); }
+.tutorial-list span { color: var(--color-muted); font-size: .9375rem; line-height: 1.55; }
 .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: .75rem; }
 .home-card { display: flex; flex-direction: column; gap: .2rem; padding: 1rem 1.1rem; border: 1px solid var(--color-line); border-radius: .75rem; background: var(--color-surface); color: var(--color-content); text-decoration: none; }
 .home-card:hover { border-color: var(--color-accent-text); color: var(--color-content); }
@@ -112,10 +135,14 @@ h1 { margin: 0; font-size: clamp(1.9rem, 4vw, 2.5rem); font-weight: 600; line-he
 
 @media (max-width: 1100px) {
   .layout { grid-template-columns: 15rem minmax(0, 1fr); }
+  .global-nav a { padding: .3rem .4rem; }
   .toc { display: none; }
 }
 @media (max-width: 800px) {
   .nav-toggle { display: inline-flex; }
+  .global-nav { display: none; }
+  .sidebar-global { display: flex; flex-wrap: wrap; gap: .25rem; margin: 0 0 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--color-line); }
+  .path-grid { grid-template-columns: 1fr; }
   .wordmark { display: none; }
   .site-header { gap: .5rem; padding: 0 1rem; }
   .header-link { padding: 0 .25rem; }

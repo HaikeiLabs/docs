@@ -4,7 +4,7 @@ description: "Kei decides with deny-overrides: any matching deny wins and polici
 type: reference
 product: kei
 nav_group: Make and maintain
-nav_order: 14
+nav_order: 10
 ---
 
 # Policy priority and precedence

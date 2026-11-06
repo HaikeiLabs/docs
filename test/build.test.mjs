@@ -123,14 +123,16 @@ test('sidebar groups pages as Get started, Make and maintain, and Reference', as
     assert.match(html, /<div class="nav-section">Get started<\/div>/);
     assert.match(html, /<div class="nav-section">Make and maintain<\/div>/);
     assert.match(html, /<div class="nav-section">Reference<\/div>/);
-    assert.equal((html.match(/class="nav-section"/g) ?? []).length, 3);
+    // The fixture's Agentware overview has no nav_group, so Agentware shows a Reference group first.
+    assert.equal((html.match(/class="nav-section"/g) ?? []).length, 4);
+    assert.ok(html.indexOf('<div class="nav-product">Agentware</div>') < html.indexOf('<div class="nav-product">Kei</div>'));
     const groups = [
       ['Get started', 'href="/kei/get-started/sign-in"'],
       ['Make and maintain', 'href="/kei/make-and-maintain/runtime"'],
       ['Reference', 'href="/kei/reference/cli"'],
     ];
     for (const [label, link] of groups) {
-      const start = html.indexOf(`<div class="nav-section">${label}</div>`);
+      const start = html.indexOf(`<div class="nav-section">${label}</div>`, html.indexOf('<div class="nav-product">Kei</div>'));
       const next = html.indexOf('<div class="nav-section">', start + 1);
       const section = html.slice(start, next === -1 ? html.indexOf('</nav>', start) : next);
       assert.ok(section.includes(link), `${label} should contain ${link}`);
@@ -198,12 +200,14 @@ test('built pages ship theme-init before stylesheets, header links, TOC and page
     await buildDocs({ ...paths, assetsDir });
     const html = await readFile(path.join(paths.outputDir, 'kei/setup/a.html'), 'utf8');
     assert.ok(html.indexOf("haikei-theme") < html.indexOf('rel="stylesheet"'));
-    assert.match(html, /href="https:\/\/github\.com\/HaikeiLabs\/docs"/);
+    assert.match(html, /href="https:\/\/github\.com\/HaikeiLabs\/docs\/edit\/main\/content\/kei\/setup\/a\.md">Edit on GitHub/);
     assert.match(html, /href="\/kei\/setup\/a\.md">View as Markdown/);
     const header = html.match(/<header class="site-header">[\s\S]*?<\/header>/)[0];
     assert.match(header, /href="https:\/\/haikeilabs\.com"/);
     assert.match(header, /href="https:\/\/app\.haikeilabs\.com">Console</);
     assert.match(header, /href="\/">Docs</);
+    assert.match(header, /<nav class="global-nav" aria-label="Site">/);
+    assert.match(header, /href="https:\/\/github\.com\/HaikeiLabs" aria-label="Haikei Labs on GitHub">GitHub</);
     assert.match(html, /class="toc"/);
     assert.match(html, /class="pager-next" href="\/kei\/setup\/b"/);
     assert.equal((await stat(path.join(paths.outputDir, 'assets/site.js'))).isFile(), true);
