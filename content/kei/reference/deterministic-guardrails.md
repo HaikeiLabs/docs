@@ -32,6 +32,8 @@ The systems also differ in the properties they govern. Kei answers who may call 
 
 Kei provides identity- and group-based authorization for agent tool calls. It can limit which users or groups may invoke registered tools and connector capabilities. It does not track the flow of information read by one tool into a later tool call. Information-flow labels, as used by OpenAPPA, can complement identity-based authorization: one controls who may act, while the other controls where data may flow.
 
+For how Kei relates to Open Policy Agent, Cedar, MCP gateways and sandboxes, and how to use them together, see [Kei compared with OPA, Cedar, MCP gateways and sandboxes](/kei/reference/kei-vs-opa-cedar-gateways-sandboxes).
+
 ## Not yet supported
 
 Kei policies do not yet support conditions such as time windows or transaction amounts, time-bound just-in-time grants, or formal or SMT policy analysis. Desktop-harness decisions also do not yet include Kei policy-ID attribution.
