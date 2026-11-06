@@ -1,5 +1,6 @@
 ---
 title: Time-bound access
+description: "Grant a user or group temporary access to a workspace or capability from the Kei console, for incidents or short tasks."
 type: make-and-maintain
 product: kei
 nav_group: Make and maintain

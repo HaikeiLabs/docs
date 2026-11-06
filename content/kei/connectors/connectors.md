@@ -1,5 +1,6 @@
 ---
 title: Connectors
+description: "Set up a connector in the Kei console: connect an account, review and approve its tools, and make it ready for agents."
 type: read-and-use
 product: kei
 nav_group: Make and maintain

@@ -1,10 +1,11 @@
 ---
-title: How Kei checks coding agents
+title: How Kei puts guardrails on coding agents
+description: "How Kei puts guardrails on coding agents across Claude Code, Codex, OpenCode, Pi, Open WebUI, and Agentware agents."
 type: read-and-use
 product: kei
 nav_group: Reference
 ---
-# How Kei checks coding agents
+# How Kei puts guardrails on coding agents
 
 Kei supports six harness types: Claude Code, Codex, OpenCode, Pi, Open WebUI, and SDK (Agentware). Claude Code, Codex, and OpenCode are desktop harnesses; Pi uses its own package and local-socket adapter; Open WebUI uses its own integration; other agents integrate through the Agentware SDK. Each developer machine has one runtime installation, and each harness session is associated with it. Kei renders eligible command policies into desktop editor settings; each editor makes its own **native decision** (allow, deny, or ask), and Kei audits the session.
 

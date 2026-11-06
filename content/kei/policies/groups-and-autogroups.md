@@ -1,5 +1,6 @@
 ---
 title: Groups & autogroups
+description: "Create Kei groups to decide who a policy applies to, and use autogroups that follow organization roles."
 type: make-and-maintain
 product: kei
 nav_group: Make and maintain

@@ -1,5 +1,6 @@
 ---
 title: Connect your agent
+description: "Connect Claude Code, Codex, OpenCode, Pi, or another agent to the Kei runtime on this machine."
 type: read-and-use
 product: kei
 nav_group: Get started
@@ -8,7 +9,7 @@ nav_order: 3
 
 # Connect your agent
 
-Choose the agent you want to connect and follow its setup page. This step connects the agent's harness to the runtime on this machine. Installing skills alone does not connect an agent.
+Choose the agent you want to connect and follow its setup page. This step connects the agent's harness to the runtime on this machine. Installing skills alone does not connect an agent. If your agent does not have them yet, start with [Install Haikei Skills in your coding assistant](/skills/).
 
 - [Claude Code](/kei/connect-your-harness/harness-setup#claude-code)
 - [Codex](/kei/connect-your-harness/harness-setup#codex)

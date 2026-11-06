@@ -1,5 +1,6 @@
 ---
 title: Deny reason codes and hints
+description: "Every reason_code a kei-proxy deny can return, with the hint that tells you what to fix next."
 type: reference
 product: agentware
 nav_group: Reference

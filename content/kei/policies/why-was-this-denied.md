@@ -1,5 +1,6 @@
 ---
 title: Why was this denied?
+description: "Find out why Kei denied a tool call or command, using the audit log and kei policy test."
 type: read-and-use
 product: kei
 nav_group: Get started

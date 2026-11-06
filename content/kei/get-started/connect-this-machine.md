@@ -1,5 +1,6 @@
 ---
 title: Connect this machine
+description: "Install the kei CLI and the kei-proxy runtime on the machine that runs your agent, and deliver its runtime credential safely."
 type: read-and-use
 product: kei
 nav_group: Get started

@@ -10,6 +10,8 @@
     "check:frontmatter": "node scripts/check-frontmatter.mjs",
     "check:language": "node scripts/check-language.mjs",
     "check:links": "node scripts/check-links.mjs",
+    "check:compat": "node scripts/check-compat.mjs",
+    "sync:compat": "node scripts/sync-compat.mjs",
     "build": "node scripts/build.mjs",
     "test": "node --test",
     "preview": "node scripts/preview.mjs"

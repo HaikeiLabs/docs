@@ -1,5 +1,6 @@
 ---
 title: What can I do here?
+description: "Find your next step in Kei based on your role and what you want to do."
 type: read-and-use
 product: kei
 nav_group: Get started

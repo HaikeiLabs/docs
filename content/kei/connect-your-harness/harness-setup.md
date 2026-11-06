@@ -1,5 +1,6 @@
 ---
 title: Connect a harness to an agent
+description: "Connect Claude Code, Codex, OpenCode, Pi, Open WebUI, or an Agentware agent to Kei, and install Haikei Skills in your coding agent."
 type: read-and-use
 product: kei
 nav_group: Make and maintain

@@ -1,5 +1,6 @@
 ---
 title: Deterministic guardrails
+description: "Kei policies are deterministic guardrails: a fixed rule engine, not a model, decides each tool call, and any matching deny wins."
 type: reference
 product: kei
 nav_group: Reference

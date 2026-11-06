@@ -1,5 +1,6 @@
 ---
 title: Policies and approvals
+description: "How Kei policies allow or deny connector capabilities, shell commands, skills, and file paths, and where to find task guides."
 type: reference
 product: kei
 nav_group: Make and maintain

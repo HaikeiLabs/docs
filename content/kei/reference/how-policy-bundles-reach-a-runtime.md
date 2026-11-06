@@ -1,5 +1,6 @@
 ---
 title: How policy bundles reach a runtime
+description: "How Kei builds a policy bundle for one runtime installation, how the runtime gets it, and why a newer field can be missing."
 type: read-and-use
 product: kei
 nav_group: Reference

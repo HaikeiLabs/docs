@@ -1,5 +1,6 @@
 ---
 title: Contracts, Agentware, and how to build a custom connector
+description: "How kei-connector-contracts, Agentware, and connectors fit together, and how to build a custom connector."
 type: reference
 product: kei
 nav_group: Reference
@@ -550,7 +551,7 @@ my-harness/
 The `go.mod` depends only on agentware:
 
 ```
-require github.com/haikeilabs/agentware/go v0.11.0
+require github.com/haikeilabs/agentware/go v0.16.0
 ```
 
 No direct dependency on `kei-connector-contracts` is needed — agentware wraps

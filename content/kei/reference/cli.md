@@ -1,5 +1,6 @@
 ---
 title: "Reference: kei CLI"
+description: "Reference for the kei CLI: commands for signing in and administering Kei runtime installations, plus sign-in troubleshooting."
 type: reference
 product: kei
 nav_group: Reference

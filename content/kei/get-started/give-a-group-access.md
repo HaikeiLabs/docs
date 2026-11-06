@@ -1,5 +1,6 @@
 ---
 title: Give a group access
+description: "Add your agent's user to a Kei group, then write a policy that allows only the operations your workflow needs."
 type: read-and-use
 product: kei
 nav_group: Get started

@@ -1,14 +1,15 @@
 ---
-title: Install Kei skills in your agent
+title: Install Haikei Skills in your agent
+description: "Install Haikei Skills in your coding agent so it knows how to set up and use Kei. Skills do not install a runtime or grant access."
 type: read-and-use
 product: kei
 nav_group: Get started
 nav_order: 5
 ---
 
-# Install Kei skills in your agent
+# Install Haikei Skills in your agent
 
-Install the public Kei skills in the agent you plan to use. Skills give an agent reusable instructions for Kei setup; they do not install a runtime or grant access.
+Install the public Haikei Skills in the agent you plan to use. Skills give an agent reusable instructions for Kei setup; they do not install a runtime or grant access. For the install command for every assistant, see [/skills/](/skills/).
 
 Install the router skill together with the area skill you need. For example, to install Kei harness setup for Codex:
 
@@ -30,6 +31,6 @@ Alternatively, Claude Code and Codex can use the [plugin marketplace instruction
 
 ## Check it worked
 
-Ask your agent to list the Kei skills it can use. Continue with [Connect this machine](/kei/get-started/connect-this-machine) to install the runtime tools and connect a runtime installation.
+Ask your agent to list the Haikei Skills it can use. Continue with [Connect this machine](/kei/get-started/connect-this-machine) to install the runtime tools and connect a runtime installation.
 
 Stuck? See [Troubleshoot setup](/kei/get-started/troubleshooting).
