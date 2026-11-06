@@ -1,5 +1,6 @@
 ---
 title: Install Haikei Skills in your agent
+description: "Install Haikei Skills in your coding agent so it knows how to set up and use Kei. Skills do not install a runtime or grant access."
 type: read-and-use
 product: kei
 nav_group: Get started

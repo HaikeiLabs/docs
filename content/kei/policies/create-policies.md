@@ -1,5 +1,6 @@
 ---
 title: Create policies
+description: "Create Kei policies in the console or with the kei CLI: who may do what, and whether it is allowed or denied."
 type: reference
 product: kei
 nav_group: Make and maintain

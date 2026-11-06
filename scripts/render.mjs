@@ -144,6 +144,21 @@ export function stripLeadingTitle(body) {
   return body.replace(/^\s*# [^\n]*\n+/, '');
 }
 
+// Whole-line HTML comments (such as the generated compat block markers) stay in the
+// raw Markdown but are dropped from the HTML; the renderer escapes inline HTML.
+export function stripHtmlComments(body) {
+  let fence = null;
+  return body.split('\n').filter((line) => {
+    const marker = line.match(/^\s*(`{3,}|~{3,})/);
+    if (marker) {
+      if (!fence) fence = marker[1][0];
+      else if (marker[1][0] === fence) fence = null;
+      return true;
+    }
+    return fence || !/^\s*<!--.*-->\s*$/.test(line);
+  }).join('\n');
+}
+
 export function createMarkdown() {
   const md = new MarkdownIt({ html: false, linkify: true, typographer: true });
   md.use(headingsPlugin).use(calloutsPlugin).use(fencePlugin);

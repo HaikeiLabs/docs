@@ -1,5 +1,6 @@
 ---
 title: Troubleshoot the runtime container
+description: "Fix a kei-proxy runtime container that fails to start or never connects. Each entry lists the symptom, cause, fix, and check."
 type: read-and-use
 product: kei
 nav_group: Make and maintain

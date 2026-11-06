@@ -1,5 +1,6 @@
 ---
 title: Connectors, explained
+description: "What a Kei connector is, how it links an external service such as GitHub, Linear, or an MCP server, and how Kei checks each call."
 type: reference
 product: kei
 nav_group: Reference

@@ -1,5 +1,6 @@
 ---
 title: Tools and capabilities
+description: "How Kei policies match tool: and capability: targets, how required_capabilities are evaluated, and how capability names are built."
 type: reference
 product: kei
 nav_group: Reference

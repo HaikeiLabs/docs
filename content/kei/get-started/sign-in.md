@@ -1,5 +1,6 @@
 ---
 title: Sign in to Kei
+description: "Sign in to the Kei web app, then choose the organization and workspace where you will connect an agent."
 type: read-and-use
 product: kei
 nav_group: Get started

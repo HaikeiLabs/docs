@@ -1,5 +1,6 @@
 ---
 title: Sync an Entra security group to Kei
+description: "Sync one Microsoft Entra security group and its direct user members into a Kei organization as a Kei group."
 type: read-and-use
 product: kei
 nav_group: Make and maintain

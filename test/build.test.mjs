@@ -43,14 +43,14 @@ async function fixture() {
   const outputDir = path.join(root, 'dist');
   await mkdir(path.join(contentDir, 'kei', 'setup'), { recursive: true });
   await mkdir(path.join(contentDir, 'agentware', 'build'), { recursive: true });
-  await writeFile(path.join(contentDir, 'agentware/build/overview.md'), '---\ntitle: Agentware\ntype: reference\nproduct: agentware\n---\n\nOverview.\n');
+  await writeFile(path.join(contentDir, 'agentware/build/overview.md'), '---\ntitle: Agentware\ndescription: Test page.\ntype: reference\nproduct: agentware\n---\n\nOverview.\n');
   return { root, contentDir, outputDir };
 }
 
 test('build fails when a make-and-maintain page has no validation metadata', async () => {
   const paths = await fixture();
   try {
-    await writeFile(path.join(paths.contentDir, 'kei/setup/example.md'), '---\ntitle: Example\ntype: make-and-maintain\nproduct: kei\n---\n\nDo the task.\n');
+    await writeFile(path.join(paths.contentDir, 'kei/setup/example.md'), '---\ntitle: Example\ndescription: Test page.\ntype: make-and-maintain\nproduct: kei\n---\n\nDo the task.\n');
     await assert.rejects(buildDocs({ ...paths, assetsDir }), /require validated: YYYY-MM-DD/);
   } finally {
     await rm(paths.root, { recursive: true, force: true });
@@ -61,7 +61,7 @@ test('build rejects a missing Agentware overview and broken internal links', asy
   const paths = await fixture();
   try {
     await rm(path.join(paths.contentDir, 'agentware/build/overview.md'));
-    await writeFile(path.join(paths.contentDir, 'kei/setup/example.md'), '---\ntitle: Example\ntype: reference\nproduct: kei\n---\n\n[Missing](/kei/setup/missing)\n');
+    await writeFile(path.join(paths.contentDir, 'kei/setup/example.md'), '---\ntitle: Example\ndescription: Test page.\ntype: reference\nproduct: kei\n---\n\n[Missing](/kei/setup/missing)\n');
     await assert.rejects(buildDocs({ ...paths, assetsDir }), (error) => {
       assert.match(error.message, /require content\/agentware\/build\/overview\.md/);
       assert.match(error.message, /\/kei\/setup\/missing/);
@@ -94,7 +94,7 @@ test('static pages expose escaped descriptions, canonical URLs, sitemap and robo
 test('build accepts validated pages and writes static HTML with a raw Markdown twin', async () => {
   const paths = await fixture();
   try {
-    const source = '---\ntitle: Example\ntype: make-and-maintain\nproduct: kei\nvalidated: 2026-10-17\nvalidated_with: kei v0.1.32\n---\n\nRun `kei --version`.\n';
+    const source = '---\ntitle: Example\ndescription: Test page.\ntype: make-and-maintain\nproduct: kei\nvalidated: 2026-10-17\nvalidated_with: kei v0.1.32\n---\n\nRun `kei --version`.\n';
     await writeFile(path.join(paths.contentDir, 'kei/setup/example.md'), source);
     const pages = await buildDocs({ ...paths, assetsDir });
     assert.equal(pages.length, 2);
@@ -114,9 +114,9 @@ test('sidebar groups pages as Get started, Make and maintain, and Reference', as
     await mkdir(path.join(paths.contentDir, 'kei', 'get-started'), { recursive: true });
     await mkdir(path.join(paths.contentDir, 'kei', 'make-and-maintain'), { recursive: true });
     await mkdir(path.join(paths.contentDir, 'kei', 'reference'), { recursive: true });
-    await writeFile(path.join(paths.contentDir, 'kei/get-started/sign-in.md'), '---\ntitle: Sign in\ntype: read-and-use\nproduct: kei\nnav_group: Get started\nnav_order: 1\n---\n\nSign in.\n');
-    await writeFile(path.join(paths.contentDir, 'kei/make-and-maintain/runtime.md'), '---\ntitle: Deploy a runtime\ntype: read-and-use\nproduct: kei\nnav_group: Make and maintain\nnav_order: 1\n---\n\nDeploy it.\n');
-    await writeFile(path.join(paths.contentDir, 'kei/reference/cli.md'), '---\ntitle: "Reference: kei CLI"\ntype: reference\nproduct: kei\n---\n\nUse it.\n');
+    await writeFile(path.join(paths.contentDir, 'kei/get-started/sign-in.md'), '---\ntitle: Sign in\ndescription: Test page.\ntype: read-and-use\nproduct: kei\nnav_group: Get started\nnav_order: 1\n---\n\nSign in.\n');
+    await writeFile(path.join(paths.contentDir, 'kei/make-and-maintain/runtime.md'), '---\ntitle: Deploy a runtime\ndescription: Test page.\ntype: read-and-use\nproduct: kei\nnav_group: Make and maintain\nnav_order: 1\n---\n\nDeploy it.\n');
+    await writeFile(path.join(paths.contentDir, 'kei/reference/cli.md'), '---\ntitle: "Reference: kei CLI"\ndescription: Test page.\ntype: reference\nproduct: kei\n---\n\nUse it.\n');
     const pages = await buildDocs({ ...paths, assetsDir });
     const html = await readFile(path.join(paths.outputDir, 'index.html'), 'utf8');
     assert.equal(pages.length, 4);
@@ -144,7 +144,7 @@ test('navigation uses explicit groups and order, defaulting unconfigured pages t
   const paths = await fixture();
   try {
     await mkdir(path.join(paths.contentDir, 'agentware', 'build'), { recursive: true });
-    const page = (title, nav = '') => `---\ntitle: ${title}\ntype: reference\nproduct: agentware\n${nav}---\n\nBody.\n`;
+    const page = (title, nav = '') => `---\ntitle: ${title}\ndescription: Test page.\ntype: reference\nproduct: agentware\n${nav}---\n\nBody.\n`;
     await writeFile(path.join(paths.contentDir, 'agentware/build/z-first.md'), page('First', 'nav_group: Make and maintain\nnav_order: 1\n'));
     await writeFile(path.join(paths.contentDir, 'agentware/build/a-second.md'), page('Second', 'nav_group: Make and maintain\nnav_order: 2\n'));
     await writeFile(path.join(paths.contentDir, 'agentware/build/b-default.md'), page('Default'));
@@ -192,7 +192,7 @@ test('build writes clean HTML and Markdown paths with extensionless sidebar link
 test('built pages ship theme-init before stylesheets, header links, TOC and pager while keeping the URL contract', async () => {
   const paths = await fixture();
   try {
-    const page = (title, extra = '') => `---\ntitle: ${title}\ntype: reference\nproduct: kei\n---\n\n## One\n\n## Two\n\n## Three\n\n\`\`\`sh\nkei help\n\`\`\`\n${extra}`;
+    const page = (title, extra = '') => `---\ntitle: ${title}\ndescription: Test page.\ntype: reference\nproduct: kei\n---\n\n## One\n\n## Two\n\n## Three\n\n\`\`\`sh\nkei help\n\`\`\`\n${extra}`;
     await writeFile(path.join(paths.contentDir, 'kei/setup/a.md'), page('Alpha'));
     await writeFile(path.join(paths.contentDir, 'kei/setup/b.md'), page('Beta'));
     await buildDocs({ ...paths, assetsDir });
@@ -216,8 +216,8 @@ test('built pages ship theme-init before stylesheets, header links, TOC and page
 test('Mermaid pages render diagram containers and load the pinned renderer while raw Markdown stays unchanged', async () => {
   const paths = await fixture();
   try {
-    const source = '---\ntitle: Mermaid example\ntype: reference\nproduct: kei\n---\n\n```mermaid\ngraph TD\n  A[Policy] --> B[Allow]\n```\n';
-    const plain = '---\ntitle: Plain example\ntype: reference\nproduct: kei\n---\n\n```sh\necho hello\n```\n';
+    const source = '---\ntitle: Mermaid example\ndescription: Test page.\ntype: reference\nproduct: kei\n---\n\n```mermaid\ngraph TD\n  A[Policy] --> B[Allow]\n```\n';
+    const plain = '---\ntitle: Plain example\ndescription: Test page.\ntype: reference\nproduct: kei\n---\n\n```sh\necho hello\n```\n';
     await writeFile(path.join(paths.contentDir, 'kei/setup/diagram.md'), source);
     await writeFile(path.join(paths.contentDir, 'kei/setup/plain.md'), plain);
     await buildDocs({ ...paths, assetsDir });
@@ -240,7 +240,7 @@ test('build publishes index.json: one {slug,title,path,product} per page in side
   const paths = await fixture();
   try {
     await mkdir(path.join(paths.contentDir, 'kei', 'get-started'), { recursive: true });
-    const page = (title) => `---\ntitle: ${title}\ntype: reference\nproduct: kei\n---\n\nBody.\n`;
+    const page = (title) => `---\ntitle: ${title}\ndescription: Test page.\ntype: reference\nproduct: kei\n---\n\nBody.\n`;
     await writeFile(path.join(paths.contentDir, 'kei/setup/runtime.md'), page('Runtime'));
     await writeFile(path.join(paths.contentDir, 'kei/get-started/sign-in.md'), page('Sign in to Kei'));
     await buildDocs({ ...paths, assetsDir });
@@ -263,7 +263,7 @@ test('Get started sidebar, prev/next chain and manifest follow the order field, 
   const paths = await fixture();
   try {
     await mkdir(path.join(paths.contentDir, 'kei', 'get-started'), { recursive: true });
-    const page = (title, order) => `---\ntitle: ${title}\ntype: read-and-use\nproduct: kei\nnav_group: Get started\n${order ? `order: ${order}\n` : ''}---\n\nBody.\n`;
+    const page = (title, order) => `---\ntitle: ${title}\ndescription: Test page.\ntype: read-and-use\nproduct: kei\nnav_group: Get started\n${order ? `order: ${order}\n` : ''}---\n\nBody.\n`;
     // Alphabetical by title would be Alpha, Bravo, Charlie, Delta, Echo.
     await writeFile(path.join(paths.contentDir, 'kei/get-started/echo.md'), page('Echo', 1));
     await writeFile(path.join(paths.contentDir, 'kei/get-started/delta.md'), page('Delta', 2));
@@ -287,7 +287,7 @@ test('Get started sidebar, prev/next chain and manifest follow the order field, 
 test('build rejects an order that is not a positive integer', async () => {
   const paths = await fixture();
   try {
-    await writeFile(path.join(paths.contentDir, 'kei/setup/a.md'), '---\ntitle: A\ntype: reference\nproduct: kei\norder: first\n---\n\nBody.\n');
+    await writeFile(path.join(paths.contentDir, 'kei/setup/a.md'), '---\ntitle: A\ndescription: Test page.\ntype: reference\nproduct: kei\norder: first\n---\n\nBody.\n');
     await assert.rejects(buildDocs({ ...paths, assetsDir }), /order must be a positive integer/);
   } finally {
     await rm(paths.root, { recursive: true, force: true });
@@ -297,7 +297,7 @@ test('build rejects an order that is not a positive integer', async () => {
 test('header and footer link the Discord community, opening safely in a new tab', async () => {
   const paths = await fixture();
   try {
-    await writeFile(path.join(paths.contentDir, 'kei/setup/a.md'), '---\ntitle: Alpha\ntype: reference\nproduct: kei\n---\n\nBody.\n');
+    await writeFile(path.join(paths.contentDir, 'kei/setup/a.md'), '---\ntitle: Alpha\ndescription: Test page.\ntype: reference\nproduct: kei\n---\n\nBody.\n');
     await buildDocs({ ...paths, assetsDir });
     for (const file of ['kei/setup/a.html', 'index.html']) {
       const html = await readFile(path.join(paths.outputDir, file), 'utf8');

@@ -1,5 +1,6 @@
 ---
 title: Audit logs
+description: "Review Kei decision and admin records in the audit log: what each record holds, what is redacted, and how to search and filter it."
 type: read-and-use
 product: kei
 nav_group: Make and maintain

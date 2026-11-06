@@ -1,5 +1,6 @@
 ---
 title: Ask for access
+description: "A tool call or command was denied and you need access. Learn how Kei grants it through groups and policies, and who to ask."
 type: read-and-use
 product: kei
 nav_group: Get started

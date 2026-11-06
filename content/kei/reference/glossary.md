@@ -1,5 +1,6 @@
 ---
 title: Kei terms
+description: "Definitions of the terms used across the Kei docs: agent, harness, workspace, runtime, policy, and more."
 type: reference
 product: kei
 nav_group: Reference

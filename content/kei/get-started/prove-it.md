@@ -1,5 +1,6 @@
 ---
 title: Prove access with an allow and a deny
+description: "Make one allowed and one denied request from your connected agent to prove Kei enforces your policy."
 type: read-and-use
 product: kei
 nav_group: Get started
