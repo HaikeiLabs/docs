@@ -3,7 +3,7 @@ import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import YAML from 'yaml';
-import { createMarkdown, escapeHtml, neighbours, renderToc, stripLeadingTitle } from './render.mjs';
+import { createMarkdown, escapeHtml, neighbours, renderToc, stripHtmlComments, stripLeadingTitle } from './render.mjs';
 import { checkBuiltRoutes, checkLinks } from './check-links.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -186,7 +186,7 @@ function renderPage(page, pages) {
     ? `<p class="validated">Last validated ${escapeHtml(page.validated)} with ${escapeHtml(page.validated_with)}</p>`
     : '';
   const env = {};
-  const rendered = markdown.render(stripLeadingTitle(page.body), env);
+  const rendered = markdown.render(stripHtmlComments(stripLeadingTitle(page.body)), env);
   const links = `<a class="markdown-link" href="/${escapeHtml(page.relativePath)}">View as Markdown</a><a class="markdown-link" href="${repoUrl}/edit/main/content/${escapeHtml(page.relativePath)}">Edit on GitHub</a>`;
   const body = `<div class="title-row"><h1>${escapeHtml(page.title)}</h1><div class="page-links">${links}</div></div>${validation}<article class="prose">${rendered}</article>${pager(orderedPages(pages), page)}`;
   return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"'), description: page.description.trim(), canonical: pageHref(page), ogType: 'article' }) };

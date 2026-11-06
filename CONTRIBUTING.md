@@ -53,6 +53,12 @@ The build writes the search and share metadata; you do not add it by hand:
 - `dist/sitemap.xml` lists the home and every page in `dist/index.json`. `dist/robots.txt` allows all crawlers and names the sitemap.
 - The raw Markdown copies are served with a `Link: <page URL>; rel="canonical"` header from `dist/_headers`, so search engines index the HTML page instead of the copy. Cloudflare Pages allows 100 `_headers` rules; the build fails before that limit so the copies can move to one `X-Robots-Tag: noindex` rule.
 
+## Agentware versions
+
+The Agentware compatibility table in `content/agentware/build/overview.md` is generated between `<!-- compat:begin -->` and `<!-- compat:end -->` from agentware's `VERSION` file and README table. Don't edit it by hand. After an agentware release, run `npm run sync:compat` (or `npm run sync:compat -- --from ../agentware` for a local checkout). It refreshes the vendored copy in `scripts/data/agentware-compat.json` and the block.
+
+`npm test` and `npm run check:compat` run offline against the vendored copy. They fail when the block is stale, when a page keeps its own "Compatible versions:" line, or when a page names an Agentware version other than the current one without writing it as a floor. Write feature floors as "from Agentware 0.11.0" or "Agentware 0.11.0 or later", and link to the shared block for the versions that work together.
+
 ## Page conventions
 
 - The page `title` is rendered in the header row; a leading `# Title` in the body is dropped.
