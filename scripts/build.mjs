@@ -215,10 +215,10 @@ const themeInit = `(function () {
 })()`;
 
 // C4 Consent Mode v2 defaults are set before config. No Google signals, no ad storage.
-// Skipped on local hosts so previews and tests never report.
+// Allowlist, as on the marketing site: only the production host reports, so local
+// previews and Cloudflare Pages previews (*.pages.dev) never send hits.
 const ga4Snippet = `<script>(function () {
-  var host = location.hostname
-  if (!host || host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host.endsWith('.localhost')) return
+  if (location.hostname !== 'docs.haikeilabs.com') return
   window.dataLayer = window.dataLayer || []
   function gtag() { dataLayer.push(arguments) }
   window.gtag = gtag

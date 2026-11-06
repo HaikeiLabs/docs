@@ -54,8 +54,29 @@ test('ga4: every page head loads gtag.js with Consent Mode v2 defaults before co
     assert.match(h, /ad_user_data: 'denied'/);
     assert.match(h, /ad_personalization: 'denied'/);
     assert.match(h, /allow_google_signals: false/);
-    assert.match(h, /localhost/, `${file}: must not load on localhost`);
+    assert.match(h, /if \(location\.hostname !== 'docs\.haikeilabs\.com'\) return/, `${file}: loads only on the production host`);
   }
+}));
+
+// Run the built head snippet against a host and report what it queued and loaded.
+function runSnippet(html, hostname) {
+  const source = head(html).match(/<script>(\(function \(\) \{\n  if \(location\.hostname[\s\S]*?)<\/script>/)[1];
+  const loaded = [];
+  const document = { createElement: () => ({}), head: { appendChild: (s) => loaded.push(s.src) } };
+  const window = vm.createContext({ document, location: { hostname }, Date });
+  window.window = window; // in a browser, window is the global, so bare dataLayer resolves
+  vm.runInContext(source, window);
+  return { queued: Array.from(window.dataLayer ?? [], (args) => args[0]), loaded };
+}
+
+test('ga4: allowlist loads only on docs.haikeilabs.com', () => withSite(async (read) => {
+  const html = await read('index.html');
+  for (const host of ['localhost', '127.0.0.1', 'feat-ga4.haikei-docs.pages.dev', 'haikei-docs.pages.dev', 'docs.haikeilabs.com.evil.example', '']) {
+    assert.deepEqual(runSnippet(html, host), { queued: [], loaded: [] }, host);
+  }
+  const prod = runSnippet(html, 'docs.haikeilabs.com');
+  assert.deepEqual(prod.queued, ['consent', 'js', 'config']);
+  assert.deepEqual(prod.loaded, ['https://www.googletagmanager.com/gtag/js?id=G-EV3X1G9P73']);
 }));
 
 test('ga4: build marks skills commands with data-assistant', () => withSite(async (read) => {
