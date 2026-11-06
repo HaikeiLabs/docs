@@ -259,6 +259,10 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   await writeFile(path.join(outputDir, 'agentware/build/index.html'), overviewHtml);
   await mkdir(path.join(outputDir, 'agentware'), { recursive: true });
   await writeFile(path.join(outputDir, 'agentware/index.html'), overviewHtml);
+  if (pages.some((page) => page.relativePath === 'skills.md')) {
+    await mkdir(path.join(outputDir, 'skills'), { recursive: true });
+    await writeFile(path.join(outputDir, 'skills/index.html'), await readFile(path.join(outputDir, 'skills.html'), 'utf8'));
+  }
   await writeFile(path.join(outputDir, '_redirects'), [
     '/agentware /agentware/build/overview 301',
     '/agentware/build /agentware/build/overview 301',

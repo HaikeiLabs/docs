@@ -17,7 +17,7 @@ Install the canonical [Haikei Skills](https://github.com/HaikeiLabs/skills) for 
 npx skills add HaikeiLabs/skills --skill haikei --skill agentware-sdk -a codex -y
 ```
 
-Replace `codex` with `claude-code`, `cursor`, `opencode`, or `pi` for the corresponding coding agent. Skills guide the assistant; they do not install SDKs, configure Kei, or grant permissions.
+Replace `codex` with `claude-code`, `cursor`, `opencode`, or `pi` for the corresponding coding agent. Skills guide the assistant; they do not install SDKs, configure Kei, or grant permissions. For the command for every assistant, see [Install Haikei Skills in your coding assistant](/skills/).
 
 Choose the [TypeScript](/agentware/build/typescript), [Python](/agentware/build/python), or [Go](/agentware/build/go) guide to install the SDK and run an offline fake-proxy example. It prints an allowed echo and a denied operation; no Kei account or runtime is needed for the fake. The [Agentware README](https://github.com/HaikeiLabs/agentware#start-building) also has a local Python echo example.
 
