@@ -8,7 +8,7 @@ nav_order: 3
 
 Add Kei governance to a Go agent harness using the `runtimesocket` client. The socket client sends each tool call to `kei-proxy authorize` over the local Unix socket and returns the decision.
 
-Compatible versions: agentware 0.11.0, kei-proxy v0.3.0, kei-cli 0.2.0. For the full API reference, see the [Go module documentation](https://github.com/haikeilabs/agentware/tree/main/go).
+For the Agentware, kei-proxy and kei-cli versions that work together, see [Compatible versions](/content/agentware/build/overview.html#compatible-versions). For the full API reference, see the [Go module documentation](https://github.com/haikeilabs/agentware/tree/main/go).
 
 ## Install
 

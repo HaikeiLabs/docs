@@ -42,6 +42,12 @@ npm run preview
 
 The preview server serves the generated site at <http://localhost:4173>. Each rendered page has a sibling raw Markdown file for editing, review, and agent consumption.
 
+## Agentware versions
+
+The Agentware compatibility table in `content/agentware/build/overview.md` is generated between `<!-- compat:begin -->` and `<!-- compat:end -->` from agentware's `VERSION` file and README table. Don't edit it by hand. After an agentware release, run `npm run sync:compat` (or `npm run sync:compat -- --from ../agentware` for a local checkout). It refreshes the vendored copy in `scripts/data/agentware-compat.json` and the block.
+
+`npm test` and `npm run check:compat` run offline against the vendored copy. They fail when the block is stale, when a page keeps its own "Compatible versions:" line, or when a page names an Agentware version other than the current one without writing it as a floor. Write feature floors as "from Agentware 0.11.0" or "Agentware 0.11.0 or later", and link to the shared block for the versions that work together.
+
 ## Page conventions
 
 - The page `title` is rendered in the header row; a leading `# Title` in the body is dropped.

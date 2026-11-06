@@ -8,7 +8,7 @@ nav_order: 7
 
 An Agentware SDK harness sends every governed tool call through `kei-proxy authorize`. The proxy evaluates the active policy and returns an allow or deny decision; every decision is recorded in the Kei audit log.
 
-Compatible versions: agentware 0.11.0, kei-proxy v0.3.0, kei-cli 0.2.0.
+For the Agentware, kei-proxy and kei-cli versions that work together, see [Compatible versions](/content/agentware/build/overview.html#compatible-versions).
 
 ## How policy evaluation works
 
