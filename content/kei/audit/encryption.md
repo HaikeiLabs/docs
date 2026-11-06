@@ -7,7 +7,7 @@ nav_order: 16
 ---
 # Audit tool-argument encryption
 
-Audit-args encryption protects the content of governed tool calls with age encryption and customer-held X25519 keys. It is opt-in for each organization. Kei stores no customer private key, and the console never decrypts audit arguments.
+Audit-args encryption protects the content of the tool calls Kei checks with age encryption and customer-held X25519 keys. It is opt-in for each organization. Kei stores no customer private key, and the console never decrypts audit arguments.
 
 ## What is encrypted
 

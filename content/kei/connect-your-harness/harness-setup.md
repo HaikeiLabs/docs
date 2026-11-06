@@ -13,7 +13,7 @@ For the full browser sequence, including workspace, connector, and policy setup,
 
 Installing skills provides coding-agent guidance; it does not deploy a harness. For a local workstation/headless workflow, use `kei setup` and `kei runtime bootstrap` in [CLI authentication and runtime setup](/kei/get-started/connect-this-machine). For a deployed service or SDK (Agentware) integration, configure the customer-owned runtime and secret store using [Tenant-side runtime](/kei/runtime/tenant-runtime).
 
-Use the integration documented for your harness to route governed operations through your tenant-side connector runtime. SDK (Agentware) integrations use `KeiProxyEvaluator`; Pi uses the `kei-lime-pi` extension and local runtime socket; Open WebUI uses its own image and tool packs. The runtime evaluates policy and performs governed connector operations in your environment. See [how the connector runtime enforces policy](/kei/runtime/tenant-runtime). Keep provider credentials and customer data in your tenant environment.
+Use the integration documented for your harness to route tool operations through your tenant-side connector runtime. SDK (Agentware) integrations use `KeiProxyEvaluator`; Pi uses the `kei-lime-pi` extension and local runtime socket; Open WebUI uses its own image and tool packs. The runtime evaluates policy and performs the connector operations Kei allows in your environment. See [how the connector runtime enforces policy](/kei/runtime/tenant-runtime). Keep provider credentials and customer data in your tenant environment.
 
 Create and connect agents from **Agents → Add Agent**. The wizard names the agent, assigns an active workspace model profile, creates its runtime installation, and reveals the installation credential once. Use the Connect step for workstation or deployed-service instructions. After setup, manage installation credentials, status, and logs from **Agents → Runtime installations**. The production control-plane URL is `https://app.haikeilabs.com`.
 
@@ -55,7 +55,7 @@ On `kei-cli` 0.1.17 and earlier, specify the installation and agent explicitly:
 kei harness add --installation <INSTALLATION_UUID> --kind custom --agent <AGENT_UUID>
 ```
 
-With `kei-cli` 0.1.18 or later, the installation is resolved from the runtime config and the agent defaults to the installation's default agent, which you can set with `kei bot agents add --default`. The SDK harness authorizes each governed call with `kei-proxy authorize` through agentware's `KeiProxyEvaluator`. Calls that match no policy are denied.
+With `kei-cli` 0.1.18 or later, the installation is resolved from the runtime config and the agent defaults to the installation's default agent, which you can set with `kei bot agents add --default`. The SDK harness authorizes each protected call with `kei-proxy authorize` through agentware's `KeiProxyEvaluator`. Calls that match no policy are denied.
 
 If `kei harness add` reports `ALREADY_EXISTS`, that agent already has a harness on the installation. For a desktop harness, use `kei harness sync`; for another SDK (Agentware) integration, pass `--agent` with a different agent assigned to the installation. If it reports `no default agent found`, set one or pass `--agent`:
 
@@ -119,7 +119,7 @@ The adapter gates Pi's built-in `read`, `write`, `edit`, and `bash` calls. Kei p
 
 ### If you see Not ready
 
-Open **Agents → Runtime installations → Diagnostics** and read the policy bundle reason. Use that reason to follow [runtime troubleshooting](/kei/runtime/troubleshooting). A policy bundle must be active and synced before governed calls can proceed.
+Open **Agents → Runtime installations → Diagnostics** and read the policy bundle reason. Use that reason to follow [runtime troubleshooting](/kei/runtime/troubleshooting). A policy bundle must be active and synced before protected calls can proceed.
 
 ![Diagnostics showing a not-ready policy bundle and the reason](/assets/images/harness-setup/policy-bundle-not-ready.png)
 
@@ -159,7 +159,7 @@ For Claude Code, Codex, and OpenCode, Kei can write command policies into each h
 
 ### How it works
 
-Kei policies can match shell commands (`shell:`), skills (`skill:`), or paths (`path:`). Prebuilt harness rendering resolves workspace-wide and harness-level sources (`*`, `harness:*`, `harness:<kind>`, and `harness:<id>`) plus agent-level sources. `group:`, `user:`, `email:`, and `org:` sources are not rendered into Claude Code, Codex, or OpenCode settings; runtime authorization evaluates identity-based sources for governed connector and custom-harness calls. Kei compiles matching policies into the versioned runtime policy bundle. For how the bundle reaches the runtime, see [How policy bundles reach a runtime](/kei/reference/how-policy-bundles-reach-a-runtime). Run `kei harness sync` to apply the bundle's matched permits and denies to the registered harness:
+Kei policies can match shell commands (`shell:`), skills (`skill:`), or paths (`path:`). Prebuilt harness rendering resolves workspace-wide and harness-level sources (`*`, `harness:*`, `harness:<kind>`, and `harness:<id>`) plus agent-level sources. `group:`, `user:`, `email:`, and `org:` sources are not rendered into Claude Code, Codex, or OpenCode settings; runtime authorization evaluates identity-based sources for protected connector and custom-harness calls. Kei compiles matching policies into the versioned runtime policy bundle. For how the bundle reaches the runtime, see [How policy bundles reach a runtime](/kei/reference/how-policy-bundles-reach-a-runtime). Run `kei harness sync` to apply the bundle's matched permits and denies to the registered harness:
 
 - **Claude Code:** `~/.claude/settings.json`, in `permissions.allow` and `permissions.deny`.
 - **Codex:** `~/.codex/rules/kei.rules`; deny policies render as `prefix_rule(..., decision="forbidden")`. Only `shell:` command policies are enforceable in Codex; `skill:`, `path:`, and tool policies are not rendered.
@@ -171,7 +171,7 @@ When no Kei policy matches a command in one of these prebuilt harnesses, the har
 
 Pi has no native permission file. Its extension asks the local runtime about each built-in call over the owner-only Unix socket; only an unmatched call defers to Pi's own decision.
 
-SDK (Agentware) integrations do not have these native permission files. Their governed calls are evaluated by `kei-proxy`; a call with no matching policy is denied. Connector calls also go through `kei-proxy` and fail closed when no policy matches.
+SDK (Agentware) integrations do not have these native permission files. Their protected calls are evaluated by `kei-proxy`; a call with no matching policy is denied. Connector calls also go through `kei-proxy` and fail closed when no policy matches.
 
 ### Use Kei as the only permission source
 

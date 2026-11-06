@@ -8,7 +8,7 @@ nav_order: 45
 
 # Connectors, explained
 
-A connector is a bridge between Kei and an external service — GitHub, Linear, Google Drive, a homegrown CRM API, or a remote MCP server. Connectors let agents read and write data through governed tool calls. Kei authorizes each call; the harness (Claude Code, Codex, the agentware SDK) performs the actual request.
+A connector is a bridge between Kei and an external service — GitHub, Linear, Google Drive, a homegrown CRM API, or a remote MCP server. Connectors let agents read and write data through protected tool calls. Kei authorizes each call; the harness (Claude Code, Codex, the agentware SDK) performs the actual request.
 
 ## How connectors work
 
@@ -40,7 +40,7 @@ Each native connector registers typed capabilities such as `pull_request.read`, 
 
 ### http\_api (generic REST API)
 
-The `http_api` kind is for any homegrown, private, or non-standard HTTP API. It wraps a REST endpoint with governed access: you configure a base URL, allowed HTTP methods, path patterns, and query parameters, and the harness calls the API through Kei's authorized proxy.
+The `http_api` kind is for any homegrown, private, or non-standard HTTP API. It wraps a REST endpoint with guarded access: you configure a base URL, allowed HTTP methods, path patterns, and query parameters, and the harness calls the API through Kei's authorized proxy.
 
 Use `http_api` when:
 

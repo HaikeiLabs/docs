@@ -212,4 +212,4 @@ Policies 1 and 2 give the same results whether policy 2 was created first, last,
 - [Harness rendering](/kei/reference/harness-rendering) — how Kei renders rules into each harness
 - [Tools and capabilities](/kei/reference/tools-and-capabilities) — `required_capabilities` and capability-target semantics
 - [Deterministic guardrails](/kei/reference/deterministic-guardrails) — how Kei compares with other policy models
-- [How Kei governs coding agents](/kei/reference/how-it-works) — policy distribution and architecture overview
+- [How Kei checks coding agents](/kei/reference/how-it-works) — policy distribution and architecture overview

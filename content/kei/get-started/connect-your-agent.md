@@ -20,6 +20,6 @@ If you are building a custom harness, see [Build on the agentware SDK](/kei/refe
 
 ## Check it worked
 
-Run the harness sync or verification step documented for your agent. Its runtime installation should be connected and the harness should be ready to make a governed call.
+Run the harness sync or verification step documented for your agent. Its runtime installation should be connected and the harness should be ready to make a protected call.
 
 Stuck? See [Troubleshoot setup](/kei/get-started/troubleshooting).

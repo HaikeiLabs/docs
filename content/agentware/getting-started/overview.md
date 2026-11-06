@@ -5,7 +5,7 @@ product: agentware
 nav_group: Reference
 ---
 
-Use agentware middleware to place a shared control point around an agent's tool calls. The middleware checks the request, applies guardrails, and sends Kei-governed operations to the runtime in your environment.
+Use agentware middleware to place a shared control point around an agent's tool calls. The middleware checks the request, applies guardrails, and sends the operations Kei checks to the runtime in your environment.
 
 Agentware is the SDK implementation of the **kei-connector-contracts**
 platform specification. It validates tool call templates, registers tools,

@@ -24,23 +24,23 @@ You need at least one policy that permits an operation and at least one operatio
 
 ## Step 1: Make an allowed call
 
-Ask the connected agent to perform a governed operation your group's policy permits. For example, if your group has a permit for `connector:read` on a specific connector:
+Ask the connected agent to perform an operation your group's policy permits. For example, if your group has a permit for `connector:read` on a specific connector:
 
 ```
 Read the list of open issues from the <connector-name> connector.
 ```
 
-The agent should execute the governed call successfully.
+The agent should execute the protected call successfully.
 
 ## Step 2: Make a denied call
 
-Ask the connected agent to perform a governed operation that your group's policy **denies** or does not cover. For example, if your group has no permit for `web_search`:
+Ask the connected agent to perform an operation that your group's policy **denies** or does not cover. For example, if your group has no permit for `web_search`:
 
 ```
 Search the web for "Kei documentation".
 ```
 
-The agent should refuse to run the call. The harness will report the deny to you without exposing the runtime credential (`KEI_RUNTIME_TOKEN`). You never need to export or type the token to verify a deny — the agent and its harness handle the governed call through `kei-proxy authorize` automatically using the runtime token in the environment.
+The agent should refuse to run the call. The harness will report the deny to you without exposing the runtime credential (`KEI_RUNTIME_TOKEN`). You never need to export or type the token to verify a deny — the agent and its harness route the call through `kei-proxy authorize` automatically using the runtime token in the environment.
 
 ## Step 3: Check Audit Logs
 
@@ -76,7 +76,7 @@ Use `kei policy test` to evaluate what a policy would decide for a given subject
 kei policy test --as group:Engineering --workspace <workspace-name> tool:web_search
 ```
 
-The command prints whether the policy would allow or deny the operation for the specified subject. The evaluation happens server-side and is read-only — it does not change any policy or make a governed tool call.
+The command prints whether the policy would allow or deny the operation for the specified subject. The evaluation happens server-side and is read-only — it does not change any policy or make a protected tool call.
 
 ## Check it worked
 
@@ -84,7 +84,7 @@ You can find one allow and one deny for the agent in Audit Logs. The deny was en
 
 ## What was proven
 
-- **Allow:** Kei permitted a governed tool call matching the group's policy.
-- **Deny:** Kei blocked a governed tool call that the group's policy does not cover.
+- **Allow:** Kei permitted a protected tool call matching the group's policy.
+- **Deny:** Kei blocked a protected tool call that the group's policy does not cover.
 - **Audit trail:** Both decisions are recorded with full context.
 - **No token exposure:** The runtime credential stayed in the runtime environment and was never exported, pasted, or typed into a prompt.

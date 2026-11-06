@@ -7,7 +7,7 @@ nav_group: Make and maintain
 nav_order: 4
 ---
 
-Add Kei governance to a Python agent harness. The SDK provides the `KeiProxySocketAuthorizeClient` and optional helper types for assembling a harness.
+Add Kei guardrails to a Python agent harness. The SDK provides the `KeiProxySocketAuthorizeClient` and optional helper types for assembling a harness.
 
 For Kei compatibility with your installed SDK version, check the [Agentware compatibility table](https://github.com/HaikeiLabs/agentware#compatibility). For the full API reference, see the [Python package source](https://github.com/haikeilabs/agentware/tree/main/python).
 

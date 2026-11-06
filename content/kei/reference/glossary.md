@@ -11,7 +11,7 @@ An LLM configuration that a harness runs, including its model, instructions, and
 
 ## Harness
 
-Software that lets an agent use tools. A harness connects through an integration that sends governed operations to the Kei runtime.
+Software that lets an agent use tools. A harness connects through an integration that sends protected operations to the Kei runtime.
 
 ## Workspace
 

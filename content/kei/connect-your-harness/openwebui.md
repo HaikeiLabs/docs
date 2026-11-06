@@ -9,7 +9,7 @@ nav_order: 9
 
 > Source of truth: [kei-openwebui docs/setup.md](https://github.com/HaikeiLabs/kei-openwebui/blob/main/docs/setup.md). This page is a copy; changes land there first. The kei-openwebui repository is private today, so its links open only for accounts Haikei has given access.
 
-This guide takes you from nothing to an Open WebUI where every model call and every governed tool call is decided and audited by Kei. It uses the published `openwebui-kei` image. For how the connector works inside, see [design.md](https://github.com/HaikeiLabs/kei-openwebui/blob/main/docs/design.md). For how Haikei cuts releases, see [release.md](https://github.com/HaikeiLabs/kei-openwebui/blob/main/docs/release.md).
+This guide takes you from nothing to an Open WebUI where every model call and every protected tool call is decided and audited by Kei. It uses the published `openwebui-kei` image. For how the connector works inside, see [design.md](https://github.com/HaikeiLabs/kei-openwebui/blob/main/docs/design.md). For how Haikei cuts releases, see [release.md](https://github.com/HaikeiLabs/kei-openwebui/blob/main/docs/release.md).
 
 The examples use a neutral customer, Acme, with a tool pack `acme_orders`. Replace the names, IDs and registry with your own.
 
@@ -81,10 +81,10 @@ kei model-profiles readiness acme-chat-model --workspace <workspace>
 
 Two kinds of permit make a working chat. Both are evaluated by the `kei-proxy` daemon in the container, against the user the agent session resolved to.
 
-| Governs | `--dst-pattern` | Example `--src-pattern` |
+| Controls | `--dst-pattern` | Example `--src-pattern` |
 | --- | --- | --- |
 | Model calls through the Kei Pipe | `model:invoke` | `group:chat-users` |
-| One governed tool | `tool:<name>`, the tool's declared name exactly | `group:chat-users` |
+| One tool Kei checks | `tool:<name>`, the tool's declared name exactly | `group:chat-users` |
 
 ```bash
 kei policies create --workspace <workspace> --name chat-users-models \
@@ -103,9 +103,9 @@ kei policies list --workspace <workspace>
 
 ### 1.5 Linking users
 
-Each Open WebUI user is identified by Open WebUI's own user ID, whatever SSO you configured. Kei must link that ID to an email-keyed Kei user before the user's calls are allowed. Until then the user is **unlinked** and every governed call is refused.
+Each Open WebUI user is identified by Open WebUI's own user ID, whatever SSO you configured. Kei must link that ID to an email-keyed Kei user before the user's calls are allowed. Until then the user is **unlinked** and every call Kei would check is refused.
 
-- **Claim link (any SSO).** The first time an unlinked user triggers a governed tool, the connector shows them a one-time claim link as an Open WebUI notification, to that user only. They open it, sign in to Kei, and ask again. The link is never in the chat, the model's context, or a log.
+- **Claim link (any SSO).** The first time an unlinked user triggers a tool Kei checks, the connector shows them a one-time claim link as an Open WebUI notification, to that user only. They open it, sign in to Kei, and ask again. The link is never in the chat, the model's context, or a log.
 - **Entra directory sync.** With Microsoft Entra, Kei can create your users and groups from app-role assignments or one security group's direct user members. To sync a security group, use the [Entra security group runbook](directory-sync) and set its object ID with `--group-id`. To sync app-role assignments, use:
 
 ```bash
@@ -251,7 +251,7 @@ printf 'header = "Authorization: Bearer %s"\n' "$KEI_RUNTIME_TOKEN" | \
 | A call is denied although a permit exists | The user isn't in the permit's group, the permit isn't bound to the chat agent, or the bundle hasn't refreshed | Check the user's groups and the permit's agent; wait one poll and check `policy_revision` with `policy show` |
 | No models in Open WebUI's model list | `kei-proxy` isn't ready, the agent has no model profile, or nobody holds a `model:invoke` permit | `kei model-profiles assignment --workspace <ws> --agent <id>`; add a `model:invoke` permit; check `/v1/models` (Verify, step 4) |
 | A chat turn fails with `Kei governance is unavailable, so this request was not sent` | The `kei_guard` filter found `kei-proxy` not ready | Check the container log for `kei-proxy` errors; the container exits if `kei-proxy` dies |
-| The boot log warns `tool sync: <toolkit>.<method> is left out of the manifest: ...` | No declaration is matched to that `Tools` method. Either it really is ungoverned, or its tool name doesn't follow `<prefix>.<method>` and names no `method` | From v0.1.3, set the declaration's `method` to the method that runs it. Before v0.1.3, the warning is diagnostic only if the registered count is right and each method sends its declared name; otherwise declare the tool or rename it after its method |
+| The boot log warns `tool sync: <toolkit>.<method> is left out of the manifest: ...` | No declaration is matched to that `Tools` method. Either Kei really doesn't check it, or its tool name doesn't follow `<prefix>.<method>` and names no `method` | From v0.1.3, set the declaration's `method` to the method that runs it. Before v0.1.3, the warning is diagnostic only if the registered count is right and each method sends its declared name; otherwise declare the tool or rename it after its method |
 
 ## Related
 

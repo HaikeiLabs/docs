@@ -107,5 +107,5 @@ For example, a `user:alice` deny for `shell:git push --force` only renders when 
 
 - [How Kei decides](/kei/reference/how-kei-decides) — policy ordering and precedence
 - [Policy file syntax](/kei/reference/policy-file-syntax) — source and target pattern reference
-- [How Kei governs coding agents](/kei/reference/how-it-works) — architecture overview
+- [How Kei checks coding agents](/kei/reference/how-it-works) — architecture overview
 - [Connect your agent](/kei/get-started/connect-your-agent) — harness setup

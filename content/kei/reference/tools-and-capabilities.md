@@ -92,4 +92,4 @@ If both capabilities are allowed, the tool call proceeds.
 - [How Kei decides](/kei/reference/how-kei-decides) — policy ordering and precedence, including capability AND semantics
 - [Policy file syntax](/kei/reference/policy-file-syntax) — source and target pattern reference
 - [Harness rendering](/kei/reference/harness-rendering) — how policies map to each harness
-- [How Kei governs coding agents](/kei/reference/how-it-works) — architecture overview
+- [How Kei checks coding agents](/kei/reference/how-it-works) — architecture overview
