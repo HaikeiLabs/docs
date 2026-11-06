@@ -9,6 +9,8 @@ nav_group: Reference
 
 Kei supports six harness types: Claude Code, Codex, OpenCode, Pi, Open WebUI, and SDK (Agentware). Claude Code, Codex, and OpenCode are desktop harnesses; Pi uses its own package and local-socket adapter; Open WebUI uses its own integration; other agents integrate through the Agentware SDK. Each developer machine has one runtime installation, and each harness session is associated with it. Kei renders eligible command policies into desktop editor settings; each editor makes its own **native decision** (allow, deny, or ask), and Kei audits the session.
 
+To see how this approach differs from policy engines, MCP gateways and sandboxes, read [Kei compared with OPA, Cedar, MCP gateways and sandboxes](/kei/reference/kei-vs-opa-cedar-gateways-sandboxes).
+
 ## How policies are created and distributed
 
 ```mermaid
