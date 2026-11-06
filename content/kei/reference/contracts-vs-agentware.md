@@ -39,7 +39,7 @@ the other, and walks through a complete custom-connector example.
 | Layer | Repository | What it is | Who uses it |
 |-------|-----------|------------|-------------|
 | **Contracts** | `github.com/HaikeiLabs/kei-connector-contracts` | Platform spec: tool definition schemas, call template validator, capability declarations, provider client interfaces, conformance tests | Every harness that goes through the runtime must meet this contract. The catalog uses it as a spec library. |
-| **Agentware** | `github.com/HaikeiLabs/agentware` | SDK and generic engine: imports contracts, validates templates, converts them to tool registrations, builds provider requests after an allow, syncs tool manifests | Harness developers who add Kei guardrails to a custom agent. |
+| **Agentware** | `github.com/HaikeiLabs/agentware` | SDK and generic engine: imports contracts, validates templates, converts them to tool registrations, builds provider requests after an allow, syncs tool manifests | Harness developers who add Kei policies to a custom agent. |
 | **Runtime** | `github.com/HaikeiLabs/kei-connector-runtime` | `kei-proxy` — the local decision point (authorize, credential pass-through, audit). No provider calls, no data storage. | Every agent installation on a developer machine or server. |
 
 ## kei-connector-contracts: the platform specification

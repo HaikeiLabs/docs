@@ -7,7 +7,7 @@ nav_group: Make and maintain
 nav_order: 5
 ---
 
-Add Kei guardrails to a TypeScript agent harness. The SDK provides the `KeiProxySocketAuthorizeClient` and tool registration helpers.
+Add Kei policies to a TypeScript agent harness. Kei policies are deterministic guardrails for the tool calls your agent can make. The SDK provides the `KeiProxySocketAuthorizeClient` and tool registration helpers.
 
 For Kei compatibility with your installed SDK version, check the [Agentware compatibility table](https://github.com/HaikeiLabs/agentware#compatibility). Requires Node 22.18 or later. For the full API reference, see the [TypeScript package source](https://github.com/haikeilabs/agentware/tree/main/typescript).
 
