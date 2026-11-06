@@ -125,6 +125,13 @@ export function parseInfo(info) {
   return { lang: lang.replace(/\{.*$/, ''), title };
 }
 
+// GA4 skills_command_copy (C4) needs the assistant: `-a <agent>` names it; `kei skills add`
+// detects the agents on the machine, so it is "auto".
+export function copyAssistant(code) {
+  if (!/\bskills add\b/.test(code)) return '';
+  return code.match(/\s-a\s+([\w-]+)/)?.[1] ?? 'auto';
+}
+
 function fencePlugin(md) {
   md.renderer.rules.fence = (tokens, i) => {
     const token = tokens[i];
@@ -135,7 +142,8 @@ function fencePlugin(md) {
     }
     const label = title || lang || 'text';
     const body = highlight(token.content.replace(/\n$/, ''), lang);
-    return `<div class="code-block"><div class="code-head"><span class="code-label${title ? ' is-file' : ''}">${escapeHtml(label)}</span><button class="copy" type="button" aria-label="Copy ${escapeHtml(label)} code">Copy</button></div><pre tabindex="0"><code${lang ? ` class="language-${escapeHtml(lang)}"` : ''}>${body}</code></pre></div>\n`;
+    const assistant = copyAssistant(token.content);
+    return `<div class="code-block"${assistant ? ` data-assistant="${escapeHtml(assistant)}"` : ''}><div class="code-head"><span class="code-label${title ? ' is-file' : ''}">${escapeHtml(label)}</span><button class="copy" type="button" aria-label="Copy ${escapeHtml(label)} code">Copy</button></div><pre tabindex="0"><code${lang ? ` class="language-${escapeHtml(lang)}"` : ''}>${body}</code></pre></div>\n`;
   };
 }
 
