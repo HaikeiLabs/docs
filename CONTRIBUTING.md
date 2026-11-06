@@ -11,10 +11,13 @@ Start every page with YAML front matter:
 ```yaml
 ---
 title: A useful page title
+description: One or two short sentences that say what the reader can do with this page.
 type: read-and-use
 product: kei
 ---
 ```
+
+Every page needs a `description`. It becomes the page's meta description and its share text (`og:description`), so write it for someone reading a search result: say what the page helps them do, in plain words. Keep it to 160 characters or fewer; `npm run check:frontmatter` and the build reject a missing, blank, or longer description.
 
 Use one of these `type` values:
 
@@ -41,6 +44,14 @@ npm run preview
 ```
 
 The preview server serves the generated site at <http://localhost:4173>. Each rendered page has a sibling raw Markdown file for editing, review, and agent consumption.
+
+## Search metadata
+
+The build writes the search and share metadata; you do not add it by hand:
+
+- Each page's `<head>` has a canonical URL (`https://docs.haikeilabs.com/<path>`, no `.html`), the meta description from front matter, Open Graph tags, and `twitter:card` `summary_large_image`. The share image is `/assets/social/share-card-dark-1200x627.png`, copied from the design system into `assets/social/`.
+- `dist/sitemap.xml` lists the home and every page in `dist/index.json`. `dist/robots.txt` allows all crawlers and names the sitemap.
+- The raw Markdown copies are served with a `Link: <page URL>; rel="canonical"` header from `dist/_headers`, so search engines index the HTML page instead of the copy. Cloudflare Pages allows 100 `_headers` rules; the build fails before that limit so the copies can move to one `X-Robots-Tag: noindex` rule.
 
 ## Agentware versions
 

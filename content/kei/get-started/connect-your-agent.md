@@ -1,5 +1,6 @@
 ---
 title: Connect your agent
+description: "Connect Claude Code, Codex, OpenCode, Pi, or another agent to the Kei runtime on this machine."
 type: read-and-use
 product: kei
 nav_group: Get started

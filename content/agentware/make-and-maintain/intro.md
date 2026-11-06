@@ -1,5 +1,6 @@
 ---
 title: Introduction to Agentware
+description: "What Agentware is, who it is for, and how its Go, Python, and TypeScript middleware adds Kei guardrails to the agents you build."
 type: read-and-use
 product: agentware
 nav_group: Make and maintain

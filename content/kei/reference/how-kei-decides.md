@@ -1,5 +1,6 @@
 ---
 title: How Kei decides
+description: "The single reference for how Kei evaluates policies against a request with deny-overrides: any matching deny wins."
 type: reference
 product: kei
 nav_group: Reference

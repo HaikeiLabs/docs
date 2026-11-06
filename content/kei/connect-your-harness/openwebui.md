@@ -1,5 +1,6 @@
 ---
 title: Set up Open WebUI with Kei
+description: "Run Open WebUI with the openwebui-kei image so Kei checks and audits every model call and protected tool call."
 type: read-and-use
 product: kei
 nav_group: Make and maintain

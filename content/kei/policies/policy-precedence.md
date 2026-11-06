@@ -1,5 +1,6 @@
 ---
 title: Policy priority and precedence
+description: "Kei decides with deny-overrides: any matching deny wins and policies have no priority. This page points to How Kei decides."
 type: reference
 product: kei
 nav_group: Make and maintain

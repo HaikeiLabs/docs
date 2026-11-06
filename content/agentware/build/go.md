@@ -1,5 +1,6 @@
 ---
 title: Set up a Go harness
+description: "Add Kei guardrails to a Go agent with the runtimesocket client, which sends each tool call to kei-proxy over a local Unix socket."
 type: read-and-use
 product: agentware
 nav_group: Make and maintain

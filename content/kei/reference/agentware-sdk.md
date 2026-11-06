@@ -1,5 +1,6 @@
 ---
 title: Build on the Agentware SDK
+description: "Where to start when you build an agent on the Agentware SDK, and how Agentware relates to the Kei platform specification."
 type: reference
 product: kei
 nav_group: Reference

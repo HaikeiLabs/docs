@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +16,11 @@ const repoUrl = 'https://github.com/HaikeiLabs/docs';
 const allowedTypes = new Set(['read-and-use', 'make-and-maintain', 'reference']);
 const allowedProducts = new Set(['kei', 'agentware']);
 const navGroups = ['Get started', 'Make and maintain', 'Reference'];
+const maxDescriptionLength = 160;
+// C5 share card. design-system exports it; copy it into assets/social/ (no runtime fetch).
+const shareCardPath = '/assets/social/share-card-dark-1200x627.png';
+const siteName = 'Haikei docs';
+const homeDescription = 'Guides for building with Agentware, Kei, and Haikei Skills.';
 
 function isoDate(value) {
   if (value instanceof Date && !Number.isNaN(value.valueOf())) return value.toISOString().slice(0, 10);
@@ -37,10 +43,11 @@ function validatePage(relativePath, raw) {
     throw new Error(`${relativePath}: invalid front matter: ${error.message}`);
   }
   const data = parsed.data;
-  for (const key of ['title', 'type', 'product']) {
+  for (const key of ['title', 'description', 'type', 'product']) {
     if (typeof data[key] !== 'string' || !data[key].trim()) throw new Error(`${relativePath}: front matter requires a non-empty ${key}`);
   }
-  if (data.description !== undefined && (typeof data.description !== 'string' || !data.description.trim())) throw new Error(`${relativePath}: description must be a non-empty string`);
+  const descriptionLength = data.description.trim().length;
+  if (descriptionLength > maxDescriptionLength) throw new Error(`${relativePath}: description is ${descriptionLength} characters; keep it to ${maxDescriptionLength} or fewer`);
   if (!allowedTypes.has(data.type)) throw new Error(`${relativePath}: type must be read-and-use, make-and-maintain, or reference`);
   if (!allowedProducts.has(data.product)) throw new Error(`${relativePath}: product must be kei or agentware`);
   if (data.nav_group !== undefined && !navGroups.includes(data.nav_group)) throw new Error(`${relativePath}: nav_group must be Get started, Make and maintain, or Reference`);
@@ -110,15 +117,32 @@ const themeInit = `(function () {
   document.documentElement.classList.add('js')
 })()`;
 
-function layout(title, nav, content, { toc = '', mermaid = false, description = 'Guides for building with Agentware, Kei, and Haikei Skills.', canonical = '/' } = {}) {
+function seoHead({ title, description, canonical, ogType }) {
+  const url = `${docsUrl}${canonical}`;
+  return [
+    `<meta name="description" content="${escapeHtml(description)}">`,
+    `<link rel="canonical" href="${escapeHtml(url)}">`,
+    `<meta property="og:site_name" content="${siteName}">`,
+    `<meta property="og:title" content="${escapeHtml(title)}">`,
+    `<meta property="og:description" content="${escapeHtml(description)}">`,
+    `<meta property="og:url" content="${escapeHtml(url)}">`,
+    `<meta property="og:type" content="${ogType}">`,
+    `<meta property="og:image" content="${docsUrl}${shareCardPath}">`,
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="627">',
+    '<meta name="twitter:card" content="summary_large_image">',
+  ].join('\n  ');
+}
+
+function layout(title, nav, content, { toc = '', mermaid = false, description = homeDescription, canonical = '/', ogType = 'website' } = {}) {
+  const fullTitle = `${title} · ${siteName}`;
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="${escapeHtml(description)}">
-  <link rel="canonical" href="${escapeHtml(`${docsUrl}${canonical}`)}">
-  <title>${escapeHtml(title)} · Haikei docs</title>
+  <title>${escapeHtml(fullTitle)}</title>
+  ${seoHead({ title: fullTitle, description, canonical, ogType })}
   <script>${themeInit}</script>
   <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -165,7 +189,7 @@ function renderPage(page, pages) {
   const rendered = markdown.render(stripHtmlComments(stripLeadingTitle(page.body)), env);
   const links = `<a class="markdown-link" href="/${escapeHtml(page.relativePath)}">View as Markdown</a><a class="markdown-link" href="${repoUrl}/edit/main/content/${escapeHtml(page.relativePath)}">Edit on GitHub</a>`;
   const body = `<div class="title-row"><h1>${escapeHtml(page.title)}</h1><div class="page-links">${links}</div></div>${validation}<article class="prose">${rendered}</article>${pager(orderedPages(pages), page)}`;
-  return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"'), description: page.description?.trim() ?? `${page.title} | Haikei documentation for ${page.product}.`, canonical: pageHref(page) }) };
+  return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"'), description: page.description.trim(), canonical: pageHref(page), ogType: 'article' }) };
 }
 
 function renderHome(pages) {
@@ -176,6 +200,21 @@ function renderHome(pages) {
   }).join('');
   const body = `<h1>Haikei documentation</h1><p class="home-intro">Set up Kei, build with agentware, and use Kei skills with your agent.</p>${sections}`;
   return layout('Haikei documentation', sidebar(pages), body);
+}
+
+// Every canonical page: the home plus each page in the index.json manifest.
+function sitemapXml(manifest) {
+  const urls = ['/', ...manifest.map((entry) => entry.path)];
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((url) => `  <url><loc>${escapeHtml(`${docsUrl}${url}`)}</loc></url>`).join('\n')}\n</urlset>\n`;
+}
+
+// Cloudflare Pages _headers: each raw .md copy names its HTML page as canonical
+// (Link header, C5), so search engines index the HTML page and not the copy.
+// Cloudflare Pages accepts at most 100 _headers rules.
+const maxHeaderRules = 100;
+function markdownCopyHeaders(manifest) {
+  if (manifest.length > maxHeaderRules) throw new Error(`_headers would need ${manifest.length} rules; Cloudflare Pages allows ${maxHeaderRules}. Switch the .md copies to a single X-Robots-Tag: noindex rule.`);
+  return manifest.map((entry) => `${entry.path}.md\n  Link: <${docsUrl}${entry.path}>; rel="canonical"\n`).join('');
 }
 
 export async function loadDocs(contentDir = path.join(repoRoot, 'content')) {
@@ -202,6 +241,8 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   await cp(path.join(assetsDir, 'site.css'), path.join(outputDir, 'assets/site.css'));
   await cp(path.join(assetsDir, 'site.js'), path.join(outputDir, 'assets/site.js'));
   await cp(path.join(assetsDir, 'images'), path.join(outputDir, 'assets/images'), { recursive: true });
+  // The share card arrives from design-system; until then og:image points at the C5 path.
+  if (existsSync(path.join(assetsDir, 'social'))) await cp(path.join(assetsDir, 'social'), path.join(outputDir, 'assets/social'), { recursive: true });
   for (const page of pages) {
     const { outputPath, html } = renderPage(page, pages);
     const htmlFile = path.join(outputDir, outputPath);
@@ -226,12 +267,12 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     '',
   ].join('\n'));
   await writeFile(path.join(outputDir, 'index.html'), renderHome(pages));
-  const sitemapUrls = ['/', ...pages.map(pageHref)];
-  await writeFile(path.join(outputDir, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls.map((url) => `  <url><loc>${escapeHtml(`${docsUrl}${url}`)}</loc></url>`).join('\n')}\n</urlset>\n`);
-  await writeFile(path.join(outputDir, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${docsUrl}/sitemap.xml\n`);
   // Page manifest consumed by `kei docs` (HAI-735). Keep this shape stable.
   const manifest = orderedPages(pages).map((page) => ({ slug: pageHref(page).slice(1), title: page.title, path: pageHref(page), product: page.product }));
   await writeFile(path.join(outputDir, 'index.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+  await writeFile(path.join(outputDir, 'sitemap.xml'), sitemapXml(manifest));
+  await writeFile(path.join(outputDir, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${docsUrl}/sitemap.xml\n`);
+  await writeFile(path.join(outputDir, '_headers'), markdownCopyHeaders(manifest));
   await writeFile(path.join(outputDir, '404.html'), '<!doctype html><html lang="en"><meta charset="utf-8"><title>Not found · Haikei docs</title><h1>Page not found</h1><p><a href="/">Return to the documentation home.</a></p></html>\n');
   await checkBuiltRoutes(outputDir);
   return pages;

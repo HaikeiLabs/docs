@@ -1,5 +1,6 @@
 ---
 title: Test before you sync
+description: "Test policy changes with kei policy test and preview them with kei harness sync --dry-run before they reach your coding agents."
 type: make-and-maintain
 product: kei
 nav_group: Make and maintain

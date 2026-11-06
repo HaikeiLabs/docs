@@ -1,5 +1,6 @@
 ---
 title: Tenant-side connector runtime
+description: "Deploy the Kei connector runtime beside a service, bot, or Agentware agent. Credentials, payloads, and results stay in your environment."
 type: read-and-use
 product: kei
 nav_group: Make and maintain

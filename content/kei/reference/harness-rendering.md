@@ -1,5 +1,6 @@
 ---
 title: Harness rendering
+description: "How Kei turns a policy bundle into native permission settings for Claude Code, Codex, and OpenCode."
 type: reference
 product: kei
 nav_group: Reference

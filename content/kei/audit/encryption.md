@@ -1,5 +1,6 @@
 ---
 title: Audit tool-argument encryption
+description: "Encrypt audit tool-call arguments with age and keys you hold. Kei stores no private key and never decrypts the arguments."
 type: read-and-use
 product: kei
 nav_group: Make and maintain

@@ -1,5 +1,6 @@
 ---
 title: Policies, explained
+description: "A Kei policy says which group may do what, and whether it is allowed or denied. Learn the parts of a policy and how Kei decides."
 type: read-and-use
 product: kei
 nav_group: Get started

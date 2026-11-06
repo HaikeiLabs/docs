@@ -1,5 +1,6 @@
 ---
 title: Policy and audit for Agentware SDK harnesses
+description: "How kei-proxy checks each tool call from an Agentware agent against policy, returns allow or deny, and records the decision in the audit log."
 type: read-and-use
 product: agentware
 nav_group: Make and maintain

@@ -1,5 +1,6 @@
 ---
 title: Set up a local Kei runtime for an Agentware SDK harness
+description: "Connect a Go, Python, or TypeScript agent to a local kei-proxy daemon. Credentials, payloads, and content stay in your environment."
 type: read-and-use
 product: agentware
 nav_group: Make and maintain
