@@ -1,11 +1,11 @@
 ---
-title: How Kei governs coding agents
+title: How Kei puts guardrails on coding agents
 description: "How Kei puts guardrails on coding agents across Claude Code, Codex, OpenCode, Pi, Open WebUI, and Agentware agents."
 type: read-and-use
 product: kei
 nav_group: Reference
 ---
-# How Kei governs coding agents
+# How Kei puts guardrails on coding agents
 
 Kei supports six harness types: Claude Code, Codex, OpenCode, Pi, Open WebUI, and SDK (Agentware). Claude Code, Codex, and OpenCode are desktop harnesses; Pi uses its own package and local-socket adapter; Open WebUI uses its own integration; other agents integrate through the Agentware SDK. Each developer machine has one runtime installation, and each harness session is associated with it. Kei renders eligible command policies into desktop editor settings; each editor makes its own **native decision** (allow, deny, or ask), and Kei audits the session.
 
@@ -42,7 +42,7 @@ flowchart TD
 - Admins create policy in the console or with the Kei CLI, and Kei records each change as a policy revision.
 - Kei distributes a versioned, expiring policy bundle to the machine's single runtime installation.
 - `kei harness sync` translates the bundle into native permissions for the installed harnesses.
-- The runtime evaluates group, user, and `autogroup:member` policy sources for governed calls. For desktop command policies, a `group:` source renders when it matches one of the bundle subject's groups, and a `user:` source renders when it matches that subject. A non-matching source is skipped; policies for user and group sources are not rendered for other subjects. `autogroup:member` resolves at runtime for every organization member and is never stored. Automatic re-sync is planned, as shown by the dotted arrow.
+- The runtime evaluates group, user, and `autogroup:member` policy sources for protected calls. For desktop command policies, a `group:` source renders when it matches one of the bundle subject's groups, and a `user:` source renders when it matches that subject. A non-matching source is skipped; policies for user and group sources are not rendered for other subjects. `autogroup:member` resolves at runtime for every organization member and is never stored. Automatic re-sync is planned, as shown by the dotted arrow.
 
 ## Bring your own editor
 

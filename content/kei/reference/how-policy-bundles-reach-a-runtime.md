@@ -15,7 +15,7 @@ A bundle is plain JSON. The catalog builds it from your workspace's policies, gr
 
 Two things read it:
 
-- **`kei-proxy`** uses the bundle as its local policy decision point. It decides governed calls from the bundle without calling the catalog for each one.
+- **`kei-proxy`** uses the bundle as its local policy decision point. It decides protected calls from the bundle without calling the catalog for each one.
 - **Harness adapters** and `kei harness sync` use the bundle to write native permission settings for Claude Code, Codex, and OpenCode. See [Govern harness commands](/kei/policies/govern-harness-commands).
 
 ## How it is delivered

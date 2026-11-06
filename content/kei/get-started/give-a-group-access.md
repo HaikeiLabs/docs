@@ -11,7 +11,7 @@ nav_order: 4
 
 In the selected workspace, open **Groups** and add the agent's user to the group that should use Kei. Then open **Policies** and grant that group only the operations and resources the workflow needs.
 
-Keep access narrow. An agent being connected to a runtime does not give it permission to use a connector or perform a governed operation. Ask an organization owner or workspace admin to make these changes if your role does not allow them.
+Keep access narrow. An agent being connected to a runtime does not give it permission to use a connector or perform a protected operation. Ask an organization owner or workspace admin to make these changes if your role does not allow them.
 
 ## Check it worked
 

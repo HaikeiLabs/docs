@@ -30,7 +30,7 @@ The systems also differ in the properties they govern. Kei answers who may call 
 
 ## Where Kei fits
 
-Kei provides identity- and group-based authorization for agent tool calls. It can limit which users or groups may invoke registered tools and connector capabilities. It does not track the flow of information read by one tool into a later tool call. Information-flow labels, as used by OpenAPPA, can complement identity-based authorization: one governs who may act, while the other governs where data may flow.
+Kei provides identity- and group-based authorization for agent tool calls. It can limit which users or groups may invoke registered tools and connector capabilities. It does not track the flow of information read by one tool into a later tool call. Information-flow labels, as used by OpenAPPA, can complement identity-based authorization: one controls who may act, while the other controls where data may flow.
 
 ## Not yet supported
 

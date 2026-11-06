@@ -9,7 +9,7 @@ nav_order: 55
 
 # Contracts, Agentware, and how to build a custom connector
 
-Kei governs agent tool calls through three layers that serve different roles:
+Kei checks agent tool calls through three layers that serve different roles:
 
 - **kei-connector-contracts** is the platform specification — the canonical
   schemas and validators that define what a tool definition looks like, which
@@ -39,13 +39,13 @@ the other, and walks through a complete custom-connector example.
 | Layer | Repository | What it is | Who uses it |
 |-------|-----------|------------|-------------|
 | **Contracts** | `github.com/HaikeiLabs/kei-connector-contracts` | Platform spec: tool definition schemas, call template validator, capability declarations, provider client interfaces, conformance tests | Every harness that goes through the runtime must meet this contract. The catalog uses it as a spec library. |
-| **Agentware** | `github.com/HaikeiLabs/agentware` | SDK and generic engine: imports contracts, validates templates, converts them to tool registrations, builds provider requests after an allow, syncs tool manifests | Harness developers who add Kei governance to a custom agent. |
+| **Agentware** | `github.com/HaikeiLabs/agentware` | SDK and generic engine: imports contracts, validates templates, converts them to tool registrations, builds provider requests after an allow, syncs tool manifests | Harness developers who add Kei policies to a custom agent. |
 | **Runtime** | `github.com/HaikeiLabs/kei-connector-runtime` | `kei-proxy` — the local decision point (authorize, credential pass-through, audit). No provider calls, no data storage. | Every agent installation on a developer machine or server. |
 
 ## kei-connector-contracts: the platform specification
 
 The contracts repository (`kei-connector-contracts`) is the authoritative
-definition of **what a governed tool call looks like**. It contains:
+definition of **what a protected tool call looks like**. It contains:
 
 - **JSON Schemas** for tool definitions
   (`schemas/tool-definition.v1.schema.json`) and the stricter tool-call
@@ -245,7 +245,7 @@ Only credential release and audit upload are online operations.
 ## The providers package: when to use it versus a template
 
 The `providers` package in `kei-connector-contracts` is a **stable,
-harness-consumable Go library** of governed connector clients (ADR-036
+harness-consumable Go library** of protected connector clients (ADR-036
 section 9.2). It is **kept, not retired** — the owner confirmed this on
 2026-10-24. HAI-724 deletes the runtime executors that imported it, but the
 package itself and its two `kei` CLI users stay.

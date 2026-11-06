@@ -7,7 +7,7 @@ nav_group: Make and maintain
 nav_order: 2
 ---
 
-Build a custom agent or harness with Agentware: call typed tools, add guardrails, and record tool decisions. Start with an offline echo example, then adapt the tool to a research, monitoring, or workflow application. Agentware is a library; Haikei Skills are instructions for your coding assistant; Kei is an optional integration for governed operations. Kei is a metadata-only control plane: provider payloads, customer content, and credentials never enter Kei.
+Build a custom agent or harness with Agentware: call typed tools, add guardrails, and record tool decisions. Start with an offline echo example, then adapt the tool to a research, monitoring, or workflow application. Agentware is a library; Haikei Skills are instructions for your coding assistant; Kei is an optional integration that allows or denies operations. Kei is a metadata-only control plane: provider payloads, customer content, and credentials never enter Kei.
 
 ## Start locally
 
@@ -23,7 +23,7 @@ Choose the [TypeScript](/agentware/build/typescript), [Python](/agentware/build/
 
 ## Add Kei when needed
 
-For governed external operations, use the runtime setup below. The proxy is the enforcement point; it executes provider operations in your environment. The control plane holds registration, policy, and audit metadata, not secrets or provider data.
+For external operations Kei checks, use the runtime setup below. The proxy is the enforcement point; it executes provider operations in your environment. The control plane holds registration, policy, and audit metadata, not secrets or provider data.
 
 Agentware implements the **kei-connector-contracts** platform specification.
 Contracts defines the tool definition schemas, call template validator, and
@@ -47,7 +47,7 @@ Kei has six user-facing harness types. The **SDK (Agentware)** type covers harne
 | **Pi** | Own package + local-socket adapter. |
 | **Open WebUI** | Own Python library (`openwebui-kei`), not the SDK path. |
 
-## Six-step governed path
+## Six-step protected path
 
 Bring up an Agentware SDK harness in this order:
 
@@ -56,7 +56,7 @@ Bring up an Agentware SDK harness in this order:
 3. **Register the harness** — `kei harness add --kind custom --installation INSTALLATION_ID` registers the SDK harness. The CLI resolves the assigned agent for that installation.
 4. **Register tools** — Use `ToolSpec` with a `harness_executor` route over the runtime socket (`POST /v1/tools:register`), or maintain a `tools.json` manifest and sync it with `kei harness sync --harness custom --manifest tools.json`. The manifest is tool metadata, not a permission grant. For Open WebUI, see [tool specs from a deployment-provided file](/content/kei/connect-your-harness/openwebui.html#3-tool-implementations-and-definitions).
 5. **Start the runtime daemon** — `kei-proxy serve` runs the policy enforcement point on a local Unix socket. The SDK discovers it through `KEI_RUNTIME_SOCKET_PATH`.
-6. **Run the harness** — Each governed tool call goes through `kei-proxy authorize`. An explicit allow lets the tool run; a deny returns `reason_code` and `hint`; a socket or protocol failure fails closed.
+6. **Run the harness** — Each protected tool call goes through `kei-proxy authorize`. An explicit allow lets the tool run; a deny returns `reason_code` and `hint`; a socket or protocol failure fails closed.
 
 ## Compatible versions
 

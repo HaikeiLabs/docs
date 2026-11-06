@@ -7,7 +7,7 @@ nav_group: Make and maintain
 nav_order: 7
 ---
 
-An Agentware SDK harness sends every governed tool call through `kei-proxy authorize`. The proxy evaluates the active policy and returns an allow or deny decision; every decision is recorded in the Kei audit log.
+An Agentware SDK harness sends every protected tool call through `kei-proxy authorize`. The proxy evaluates the active policy and returns an allow or deny decision; every decision is recorded in the Kei audit log.
 
 For the Agentware, kei-proxy and kei-cli versions that work together, see [Compatible versions](/content/agentware/build/overview.html#compatible-versions).
 

@@ -35,4 +35,4 @@ If you manage policies for your organization:
 - [How Kei decides](/kei/reference/how-kei-decides) — policy ordering and precedence
 - [Policy file syntax](/kei/reference/policy-file-syntax) — source and target pattern reference
 - [Autogroups](/kei/reference/autogroups) — how autogroups resolve at runtime
-- [How Kei governs coding agents](/kei/reference/how-it-works) — architecture overview
+- [How Kei checks coding agents](/kei/reference/how-it-works) — architecture overview
