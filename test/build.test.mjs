@@ -204,7 +204,7 @@ test('built pages ship theme-init before stylesheets, header links, TOC and page
     assert.match(html, /href="\/kei\/setup\/a\.md">View as Markdown/);
     const header = html.match(/<header class="site-header">[\s\S]*?<\/header>/)[0];
     assert.match(header, /href="https:\/\/haikeilabs\.com"/);
-    assert.match(header, /href="https:\/\/app\.haikeilabs\.com">Console</);
+    assert.match(header, /href="https:\/\/app\.haikeilabs\.com\/\?source=docs-header-console&amp;utm_source=docs&amp;utm_medium=docs&amp;utm_campaign=evergreen">Console</);
     assert.match(header, /href="\/">Docs</);
     assert.match(header, /<nav class="global-nav" aria-label="Site">/);
     assert.match(header, /href="https:\/\/github\.com\/HaikeiLabs" aria-label="Haikei Labs on GitHub">GitHub</);

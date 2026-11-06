@@ -11,6 +11,8 @@ const markdown = createMarkdown();
 const siteUrl = 'https://haikeilabs.com';
 const docsUrl = 'https://docs.haikeilabs.com';
 const consoleUrl = 'https://app.haikeilabs.com';
+// C4: one GA4 property across haikeilabs.com, docs, app and playground. Plain gtag.js, no GTM.
+export const GA4_MEASUREMENT_ID = 'G-EV3X1G9P73';
 const discordUrl = 'https://discord.gg/g6QaTYWXDa';
 const repoUrl = 'https://github.com/HaikeiLabs/docs';
 const githubUrl = 'https://github.com/HaikeiLabs';
@@ -212,6 +214,35 @@ const themeInit = `(function () {
   document.documentElement.classList.add('js')
 })()`;
 
+// C4 Consent Mode v2 defaults are set before config. No Google signals, no ad storage.
+// Allowlist, as on the marketing site: only the production host reports, so local
+// previews and Cloudflare Pages previews (*.pages.dev) never send hits.
+const ga4Snippet = `<script>(function () {
+  if (location.hostname !== 'docs.haikeilabs.com') return
+  window.dataLayer = window.dataLayer || []
+  function gtag() { dataLayer.push(arguments) }
+  window.gtag = gtag
+  gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' })
+  gtag('js', new Date())
+  gtag('config', '${GA4_MEASUREMENT_ID}', { allow_google_signals: false, allow_ad_personalization_signals: false })
+  var script = document.createElement('script')
+  script.async = true
+  script.src = 'https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}'
+  document.head.appendChild(script)
+})()</script>`;
+
+// C4 link attribution: every link into the app carries source=docs-<page>-<cta> plus UTM.
+// A link that already names its source keeps it.
+export function appLink(href, source) {
+  const url = new URL(href);
+  if (url.host !== new URL(consoleUrl).host || url.searchParams.has('source')) return href;
+  url.searchParams.set('source', source);
+  url.searchParams.set('utm_source', 'docs');
+  url.searchParams.set('utm_medium', 'docs');
+  url.searchParams.set('utm_campaign', 'evergreen');
+  return url.toString();
+}
+
 function seoHead({ title, description, canonical, ogType }) {
   const url = `${docsUrl}${canonical}`;
   return [
@@ -229,7 +260,7 @@ function seoHead({ title, description, canonical, ogType }) {
   ].join('\n  ');
 }
 
-function layout(title, nav, content, { toc = '', mermaid = false, description = homeDescription, canonical = '/', ogType = 'website', fullTitle = `${title} · ${siteName}`, links, currentPath = '' } = {}) {
+function layout(title, nav, content, { toc = '', mermaid = false, description = homeDescription, canonical = '/', ogType = 'website', fullTitle = `${title} · ${siteName}`, links, currentPath = '', tutorial = '' } = {}) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -238,6 +269,7 @@ function layout(title, nav, content, { toc = '', mermaid = false, description = 
   <title>${escapeHtml(fullTitle)}</title>
   ${seoHead({ title: fullTitle, description, canonical, ogType })}
   <script>${themeInit}</script>
+  ${ga4Snippet}
   <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -255,10 +287,10 @@ function layout(title, nav, content, { toc = '', mermaid = false, description = 
     <a class="docs-label" href="/">Docs</a>
     ${globalNav(links, currentPath)}
     <span class="header-spacer"></span>
-    <a class="header-link" href="${consoleUrl}">Console</a>
+    <a class="header-link" href="${escapeHtml(appLink(`${consoleUrl}/`, 'docs-header-console'))}">Console</a>
     <button class="theme-toggle" type="button" aria-label="Switch color theme"></button>
   </header>
-  <div class="layout">${nav}<main id="main" class="content">${content}<footer class="footer"><p>Public guidance for people building and using agents with Kei.</p><p>Questions? Join the developer community on <a href="${discordUrl}" target="_blank" rel="noopener noreferrer">Discord</a>.</p></footer></main>${toc}</div>
+  <div class="layout">${nav}<main id="main" class="content"${tutorial ? ` data-tutorial="${escapeHtml(tutorial)}"` : ''}>${content}<footer class="footer"><p>Public guidance for people building and using agents with Kei.</p><p>Questions? Join the developer community on <a href="${discordUrl}" target="_blank" rel="noopener noreferrer">Discord</a>.</p></footer></main>${toc}</div>
 </body>
 </html>
 `;
@@ -279,29 +311,35 @@ function tutorialList(pages) {
   return `<ul class="tutorial-list">${tutorials.map((entry) => `<li><a href="${pageHref(entry)}"><strong>${escapeHtml(entry.title)}</strong><span>${escapeHtml(entry.description.trim())}</span></a></li>`).join('')}</ul>`;
 }
 
+// tutorial_start (C4) fires on a tutorial page, not the tutorials index.
+function tutorialSlug(page) {
+  return page.relativePath.startsWith('tutorials/') && page.relativePath !== 'tutorials/index.md' ? pageSlug(page).split('/').pop() : '';
+}
+
 function renderPage(page, pages, links = siteLinks(pages)) {
   const outputPath = pageOutputPath(page);
   const validation = page.validated && page.validated_with
     ? `<p class="validated">Last validated ${escapeHtml(page.validated)} with ${escapeHtml(page.validated_with)}</p>`
     : '';
-  const env = {};
+  const env = { appSource: `docs-${pageSlug(page).split('/').pop()}-console` };
   const rendered = markdown.render(stripHtmlComments(stripLeadingTitle(page.body)), env);
   const pageLinks = `<a class="markdown-link" href="/${escapeHtml(page.relativePath)}">View as Markdown</a><a class="markdown-link" href="${repoUrl}/edit/main/content/${escapeHtml(page.relativePath)}">Edit on GitHub</a>`;
   const listing = page.relativePath === 'tutorials/index.md' ? tutorialList(pages) : '';
   const body = `<div class="title-row"><h1>${escapeHtml(page.title)}</h1><div class="page-links">${pageLinks}</div></div>${validation}<article class="prose">${rendered}${listing}</article>${pager(orderedPages(pages), page)}`;
   const fullTitle = page.seo_title ?? `${page.title} · ${siteName}`;
-  return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath, links), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"'), description: page.description.trim(), canonical: pageHref(page), ogType: 'article', fullTitle, links, currentPath: page.relativePath }) };
+  return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath, links), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"'), description: page.description.trim(), canonical: pageHref(page), ogType: 'article', fullTitle, links, currentPath: page.relativePath, tutorial: tutorialSlug(page) }) };
 }
 
 // Two paths (C3a): build your own agent, or bring the agent you use. Both link /skills/.
 function renderHome(pages) {
   const links = siteLinks(pages);
-  const card = ({ eyebrow, heading, id, text, actions }) => `<section class="path-card" aria-labelledby="${id}"><p class="path-eyebrow">${eyebrow}</p><h2 id="${id}">${heading}</h2><p>${text}</p><ul class="path-actions">${actions.filter(Boolean).map(([href, label], index) => `<li><a${index === 0 ? ' class="path-primary"' : ''} href="${href}">${escapeHtml(label)}</a></li>`).join('')}</ul></section>`;
+  const card = ({ eyebrow, heading, id, path: choice, text, actions }) => `<section class="path-card" data-path="${choice}" aria-labelledby="${id}"><p class="path-eyebrow">${eyebrow}</p><h2 id="${id}">${heading}</h2><p>${text}</p><ul class="path-actions">${actions.filter(Boolean).map(([href, label], index) => `<li><a${index === 0 ? ' class="path-primary"' : ''} href="${href}">${escapeHtml(label)}</a></li>`).join('')}</ul></section>`;
   const cards = [
     card({
       eyebrow: 'Agentware',
       heading: 'Build your own agent',
       id: 'build-your-own-agent',
+      path: 'build',
       text: 'Write tools and run the agent loop with Agentware in TypeScript, Go or Python, on any OpenAI-compatible model. You need a model API key, not a Kei account.',
       actions: [
         [links.agentware, 'Build on Agentware'],
@@ -313,6 +351,7 @@ function renderHome(pages) {
       eyebrow: 'Claude Code, Codex, OpenCode, Pi, Open WebUI',
       heading: 'Bring the agent you use',
       id: 'bring-the-agent-you-use',
+      path: 'bring',
       text: 'Install the kei CLI and connect the agent you already use. Then add Kei policies: deterministic guardrails for the tool calls your agent can make.',
       actions: [
         links.bring && [links.bring.href, links.bring.label],
@@ -354,6 +393,7 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     const token = tokens[index];
     const href = token.attrGet('href');
     if (href?.startsWith('/content/')) token.attrSet('href', href.replace(/^\/content\//, '/').replace(/\.html(?=([?#]|$))/, ''));
+    if (href?.startsWith(consoleUrl) && env?.appSource) token.attrSet('href', appLink(href, env.appSource));
     return self.renderToken(tokens, index, options);
   };
   const pages = await loadDocs(contentDir);

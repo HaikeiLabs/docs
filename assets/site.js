@@ -1,5 +1,32 @@
-// Tiny vanilla enhancements: theme toggle, copy buttons, mobile nav.
+// Tiny vanilla enhancements: theme toggle, copy buttons, mobile nav, GA4 events.
 (function () {
+  // GA4 events (C4). gtag is absent on localhost or when blocked, so track() is a no-op then.
+  function track(name, params) {
+    try {
+      if (typeof window.gtag === 'function') window.gtag('event', name, params);
+    } catch (e) {}
+  }
+  // The build sets data-assistant on skills commands; the -a flag is the fallback.
+  function classifyCopy(text, assistant, page) {
+    if (/\bskills add\b/.test(text)) {
+      var flag = text.match(/\s-a\s+([\w-]+)/);
+      return { name: 'skills_command_copy', params: { assistant: assistant || (flag ? flag[1] : 'auto'), page: page } };
+    }
+    var language = /\b(npm (install|i)|pnpm add|yarn add)\b/.test(text) ? 'ts'
+      : /\b(pip3? install|uv (add|pip install))\b/.test(text) ? 'python'
+      : /\bgo (get|install)\b/.test(text) ? 'go' : '';
+    return language ? { name: 'sdk_install_copy', params: { language: language } } : null;
+  }
+  function outboundDestination(href) {
+    var host;
+    try { host = new URL(href).hostname; } catch (e) { return null; }
+    if (host === 'github.com' || host.slice(-11) === '.github.com') return 'github';
+    if (host === 'discord.gg' || host === 'discord.com' || host.slice(-12) === '.discord.com') return 'discord';
+    if (host === 'substack.com' || host.slice(-13) === '.substack.com') return 'substack';
+    return null;
+  }
+  window.haikeiAnalytics = { track: track, classifyCopy: classifyCopy, outboundDestination: outboundDestination };
+
   var root = document.documentElement;
   var toggle = document.querySelector('.theme-toggle');
   function renderMermaid() {
@@ -49,11 +76,35 @@
   document.addEventListener('click', function (event) {
     var button = event.target.closest('.copy');
     if (!button) return;
-    var code = button.closest('.code-block').querySelector('code').textContent;
+    var block = button.closest('.code-block');
+    var code = block.querySelector('code').textContent;
+    var copied = classifyCopy(code, block.getAttribute('data-assistant') || '', location.pathname);
+    if (copied) track(copied.name, copied.params);
     var done = function () {
       button.textContent = 'Copied';
       setTimeout(function () { button.textContent = 'Copy'; }, 1500);
     };
     if (navigator.clipboard) navigator.clipboard.writeText(code).then(done);
   });
+
+  document.addEventListener('click', function (event) {
+    var link = event.target.closest && event.target.closest('a[href]');
+    if (!link) return;
+    var card = link.closest('.path-card[data-path]');
+    if (card) track('path_choice', { path: card.getAttribute('data-path') });
+    var destination = outboundDestination(link.href);
+    if (destination) track('outbound_click', { destination: destination });
+  });
+
+  // tutorial_start: once the reader scrolls past the "Before you start" heading.
+  var tutorialMain = document.querySelector('main[data-tutorial]');
+  var start = tutorialMain && tutorialMain.querySelector('#before-you-start');
+  if (start) {
+    var onScroll = function () {
+      if (start.getBoundingClientRect().bottom >= 0) return;
+      window.removeEventListener('scroll', onScroll);
+      track('tutorial_start', { tutorial: tutorialMain.getAttribute('data-tutorial') });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
 })();
