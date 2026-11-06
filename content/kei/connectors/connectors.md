@@ -4,7 +4,7 @@ description: "Set up a connector in the Kei console: connect an account, review 
 type: read-and-use
 product: kei
 nav_group: Make and maintain
-nav_order: 17
+nav_order: 14
 ---
 # Connectors
 

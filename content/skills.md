@@ -3,7 +3,8 @@ description: One command teaches your coding assistant to build with Agentware a
 title: Install Haikei Skills in Claude Code, Codex, Cursor, OpenCode or Pi
 type: reference
 product: kei
-nav_group: Reference
+nav_group: Start here
+nav_order: 4
 ---
 
 # Install Haikei Skills in your coding assistant

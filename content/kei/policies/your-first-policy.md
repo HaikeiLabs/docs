@@ -3,10 +3,10 @@ title: Your first policy
 description: "Create your first Kei policy step by step in the console or with the kei CLI. Requires the owner or admin role."
 type: make-and-maintain
 product: kei
-nav_group: Make and maintain
-nav_order: 10
 validated: 2026-10-21
 validated_with: kei v0.2.5
+nav_group: Make and maintain
+nav_order: 6
 ---
 
 # Your first policy

@@ -4,7 +4,7 @@ description: "Encrypt audit tool-call arguments with age and keys you hold. Kei 
 type: read-and-use
 product: kei
 nav_group: Make and maintain
-nav_order: 16
+nav_order: 17
 ---
 # Audit tool-argument encryption
 

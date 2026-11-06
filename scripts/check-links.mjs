@@ -40,7 +40,9 @@ export async function checkLinks(contentDir = new URL('../content/', import.meta
         if (child.type !== 'link_open') continue;
         const destination = child.attrGet('href');
         const target = sourceTarget(destination, file.relativePath);
-        if (target && !available.has(target)) broken.push(`${file.relativePath}: ${destination} -> ${target}`);
+        // A folder link (/tutorials/) resolves to that folder's index.md.
+        const folderIndex = target?.replace(/\.md$/, '/index.md');
+        if (target && !available.has(target) && !available.has(folderIndex)) broken.push(`${file.relativePath}: ${destination} -> ${target}`);
       }
     }
   }
@@ -58,7 +60,7 @@ export async function checkBuiltRoutes(outputDir) {
     }
   }
   const redirects = await readFile(path.join(outputDir, '_redirects'), 'utf8');
-  for (const route of ['/agentware /agentware/build/overview 301', '/agentware/build /agentware/build/overview 301', '/agentware/build/quickstart /agentware/build/overview 301', '/agentware/build/quickstart/ /agentware/build/overview 301']) {
+  for (const route of ['/agentware /agentware/build/overview 301', '/agentware/ /agentware/build/overview 301', '/agentware/build /agentware/build/overview 301', '/agentware/build/ /agentware/build/overview 301', '/agentware/build/quickstart /agentware/build/overview 301', '/agentware/build/quickstart/ /agentware/build/overview 301']) {
     if (!redirects.split(/\r?\n/).includes(route)) throw new Error(`Broken Agentware section redirect: ${route}`);
   }
 }

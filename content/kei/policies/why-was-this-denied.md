@@ -4,7 +4,7 @@ description: "Find out why Kei denied a tool call or command, using the audit lo
 type: read-and-use
 product: kei
 nav_group: Get started
-nav_order: 8
+nav_order: 9
 ---
 
 # Why was this denied?

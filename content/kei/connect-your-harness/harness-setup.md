@@ -4,7 +4,7 @@ description: "Connect Claude Code, Codex, OpenCode, Pi, Open WebUI, or an Agentw
 type: read-and-use
 product: kei
 nav_group: Make and maintain
-nav_order: 8
+nav_order: 1
 ---
 # Connect a harness to an agent
 

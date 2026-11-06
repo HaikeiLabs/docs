@@ -4,7 +4,7 @@ description: "A Kei policy says which group may do what, and whether it is allow
 type: read-and-use
 product: kei
 nav_group: Get started
-nav_order: 5
+nav_order: 7
 ---
 
 # Policies, explained

@@ -13,14 +13,23 @@ const docsUrl = 'https://docs.haikeilabs.com';
 const consoleUrl = 'https://app.haikeilabs.com';
 const discordUrl = 'https://discord.gg/g6QaTYWXDa';
 const repoUrl = 'https://github.com/HaikeiLabs/docs';
+const githubUrl = 'https://github.com/HaikeiLabs';
 const allowedTypes = new Set(['read-and-use', 'make-and-maintain', 'reference']);
 const allowedProducts = new Set(['kei', 'agentware']);
-const navGroups = ['Get started', 'Make and maintain', 'Reference'];
+const navGroups = ['Start here', 'Get started', 'Make and maintain', 'Reference'];
+// The sidebar shows Agentware first (its Start here group leads), then Kei.
+// Start here is always an Agentware group, whatever the page's product.
+const navProducts = [['agentware', 'Agentware'], ['kei', 'Kei']];
 const maxDescriptionLength = 160;
 // C5 share card. design-system exports it; copy it into assets/social/ (no runtime fetch).
 const shareCardPath = '/assets/social/share-card-dark-1200x627.png';
 const siteName = 'Haikei docs';
-const homeDescription = 'Guides for building with Agentware, Kei, and Haikei Skills.';
+// Docs home head and H1: the p-docs row of the PAGES table (study.txt 1116).
+const homeTitle = 'Haikei docs: build, use and protect AI agents';
+const homeDescription = 'Guides for Agentware, Haikei Skills and Kei: build an AI agent, use it with your coding assistant, and add permissions and audit.';
+// C3a paths. Peers write these pages; until one lands, links fall back to a page that exists.
+const tutorialPath = 'tutorials/hacker-news-research-agent.md';
+const bringYourAgentPath = 'kei/get-started/bring-your-agent.md';
 
 function isoDate(value) {
   if (value instanceof Date && !Number.isNaN(value.valueOf())) return value.toISOString().slice(0, 10);
@@ -50,13 +59,15 @@ function validatePage(relativePath, raw) {
   if (descriptionLength > maxDescriptionLength) throw new Error(`${relativePath}: description is ${descriptionLength} characters; keep it to ${maxDescriptionLength} or fewer`);
   if (!allowedTypes.has(data.type)) throw new Error(`${relativePath}: type must be read-and-use, make-and-maintain, or reference`);
   if (!allowedProducts.has(data.product)) throw new Error(`${relativePath}: product must be kei or agentware`);
-  if (data.nav_group !== undefined && !navGroups.includes(data.nav_group)) throw new Error(`${relativePath}: nav_group must be Get started, Make and maintain, or Reference`);
+  if (data.nav_group !== undefined && !navGroups.includes(data.nav_group)) throw new Error(`${relativePath}: nav_group must be Start here, Get started, Make and maintain, or Reference`);
+  if (data.seo_title !== undefined && (typeof data.seo_title !== 'string' || !data.seo_title.trim())) throw new Error(`${relativePath}: seo_title must be a non-empty string`);
   if (data.nav_order !== undefined && (!Number.isInteger(data.nav_order) || data.nav_order < 0)) throw new Error(`${relativePath}: nav_order must be a non-negative integer`);
   const parts = relativePath.split('/');
   if (['kei', 'agentware'].includes(parts[0]) && parts.length !== 3) throw new Error(`${relativePath}: pages must use content/${parts[0]}/<section>/<slug>.md`);
   if (parts[0] === 'kei' && data.product !== 'kei') throw new Error(`${relativePath}: Kei pages require product: kei`);
   if (parts[0] === 'agentware' && data.product !== 'agentware') throw new Error(`${relativePath}: agentware pages require product: agentware`);
-  if (!['kei', 'agentware'].includes(parts[0]) && relativePath !== 'skills.md') throw new Error(`${relativePath}: use content/kei, content/agentware, or content/skills.md`);
+  if (parts[0] === 'tutorials' && parts.length !== 2) throw new Error(`${relativePath}: tutorials must use content/tutorials/<slug>.md`);
+  if (!['kei', 'agentware', 'tutorials'].includes(parts[0]) && relativePath !== 'skills.md') throw new Error(`${relativePath}: use content/kei, content/agentware, content/tutorials, or content/skills.md`);
 
   const validated = isoDate(data.validated);
   const validatedWith = typeof data.validated_with === 'string' ? data.validated_with.trim() : '';
@@ -66,7 +77,7 @@ function validatePage(relativePath, raw) {
     throw new Error(`${relativePath}: validated must be a real YYYY-MM-DD date and validated_with must match kei vX.Y.Z`);
   }
   if (data.order !== undefined && !(Number.isInteger(data.order) && data.order > 0)) throw new Error(`${relativePath}: order must be a positive integer`);
-  return { ...data, nav_group: data.nav_group ?? 'Reference', nav_order: data.nav_order, validated, validated_with: validatedWith, body: parsed.content, relativePath };
+  return { ...data, seo_title: data.seo_title?.trim(), nav_group: data.nav_group ?? 'Reference', nav_order: data.nav_order, validated, validated_with: validatedWith, body: parsed.content, relativePath };
 }
 
 async function markdownFiles(directory, root = directory) {
@@ -80,28 +91,112 @@ async function markdownFiles(directory, root = directory) {
   return files;
 }
 
+// Folder URLs (C3): content/<dir>/index.md is /<dir>/, and skills.md is /skills/.
+// Every other page drops .md (/kei/get-started/sign-in).
+const folderPages = new Set(['skills.md']);
 function pageHref(page) {
+  if (page.relativePath.endsWith('/index.md')) return `/${page.relativePath.slice(0, -'index.md'.length)}`;
+  if (folderPages.has(page.relativePath)) return `/${page.relativePath.replace(/\.md$/, '')}/`;
   return `/${page.relativePath.replace(/\.md$/, '')}`;
 }
 
+// A folder URL is served from <dir>/index.html, every other page from <path>.html.
+function pageOutputPath(page) {
+  const href = pageHref(page).slice(1);
+  return href.endsWith('/') ? `${href}index.html` : `${href}.html`;
+}
+
+function pageSlug(page) {
+  return pageHref(page).slice(1).replace(/\/$/, '');
+}
+
+function navProduct(page) {
+  return page.nav_group === 'Start here' || page.product === 'agentware' ? 'agentware' : 'kei';
+}
+
+// Sidebar sections in display order: [{ product, label, group, pages }], empty sections dropped.
 // Explicit nav_order is preferred; the legacy `order` field remains supported during migration.
+function navSections(pages) {
+  return navProducts.flatMap(([product, label]) => navGroups.map((group) => ({
+    product,
+    label,
+    group,
+    pages: pages
+      .filter((page) => navProduct(page) === product && page.nav_group === group)
+      .sort((a, b) => (a.nav_order ?? a.order ?? Number.MAX_SAFE_INTEGER) - (b.nav_order ?? b.order ?? Number.MAX_SAFE_INTEGER) || a.relativePath.localeCompare(b.relativePath)),
+  }))).filter((section) => section.pages.length);
+}
+
 function orderedPages(pages) {
-  return navGroups.flatMap((group) => pages
-    .filter((page) => page.nav_group === group)
-    .sort((a, b) => (a.nav_order ?? a.order ?? Number.MAX_SAFE_INTEGER) - (b.nav_order ?? b.order ?? Number.MAX_SAFE_INTEGER) || a.relativePath.localeCompare(b.relativePath)));
+  return navSections(pages).flatMap((section) => section.pages);
 }
 
-function sidebar(pages, currentPath = '') {
-  const groups = navGroups.map((group) => {
-    const entries = orderedPages(pages).filter((page) => page.nav_group === group);
-    return `<div class="nav-section">${group}</div><ul>${entries.map((page) => `<li><a href="${pageHref(page)}"${page.relativePath === currentPath ? ' aria-current="page"' : ''}>${escapeHtml(page.title)}</a></li>`).join('')}</ul>`;
+// Ties would fall back to path order, so each nav_order is used once per sidebar group.
+function checkNavOrder(pages) {
+  const clashes = [];
+  for (const section of navSections(pages)) {
+    const seen = new Map();
+    for (const page of section.pages) {
+      if (page.nav_order === undefined) continue;
+      const first = seen.get(page.nav_order);
+      if (first) clashes.push(`${section.label} · ${section.group}: nav_order ${page.nav_order} is used by ${first.relativePath} and ${page.relativePath}`);
+      else seen.set(page.nav_order, page);
+    }
+  }
+  if (clashes.length) throw new Error(`Duplicate nav_order values:\n${clashes.join('\n')}`);
+}
+
+function sidebar(pages, currentPath = '', links = siteLinks(pages)) {
+  let product = '';
+  const groups = navSections(pages).map((section) => {
+    const heading = section.product === product ? '' : `<div class="nav-product">${section.label}</div>`;
+    product = section.product;
+    const entries = section.pages.map((page) => `<li><a href="${pageHref(page)}"${page.relativePath === currentPath ? ' aria-current="page"' : ''}>${escapeHtml(page.title)}</a></li>`).join('');
+    return `${heading}<div class="nav-section">${section.group}</div><ul>${entries}</ul>`;
   }).join('');
-  return `<aside class="sidebar" id="site-nav"><nav aria-label="Documentation">${groups}</nav></aside>`;
+  return `<aside class="sidebar" id="site-nav">${globalNav(links, currentPath, 'sidebar-global')}<nav aria-label="Documentation">${groups}</nav></aside>`;
 }
 
-const discordMark = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M19.54 0c1.2 0 2.18.98 2.18 2.18v19.64c0 1.2-.98 2.18-2.18 2.18H4.46a2.18 2.18 0 0 1-2.18-2.18V2.18C2.28.98 3.26 0 4.46 0h15.08Zm-2.2 5.14a17.4 17.4 0 0 0-4.36-1.35l-.53 1.08a16.2 16.2 0 0 0-4.9 0l-.53-1.08a17.4 17.4 0 0 0-4.36 1.35C-.1 9.25-.87 13.26-.48 17.22a17.5 17.5 0 0 0 5.35 2.7l1.3-1.76c-.72-.26-1.4-.6-2.03-1.02l.5-.38c3.9 1.83 8.6 1.83 12.45 0l.5.38c-.63.42-1.31.76-2.03 1.02l1.3 1.76a17.5 17.5 0 0 0 5.35-2.7c.46-4.6-.79-8.57-2.84-12.08ZM8.1 15.04c-1.15 0-2.1-1.05-2.1-2.34s.92-2.34 2.1-2.34 2.1 1.05 2.1 2.34-.93 2.34-2.1 2.34Zm7.8 0c-1.15 0-2.1-1.05-2.1-2.34s.92-2.34 2.1-2.34 2.1 1.05 2.1 2.34-.92 2.34-2.1 2.34Z"/></svg>';
+// Targets shared by the home cards and the global nav. A C3a page that has not landed
+// yet falls back to the nearest page that exists, so the build never links nowhere.
+function siteLinks(pages) {
+  const has = (relativePath) => pages.find((page) => page.relativePath === relativePath);
+  const keiStart = navSections(pages).find((section) => section.product === 'kei' && section.group === 'Get started')?.pages[0];
+  const bring = has(bringYourAgentPath) ?? has('kei/get-started/sign-in.md') ?? keiStart;
+  const tutorial = has(tutorialPath);
+  return {
+    agentware: '/agentware/build/overview',
+    kei: bring ? pageHref(bring) : '/kei/get-started/sign-in',
+    bring: bring && { href: pageHref(bring), label: bring.relativePath === bringYourAgentPath ? 'Connect the agent you use' : bring.title },
+    tutorial: tutorial
+      ? { href: pageHref(tutorial), label: tutorial.title }
+      : { href: '/tutorials/', label: 'Browse the tutorials' },
+    skills: '/skills/',
+    tutorials: '/tutorials/',
+  };
+}
+
+function navSection(currentPath) {
+  if (currentPath === '') return 'home';
+  if (currentPath === 'skills.md') return 'skills';
+  return currentPath.split('/')[0];
+}
+
+function globalNav(links, currentPath, className = 'global-nav') {
+  const current = navSection(currentPath);
+  const item = (key, href, label, extra = '') => `<a href="${href}"${extra}${key === current ? ' aria-current="true"' : ''}>${label}</a>`;
+  return `<nav class="${className}" aria-label="Site">${[
+    item('home', '/', 'Docs home'),
+    item('agentware', links.agentware, 'Agentware'),
+    item('kei', links.kei, 'Kei'),
+    item('skills', links.skills, 'Skills'),
+    item('tutorials', links.tutorials, 'Tutorials'),
+    item('', githubUrl, 'GitHub', ' aria-label="Haikei Labs on GitHub"'),
+    item('', discordUrl, 'Discord', ' target="_blank" rel="noopener noreferrer" aria-label="Haikei on Discord"'),
+  ].join('')}</nav>`;
+}
+
 const logoMark = '<svg class="logo" width="28" height="28" viewBox="0 0 32 32" role="img" aria-label="Haikei Labs"><rect x="9.5" y="9.5" width="13" height="13" rx="1.4" fill="var(--logo-plane)"/><rect x="1" y="1" width="21.5" height="21.5" rx="2.2" fill="none" stroke="var(--logo-plane)" stroke-width="2.1"/><rect x="9.5" y="9.5" width="21.5" height="21.5" rx="2.2" fill="none" stroke="var(--logo-front)" stroke-width="2.1"/><circle cx="13.3" cy="13.3" r="1.65" fill="var(--logo-point)"/><circle cx="18.7" cy="13.3" r="1.65" fill="var(--logo-point)"/><circle cx="13.3" cy="18.7" r="1.65" fill="var(--logo-point)"/><circle cx="18.7" cy="18.7" r="1.65" fill="var(--logo-point)"/></svg>';
-const githubMark = '<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>';
 // Inline before any stylesheet so a stored dark preference never flashes light.
 // Mirrors design-system/scripts/theme-init.js; the last line only marks JS as available.
 const themeInit = `(function () {
@@ -134,8 +229,7 @@ function seoHead({ title, description, canonical, ogType }) {
   ].join('\n  ');
 }
 
-function layout(title, nav, content, { toc = '', mermaid = false, description = homeDescription, canonical = '/', ogType = 'website' } = {}) {
-  const fullTitle = `${title} · ${siteName}`;
+function layout(title, nav, content, { toc = '', mermaid = false, description = homeDescription, canonical = '/', ogType = 'website', fullTitle = `${title} · ${siteName}`, links, currentPath = '' } = {}) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -159,10 +253,9 @@ function layout(title, nav, content, { toc = '', mermaid = false, description = 
     <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Menu"><span></span></button>
     <a class="brand" href="${siteUrl}" aria-label="Haikei Labs home">${logoMark}<span class="wordmark">Haikei Labs</span></a>
     <a class="docs-label" href="/">Docs</a>
+    ${globalNav(links, currentPath)}
     <span class="header-spacer"></span>
     <a class="header-link" href="${consoleUrl}">Console</a>
-    <a class="icon-link" href="${discordUrl}" target="_blank" rel="noopener noreferrer" aria-label="Haikei on Discord">${discordMark}</a>
-    <a class="icon-link" href="${repoUrl}" aria-label="Haikei docs on GitHub">${githubMark}</a>
     <button class="theme-toggle" type="button" aria-label="Switch color theme"></button>
   </header>
   <div class="layout">${nav}<main id="main" class="content">${content}<footer class="footer"><p>Public guidance for people building and using agents with Kei.</p><p>Questions? Join the developer community on <a href="${discordUrl}" target="_blank" rel="noopener noreferrer">Discord</a>.</p></footer></main>${toc}</div>
@@ -180,26 +273,55 @@ function pager(ordered, page) {
   return `<nav class="pager" aria-label="Previous and next pages">${link(prev, 'prev', 'Previous')}${link(next, 'next', 'Next')}</nav>`;
 }
 
-function renderPage(page, pages) {
-  const outputPath = `${page.relativePath.replace(/\.md$/, '')}.html`;
+function tutorialList(pages) {
+  const tutorials = orderedPages(pages).filter((entry) => entry.relativePath.startsWith('tutorials/') && entry.relativePath !== 'tutorials/index.md');
+  if (!tutorials.length) return '';
+  return `<ul class="tutorial-list">${tutorials.map((entry) => `<li><a href="${pageHref(entry)}"><strong>${escapeHtml(entry.title)}</strong><span>${escapeHtml(entry.description.trim())}</span></a></li>`).join('')}</ul>`;
+}
+
+function renderPage(page, pages, links = siteLinks(pages)) {
+  const outputPath = pageOutputPath(page);
   const validation = page.validated && page.validated_with
     ? `<p class="validated">Last validated ${escapeHtml(page.validated)} with ${escapeHtml(page.validated_with)}</p>`
     : '';
   const env = {};
   const rendered = markdown.render(stripHtmlComments(stripLeadingTitle(page.body)), env);
-  const links = `<a class="markdown-link" href="/${escapeHtml(page.relativePath)}">View as Markdown</a><a class="markdown-link" href="${repoUrl}/edit/main/content/${escapeHtml(page.relativePath)}">Edit on GitHub</a>`;
-  const body = `<div class="title-row"><h1>${escapeHtml(page.title)}</h1><div class="page-links">${links}</div></div>${validation}<article class="prose">${rendered}</article>${pager(orderedPages(pages), page)}`;
-  return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"'), description: page.description.trim(), canonical: pageHref(page), ogType: 'article' }) };
+  const pageLinks = `<a class="markdown-link" href="/${escapeHtml(page.relativePath)}">View as Markdown</a><a class="markdown-link" href="${repoUrl}/edit/main/content/${escapeHtml(page.relativePath)}">Edit on GitHub</a>`;
+  const listing = page.relativePath === 'tutorials/index.md' ? tutorialList(pages) : '';
+  const body = `<div class="title-row"><h1>${escapeHtml(page.title)}</h1><div class="page-links">${pageLinks}</div></div>${validation}<article class="prose">${rendered}${listing}</article>${pager(orderedPages(pages), page)}`;
+  const fullTitle = page.seo_title ?? `${page.title} · ${siteName}`;
+  return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath, links), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"'), description: page.description.trim(), canonical: pageHref(page), ogType: 'article', fullTitle, links, currentPath: page.relativePath }) };
 }
 
+// Two paths (C3a): build your own agent, or bring the agent you use. Both link /skills/.
 function renderHome(pages) {
-  const sections = navGroups.map((group) => {
-    const cards = orderedPages(pages).filter((page) => page.nav_group === group)
-      .map((page) => `<a class="home-card" href="${pageHref(page)}"><strong>${escapeHtml(page.title)}</strong><span>${escapeHtml(page.product)}</span></a>`).join('');
-    return `<section><h2>${group}</h2><div class="home-grid">${cards}</div></section>`;
-  }).join('');
-  const body = `<h1>Haikei documentation</h1><p class="home-intro">Set up Kei, build with agentware, and use Kei skills with your agent.</p>${sections}`;
-  return layout('Haikei documentation', sidebar(pages), body);
+  const links = siteLinks(pages);
+  const card = ({ eyebrow, heading, id, text, actions }) => `<section class="path-card" aria-labelledby="${id}"><p class="path-eyebrow">${eyebrow}</p><h2 id="${id}">${heading}</h2><p>${text}</p><ul class="path-actions">${actions.filter(Boolean).map(([href, label], index) => `<li><a${index === 0 ? ' class="path-primary"' : ''} href="${href}">${escapeHtml(label)}</a></li>`).join('')}</ul></section>`;
+  const cards = [
+    card({
+      eyebrow: 'Agentware',
+      heading: 'Build your own agent',
+      id: 'build-your-own-agent',
+      text: 'Write tools and run the agent loop with Agentware in TypeScript, Go or Python, on any OpenAI-compatible model. You need a model API key, not a Kei account.',
+      actions: [
+        [links.agentware, 'Build on Agentware'],
+        [links.tutorial.href, links.tutorial.label],
+        [links.skills, 'Install Haikei Skills'],
+      ],
+    }),
+    card({
+      eyebrow: 'Claude Code, Codex, OpenCode, Pi, Open WebUI',
+      heading: 'Bring the agent you use',
+      id: 'bring-the-agent-you-use',
+      text: 'Install the kei CLI and connect the agent you already use. Then add Kei policies: deterministic guardrails for the tool calls your agent can make.',
+      actions: [
+        links.bring && [links.bring.href, links.bring.label],
+        [links.skills, 'Install Haikei Skills'],
+      ],
+    }),
+  ].join('');
+  const body = `<h1>Haikei documentation</h1><p class="home-intro">There are two ways to start. Build your own agent with Agentware, or bring the coding agent you already use and add Kei policies to it.</p><div class="path-grid">${cards}</div>`;
+  return layout('Haikei documentation', sidebar(pages, '', links), body, { fullTitle: homeTitle, links });
 }
 
 // Every canonical page: the home plus each page in the index.json manifest.
@@ -212,9 +334,9 @@ function sitemapXml(manifest) {
 // (Link header, C5), so search engines index the HTML page and not the copy.
 // Cloudflare Pages accepts at most 100 _headers rules.
 const maxHeaderRules = 100;
-function markdownCopyHeaders(manifest) {
-  if (manifest.length > maxHeaderRules) throw new Error(`_headers would need ${manifest.length} rules; Cloudflare Pages allows ${maxHeaderRules}. Switch the .md copies to a single X-Robots-Tag: noindex rule.`);
-  return manifest.map((entry) => `${entry.path}.md\n  Link: <${docsUrl}${entry.path}>; rel="canonical"\n`).join('');
+function markdownCopyHeaders(pages) {
+  if (pages.length > maxHeaderRules) throw new Error(`_headers would need ${pages.length} rules; Cloudflare Pages allows ${maxHeaderRules}. Switch the .md copies to a single X-Robots-Tag: noindex rule.`);
+  return pages.map((page) => `/${page.relativePath}\n  Link: <${docsUrl}${pageHref(page)}>; rel="canonical"\n`).join('');
 }
 
 export async function loadDocs(contentDir = path.join(repoRoot, 'content')) {
@@ -223,6 +345,7 @@ export async function loadDocs(contentDir = path.join(repoRoot, 'content')) {
   const pages = [];
   for (const file of files) pages.push(validatePage(file.relativePath, await readFile(file.absolute, 'utf8')));
   pages.sort((a, b) => a.product.localeCompare(b.product) || a.relativePath.localeCompare(b.relativePath));
+  checkNavOrder(pages);
   return pages;
 }
 
@@ -243,8 +366,9 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   await cp(path.join(assetsDir, 'images'), path.join(outputDir, 'assets/images'), { recursive: true });
   // The share card arrives from design-system; until then og:image points at the C5 path.
   if (existsSync(path.join(assetsDir, 'social'))) await cp(path.join(assetsDir, 'social'), path.join(outputDir, 'assets/social'), { recursive: true });
+  const links = siteLinks(pages);
   for (const page of pages) {
-    const { outputPath, html } = renderPage(page, pages);
+    const { outputPath, html } = renderPage(page, pages, links);
     const htmlFile = path.join(outputDir, outputPath);
     const markdownFile = path.join(outputDir, page.relativePath);
     await mkdir(path.dirname(htmlFile), { recursive: true });
@@ -259,24 +383,25 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   await writeFile(path.join(outputDir, 'agentware/build/index.html'), overviewHtml);
   await mkdir(path.join(outputDir, 'agentware'), { recursive: true });
   await writeFile(path.join(outputDir, 'agentware/index.html'), overviewHtml);
-  if (pages.some((page) => page.relativePath === 'skills.md')) {
-    await mkdir(path.join(outputDir, 'skills'), { recursive: true });
-    await writeFile(path.join(outputDir, 'skills/index.html'), await readFile(path.join(outputDir, 'skills.html'), 'utf8'));
-  }
+  // One canonical URL for the Agentware section (C3): every alias 301s to the overview.
+  // Cloudflare Pages applies _redirects before static assets; the index.html copies
+  // remain as a fallback and carry the overview's canonical link.
   await writeFile(path.join(outputDir, '_redirects'), [
     '/agentware /agentware/build/overview 301',
+    '/agentware/ /agentware/build/overview 301',
     '/agentware/build /agentware/build/overview 301',
+    '/agentware/build/ /agentware/build/overview 301',
     '/agentware/build/quickstart /agentware/build/overview 301',
     '/agentware/build/quickstart/ /agentware/build/overview 301',
     '',
   ].join('\n'));
   await writeFile(path.join(outputDir, 'index.html'), renderHome(pages));
   // Page manifest consumed by `kei docs` (HAI-735). Keep this shape stable.
-  const manifest = orderedPages(pages).map((page) => ({ slug: pageHref(page).slice(1), title: page.title, path: pageHref(page), product: page.product }));
+  const manifest = orderedPages(pages).map((page) => ({ slug: pageSlug(page), title: page.title, path: pageHref(page), product: page.product }));
   await writeFile(path.join(outputDir, 'index.json'), `${JSON.stringify(manifest, null, 2)}\n`);
   await writeFile(path.join(outputDir, 'sitemap.xml'), sitemapXml(manifest));
   await writeFile(path.join(outputDir, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${docsUrl}/sitemap.xml\n`);
-  await writeFile(path.join(outputDir, '_headers'), markdownCopyHeaders(manifest));
+  await writeFile(path.join(outputDir, '_headers'), markdownCopyHeaders(orderedPages(pages)));
   await writeFile(path.join(outputDir, '404.html'), '<!doctype html><html lang="en"><meta charset="utf-8"><title>Not found · Haikei docs</title><h1>Page not found</h1><p><a href="/">Return to the documentation home.</a></p></html>\n');
   await checkBuiltRoutes(outputDir);
   return pages;

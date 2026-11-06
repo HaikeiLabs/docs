@@ -4,7 +4,7 @@ description: "Sync one Microsoft Entra security group and its direct user member
 type: read-and-use
 product: kei
 nav_group: Make and maintain
-nav_order: 10
+nav_order: 3
 ---
 # Sync an Entra security group to Kei
 

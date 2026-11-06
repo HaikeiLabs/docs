@@ -3,10 +3,10 @@ title: Groups & autogroups
 description: "Create Kei groups to decide who a policy applies to, and use autogroups that follow organization roles."
 type: make-and-maintain
 product: kei
-nav_group: Make and maintain
-nav_order: 11
 validated: 2026-10-21
 validated_with: kei v0.2.5
+nav_group: Make and maintain
+nav_order: 7
 ---
 
 # Groups & autogroups

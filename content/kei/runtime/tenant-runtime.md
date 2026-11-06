@@ -4,7 +4,7 @@ description: "Deploy the Kei connector runtime beside a service, bot, or Agentwa
 type: read-and-use
 product: kei
 nav_group: Make and maintain
-nav_order: 10
+nav_order: 4
 ---
 # Tenant-side connector runtime
 

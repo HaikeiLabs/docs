@@ -4,7 +4,7 @@ description: "How Kei policies allow or deny connector capabilities, shell comma
 type: reference
 product: kei
 nav_group: Make and maintain
-nav_order: 13
+nav_order: 9
 ---
 
 # Policies and approvals

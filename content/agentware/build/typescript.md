@@ -3,7 +3,7 @@ description: Install the Agentware TypeScript SDK and run an offline harness tha
 title: Set up a TypeScript harness
 type: read-and-use
 product: agentware
-nav_group: Make and maintain
+nav_group: Start here
 nav_order: 5
 ---
 

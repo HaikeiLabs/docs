@@ -4,7 +4,7 @@ description: "Fix the most common problems in Kei setup. Each entry gives the sy
 type: read-and-use
 product: kei
 nav_group: Get started
-nav_order: 7
+nav_order: 11
 ---
 
 # Troubleshoot setup

@@ -3,8 +3,8 @@ description: Build a custom AI agent or harness with Agentware, coding-agent Ski
 title: Build on Agentware
 type: read-and-use
 product: agentware
-nav_group: Make and maintain
-nav_order: 2
+nav_group: Start here
+nav_order: 1
 ---
 
 Build a custom agent or harness with Agentware: call typed tools, add guardrails, and record tool decisions. Start with an offline echo example, then adapt the tool to a research, monitoring, or workflow application. Agentware is a library; Haikei Skills are instructions for your coding assistant; Kei is an optional integration that allows or denies operations. Kei is a metadata-only control plane: provider payloads, customer content, and credentials never enter Kei.

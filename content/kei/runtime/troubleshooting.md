@@ -4,7 +4,7 @@ description: "Fix a kei-proxy runtime container that fails to start or never con
 type: read-and-use
 product: kei
 nav_group: Make and maintain
-nav_order: 11
+nav_order: 5
 ---
 # Troubleshoot the runtime container
 
