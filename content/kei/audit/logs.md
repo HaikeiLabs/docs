@@ -16,7 +16,7 @@ Open **Audit Logs** in the web app to review recent decision records and adminis
 
 ## What is recorded
 
-Decision records include the invoking subject, delegation span, tool name, resource identifiers, policy decision, and an arguments digest. Administrative events record actions and resource metadata. agentware middleware and the tenant-side connector runtime redact records: raw credentials, provider request/response payloads, and customer documents must remain out of control-plane audit logs.
+Decision records include the invoking subject, delegation span, tool name, resource identifiers, policy decision, and an arguments digest. Administrative events record actions and resource metadata. Agentware middleware and the tenant-side connector runtime redact records: raw credentials, provider request/response payloads, and customer documents must remain out of control-plane audit logs.
 
 Runtime heartbeat is operational health metadata, separate from a protected tool-call decision. The audit-log aggregator derives runtime installation connectivity from heartbeat audit records. The **Runtime installations** card shows connected, unknown, never seen, or suspended state, and its **Logs** view reads lifecycle, connectivity, decision, and event records through the Logs API. A stale or absent heartbeat does not authorize an operation; policy decisions remain fail-closed. See [Tenant-side connector runtime](/kei/runtime/tenant-runtime) for bootstrap and heartbeat commands.
 

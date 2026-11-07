@@ -17,7 +17,7 @@ Choose the agent you want to connect and follow its setup page. This step connec
 - [Pi](/kei/connect-your-harness/harness-setup#pi)
 - [Open WebUI](/kei/connect-your-harness/openwebui)
 
-If you are building a custom harness, see [Build on the agentware SDK](/kei/reference/agentware-sdk).
+If you are building a custom harness, see [Build on the Agentware SDK](/kei/reference/agentware-sdk).
 
 ## Check it worked
 

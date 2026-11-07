@@ -18,4 +18,4 @@ Agentware is for engineers adding Kei policies to a custom agent harness. Kei po
 - **Pi:** its own package and local-socket adapter.
 - **Open WebUI:** its own Python library, separate from the SDK path.
 
-To understand how Kei checks a tool call, start with [Govern an agent with agentware](/agentware/getting-started/overview). To add Kei policies to your own harness, continue with [Build on Agentware](/agentware/build/overview), then choose the guide for [Go](/agentware/build/go), [Python](/agentware/build/python), or [TypeScript](/agentware/build/typescript).
+To understand how Kei checks a tool call, start with [Add guardrails to an agent with Agentware](/agentware/getting-started/overview). To add Kei policies to your own harness, continue with [Build on Agentware](/agentware/build/overview), then choose the guide for [Go](/agentware/build/go), [Python](/agentware/build/python), or [TypeScript](/agentware/build/typescript).

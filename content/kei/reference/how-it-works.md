@@ -75,7 +75,7 @@ flowchart TD
 
 - One installation supports multiple harnesses and sessions on the same developer machine.
 - Supported editors apply eligible Kei-generated native permission settings and make their own native decision (allow, deny, or ask). The audit hook reports activity and does not decide or block calls.
-- SDK (Agentware) integrations use `KeiProxyEvaluator` to call `kei-proxy authorize`, which fails closed when it cannot authorize a request. Start with [Build on the agentware SDK](/kei/reference/agentware-sdk).
+- SDK (Agentware) integrations use `KeiProxyEvaluator` to call `kei-proxy authorize`, which fails closed when it cannot authorize a request. Start with [Build on the Agentware SDK](/kei/reference/agentware-sdk).
 - Pi and Open WebUI remain separate harness types with their own integrations; see [Pi setup](/kei/connect-your-harness/harness-setup#pi) and [Open WebUI with Kei](/kei/connect-your-harness/openwebui).
 - Kei receives audit events with the harness kind and session, and shows activity in Audit Logs and the Agents card.
 
