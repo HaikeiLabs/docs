@@ -1,17 +1,17 @@
 ---
-title: Govern an agent with agentware
+title: Add guardrails to an agent with Agentware
 description: "Use Agentware middleware to put one control point around your agent's tool calls: check requests, apply guardrails, and send protected calls to Kei."
 type: read-and-use
 product: agentware
 nav_group: Reference
 ---
 
-Use agentware middleware to place a shared control point around an agent's tool calls. The middleware checks the request, applies guardrails, and sends the operations Kei checks to the runtime in your environment.
+Use Agentware middleware to place a shared control point around an agent's tool calls. The middleware checks the request, applies guardrails, and sends the operations Kei checks to the runtime in your environment.
 
 Agentware is the SDK implementation of the **kei-connector-contracts**
 platform specification. It validates tool call templates, registers tools,
 and builds provider calls after the runtime allows them. For the full picture
-of how contracts, agentware, and the runtime fit together, see
+of how contracts, Agentware, and the runtime fit together, see
 [Contracts, Agentware, and how to build a custom connector](/kei/reference/contracts-vs-agentware).
 
 ## Keep the decision close to the tool

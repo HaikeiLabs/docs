@@ -55,3 +55,57 @@ test('flags every banned variant as a whole word', () => {
     ['governance', 'governs', 'ungoverned', 'governed'],
   );
 });
+
+test('fails on "Kei skills" with a Haikei Skills fix', async () => {
+  await withTempFiles(
+    { 'bad.md': 'Install the Kei skills into your assistant.\n' },
+    async (dir) => {
+      const problems = await checkLanguage(dir);
+      assert.equal(problems.length, 1);
+      assert.match(problems[0], /^bad\.md:1: "Kei skills" → Haikei Skills$/);
+    },
+  );
+});
+
+test('fails on "Kei guardrails" with a Kei policies fix', async () => {
+  await withTempFiles(
+    { 'bad.md': 'Add Kei guardrails to the agent.\n' },
+    async (dir) => {
+      const problems = await checkLanguage(dir);
+      assert.equal(problems.length, 1);
+      assert.match(problems[0], /^bad\.md:1: "Kei guardrails" → Kei policies$/);
+    },
+  );
+});
+
+test('fails on lowercase agentware in prose', () => {
+  const violations = findViolations('Build it with agentware today.');
+  assert.deepEqual(
+    violations.map((v) => [v.word, v.fix]),
+    [['agentware', 'Agentware']],
+  );
+});
+
+test('allows agentware in inline code, URLs and paths', () => {
+  const text =
+    'Install `agentware` from https://github.com/haikeilabs/agentware, ' +
+    'then read agentware/README.md, go/agentware and kei-agentware notes.';
+  assert.deepEqual(findViolations(text), []);
+});
+
+test('allows agentware in anchor fragments but flags headings', () => {
+  const anchored = 'See [Agentware: the SDK](#agentware-the-sdk) for details.';
+  assert.deepEqual(findViolations(anchored), []);
+  const heading = findViolations('# agentware SDK middleware');
+  assert.deepEqual(heading.map((v) => v.fix), ['Agentware']);
+});
+
+test('exempts the product: enum value but still checks title and description', () => {
+  const text =
+    '---\ntitle: Build with agentware\nproduct: agentware\n' +
+    'description: Use Agentware well.\n---\n\nUse agentware today.\n';
+  assert.deepEqual(
+    findViolations(text).map((v) => v.line),
+    [2, 7],
+  );
+});

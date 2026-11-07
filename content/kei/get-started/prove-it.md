@@ -19,7 +19,7 @@ Complete the setup journey in order:
 2. [Connect this machine](/kei/get-started/connect-this-machine)
 3. [Connect your agent](/kei/get-started/connect-your-agent)
 4. [Give a group access](/kei/get-started/give-a-group-access)
-5. [Install Kei skills in your agent](/kei/get-started/install-skills)
+5. [Install Haikei Skills in your agent](/kei/get-started/install-skills)
 
 You need at least one policy that permits an operation and at least one operation your group is **not** permitted to perform. If you do not have a deny policy yet, create one that denies a safe test tool (for example, a `web_search` or `connector:read` call on a resource your group does not need).
 
