@@ -27,7 +27,7 @@ No matching policy results in a deny. See the [Create policies](/content/kei/pol
 
 Record each authorization outcome with its harness or framework and the invoking user preserved through delegation. Keep the decision and its reason available for audit. Do not log the runtime token or other credentials.
 
-The harness and agentware run on the tenant side. Kei is a metadata-only control plane: provider payloads and results, customer content, credentials, embeddings, and indexes never enter Kei. The proxy may use metadata and credential references from the control plane, but resolves credentials and executes providers within the tenant runtime.
+The harness and Agentware run on the tenant side. Kei is a metadata-only control plane: provider payloads and results, customer content, credentials, embeddings, and indexes never enter Kei. The proxy may use metadata and credential references from the control plane, but resolves credentials and executes providers within the tenant runtime.
 
 ## View audit entries
 
@@ -61,7 +61,7 @@ Do not send `agent_id` to `authorize`. Agent identity is discovered from the run
 
 A denial includes a machine-readable `reason_code` and a user-facing `hint`. Preserve and surface those values so the user can understand the next step. See the [Deny reason codes](/content/agentware/reference/deny-hints.html) reference for the full table.
 
-## Using agentware as a team
+## Using Agentware as a team
 
 ### Developer machines
 

@@ -21,7 +21,7 @@ The diagram shows the request and decision boundary. The numbered steps below it
 <div class="runtime-flow" role="group" aria-label="Protected connector request flow">
   <div class="runtime-flow-node"><strong>Agent harness</strong><span>Requests a tool operation</span></div>
   <span class="runtime-flow-arrow" aria-hidden="true">→</span>
-  <div class="runtime-flow-node"><strong>agentware SDK middleware</strong><span>Applies harness guardrails and sends the request for a policy check</span></div>
+  <div class="runtime-flow-node"><strong>Agentware SDK middleware</strong><span>Applies harness guardrails and sends the request for a policy check</span></div>
   <span class="runtime-flow-arrow" aria-hidden="true">→</span>
   <div class="runtime-flow-node runtime-flow-runtime"><strong>Tenant-side connector runtime</strong><span>Evaluates workspace ABAC policy locally</span>
     <div class="runtime-flow-attributes"><span>Subject</span><span>Resource</span><span>Operation</span><span>Context</span></div>
@@ -32,7 +32,7 @@ The diagram shows the request and decision boundary. The numbered steps below it
   <div class="runtime-flow-deny"><strong>Deny</strong><span>Stop before the provider call</span></div>
 </div>
 
-1. The harness invokes a tool through agentware middleware.
+1. The harness invokes a tool through Agentware middleware.
 2. The middleware sends the caller identity and requested tool, action, and resource to the tenant-side connector runtime.
 3. The runtime checks subject, resource, operation, and relevant context against workspace policy.
 4. If permitted, the runtime performs the connector operation locally. If denied, stale, or out of scope, it fails closed. Redacted decision metadata is available for audit.
@@ -60,7 +60,7 @@ kei-proxy help
 
 An organization administrator creates a runtime installation in the web app or with the supported administrator CLI. Put the runtime credential in the container platform's secret store and inject it as `KEI_RUNTIME_TOKEN`; configure the fixed control-plane URL `https://app.haikeilabs.com`. The runtime reports its version from the binary build, so do not set `KEI_RUNTIME_VERSION`. Agent, organization, workspace, and installation identity are supplied through the authenticated runtime identity handshake. The installation ID is a non-secret identifier, not the credential.
 
-Before the bot accepts work, run `kei-proxy runtime bootstrap`. Keep `kei-proxy runtime heartbeat --interval 1m` running under the container's process supervisor alongside the bot. The bot's agentware middleware invokes the runtime for protected tool calls. Keep provider credentials in the container's protected secret store; never bake secrets into the image or pass them as arguments.
+Before the bot accepts work, run `kei-proxy runtime bootstrap`. Keep `kei-proxy runtime heartbeat --interval 1m` running under the container's process supervisor alongside the bot. The bot's Agentware middleware invokes the runtime for protected tool calls. Keep provider credentials in the container's protected secret store; never bake secrets into the image or pass them as arguments.
 
 For administrator installation and credential commands, see [CLI authentication and runtime setup](/kei/get-started/connect-this-machine). If bootstrap fails inside the container, see [Troubleshoot the runtime container](/kei/runtime/troubleshooting).
 
@@ -80,7 +80,7 @@ kei-proxy help
 
 An administrator creates the runtime installation and stores its runtime credential in a secret manager. Configure the workstation with `kei setup`, then verify and send its first heartbeat with `kei runtime bootstrap`. Keep the runtime token out of prompts, source control, shell history, command arguments, and logs.
 
-Use [Agent setup](/kei/connect-your-harness/harness-setup) to choose the harness and install public Kei skills in that harness. Skills provide reusable instructions; they are a separate step from installing the connector runtime. agentware middleware connects protected tool calls to the local runtime.
+Use [Agent setup](/kei/connect-your-harness/harness-setup) to choose the harness and install public Haikei Skills in that harness. Skills provide reusable instructions; they are a separate step from installing the connector runtime. Agentware middleware connects protected tool calls to the local runtime.
 
 ## Recovery from Failed Credential Creation
 

@@ -125,12 +125,12 @@ all of this plus the secret checks that JSON Schema cannot express.
 ## Agentware: the SDK and engine
 
 The [Agentware SDK](https://github.com/HaikeiLabs/agentware) wraps
-kei-connector-contracts so that harnesses import only agentware types and
+kei-connector-contracts so that harnesses import only Agentware types and
 never depend on contracts directly. It provides the generic engine that:
 
 1. **Validates and loads tool call templates** — `calltemplate.Parse`,
    `LoadFile`, and `ParseFS` are thin wrappers over the contracts package.
-   The public API exposes only agentware types (`calltemplate.Template`,
+   The public API exposes only Agentware types (`calltemplate.Template`,
    `calltemplate.Binding`, etc.):
 
    ```go
@@ -187,12 +187,12 @@ guides are at [Build on Agentware](/agentware/build/overview).
 ### Why not import contracts directly? {#why-not-import-contracts-directly}
 
 Agentware re-exports the contracts types so that a custom connector author
-needs **only the agentware dependency**. The agentware API must not expose
+needs **only the Agentware dependency**. The Agentware API must not expose
 contracts types as required imports — nothing generic may mention a specific
-connector. A harness that uses agentware never adds
+connector. A harness that uses Agentware never adds
 `github.com/HaikeiLabs/kei-connector-contracts` to its `go.mod`. The type
 aliases are transparent: `calltemplate.Template` is literally
-`contracts.Template`, but the import path stays agentware.
+`contracts.Template`, but the import path stays `agentware`.
 
 ## The runtime is decision-only
 
@@ -212,7 +212,7 @@ The `kei-proxy` binary (kei-connector-runtime) implements ADR-039: it is a
 
 The runtime **never** executes a provider call, stores provider data, or
 routes MCP calls (HAI-724 removes `/mcp` routing). Provider execution is the
-harness's responsibility — agentware's `BuildRequest` helps the harness build
+harness's responsibility — Agentware's `BuildRequest` helps the harness build
 the call, but the runtime itself only decides.
 
 ### The authorize flow
@@ -278,7 +278,7 @@ Tito, CRM, `http_api`, `skills_repo` — implements it.
 | You need **fine-grained redaction** or **capability-specific result shaping** that the built-in provider clients handle | Use `providers` — the redaction is built into each client. For a template, the harness does the redaction. |
 
 Both approaches are valid. Templates are **additive** — they do not deprecate
-or replace `providers`. The agentware template engine (`BuildRequest`) is an
+or replace `providers`. The Agentware template engine (`BuildRequest`) is an
 alternative path that does not require a Go client per provider.
 
 ### How templates and providers relate
@@ -295,7 +295,7 @@ client. A harness can use either, or both for different operations.
 This example builds a **custom connector** for a fictional
 `statuspage.io`-style API. It defines one tool (`statuspage.list_incidents`),
 validates it, registers it, and builds the provider call after an allow. Every
-command shown below has been verified against the real agentware and contracts
+command shown below has been verified against the real Agentware and contracts
 code.
 
 ### 1. Write the tool definition
@@ -369,7 +369,7 @@ The template declares:
 
 ### 2. Validate the template
 
-With the agentware Go SDK:
+With the Agentware Go SDK:
 
 ```go
 package main
@@ -548,13 +548,13 @@ my-harness/
 └── go.sum
 ```
 
-The `go.mod` depends only on agentware:
+The `go.mod` depends only on Agentware:
 
 ```
 require github.com/haikeilabs/agentware/go v0.16.0
 ```
 
-No direct dependency on `kei-connector-contracts` is needed — agentware wraps
+No direct dependency on `kei-connector-contracts` is needed — Agentware wraps
 it transparently.
 
 ## Learn more

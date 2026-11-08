@@ -8,7 +8,7 @@ nav_order: 1
 ---
 # Connect a harness to an agent
 
-Choose the agent or harness you already use, then follow the setup prompt above to connect it to Kei. Kei supports Claude Code, Codex, OpenCode, Pi, Open WebUI, and SDK (Agentware) integrations. This onboarding flow configures an existing harness and can help install the public Kei skills. Installing skills and integrating an agent through the SDK are separate tasks.
+Choose the agent or harness you already use, then follow the setup prompt above to connect it to Kei. Kei supports Claude Code, Codex, OpenCode, Pi, Open WebUI, and SDK (Agentware) integrations. This onboarding flow configures an existing harness and can help install the public Haikei Skills. Installing skills and integrating an agent through the SDK are separate tasks.
 
 For the full browser sequence, including workspace, connector, and policy setup, see [Getting Started: Web Onboarding](/kei/get-started/sign-in). For SDK (Agentware) integrations, see [Build on the Agentware SDK](https://github.com/HaikeiLabs/agentware/tree/main/docs/getting-started).
 
@@ -24,7 +24,7 @@ For the getting-started overview, see [Connect your harness](/kei/get-started/si
 
 Creating a runtime installation with `kei bot init` requires an organization owner or admin. If you do not have that role, ask an admin to create the installation in **Agents → Add Agent**. Each machine has one runtime installation, and each desktop harness (Claude Code, Codex, or OpenCode, interactive or headless) runs as a session of that installation. There is no per-harness setup in the console.
 
-For Claude Code, Codex, and OpenCode, run the installer in a terminal on the machine where that harness is installed. The script installs the Kei skills and syncs the current policy bundle. `kei harness sync` detects these desktop harnesses; they do not need `kei harness add`. Pi uses a separate extension package and setup flow below. Do not paste a runtime credential into a harness config.
+For Claude Code, Codex, and OpenCode, run the installer in a terminal on the machine where that harness is installed. The script installs the Haikei Skills and syncs the current policy bundle. `kei harness sync` detects these desktop harnesses; they do not need `kei harness add`. Pi uses a separate extension package and setup flow below. Do not paste a runtime credential into a harness config.
 
 After upgrading `kei-cli` to 0.1.17, run `kei runtime service install` again so the service restarts on the new `kei-proxy`. Then run `kei harness sync`. Harness tool calls will appear in Audit Logs with the harness kind and session.
 
@@ -56,7 +56,7 @@ On `kei-cli` 0.1.17 and earlier, specify the installation and agent explicitly:
 kei harness add --installation <INSTALLATION_UUID> --kind custom --agent <AGENT_UUID>
 ```
 
-With `kei-cli` 0.1.18 or later, the installation is resolved from the runtime config and the agent defaults to the installation's default agent, which you can set with `kei bot agents add --default`. The SDK harness authorizes each protected call with `kei-proxy authorize` through agentware's `KeiProxyEvaluator`. Calls that match no policy are denied.
+With `kei-cli` 0.1.18 or later, the installation is resolved from the runtime config and the agent defaults to the installation's default agent, which you can set with `kei bot agents add --default`. The SDK harness authorizes each protected call with `kei-proxy authorize` through Agentware's `KeiProxyEvaluator`. Calls that match no policy are denied.
 
 If `kei harness add` reports `ALREADY_EXISTS`, that agent already has a harness on the installation. For a desktop harness, use `kei harness sync`; for another SDK (Agentware) integration, pass `--agent` with a different agent assigned to the installation. If it reports `no default agent found`, set one or pass `--agent`:
 

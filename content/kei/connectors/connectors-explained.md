@@ -9,7 +9,7 @@ nav_order: 45
 
 # Connectors, explained
 
-A connector is a bridge between Kei and an external service — GitHub, Linear, Google Drive, a homegrown CRM API, or a remote MCP server. Connectors let agents read and write data through protected tool calls. Kei authorizes each call; the harness (Claude Code, Codex, the agentware SDK) performs the actual request.
+A connector is a bridge between Kei and an external service — GitHub, Linear, Google Drive, a homegrown CRM API, or a remote MCP server. Connectors let agents read and write data through protected tool calls. Kei authorizes each call; the harness (Claude Code, Codex, the Agentware SDK) performs the actual request.
 
 ## How connectors work
 
