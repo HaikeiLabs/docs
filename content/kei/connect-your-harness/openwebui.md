@@ -80,24 +80,21 @@ kei model-profiles readiness acme-chat-model --workspace <workspace>
 
 ### 1.4 Policies
 
-Two kinds of permit make a working chat. Both are evaluated by the `kei-proxy` daemon in the container, against the user the agent session resolved to.
+Two kinds of permit make a working chat. Both are evaluated by the `kei-proxy` daemon in the container, against the user the agent session resolved to. Policies apply to groups: `--group` names the group whose members the permit covers.
 
-| Controls | `--dst-pattern` | Example `--src-pattern` |
-| --- | --- | --- |
-| Model calls through the Kei Pipe | `model:invoke` | `group:chat-users` |
-| One tool Kei checks | `tool:<name>`, the tool's declared name exactly | `group:chat-users` |
+| Controls | `--allow <target>` |
+| --- | --- |
+| Model calls through the Kei Pipe | `model:invoke` |
+| One tool Kei checks | `tool:<name>`, the tool's declared name exactly |
 
 ```bash
-kei policies create --workspace <workspace> --name chat-users-models \
-  --src-pattern group:chat-users --dst-pattern model:invoke --effect permit
-kei policies create --workspace <workspace> --name chat-users-list-orders \
-  --src-pattern group:chat-users --dst-pattern tool:acme.orders.list_orders --effect permit
-kei policies list --workspace <workspace>
+kei policy create --workspace <workspace> --group chat-users --allow model:invoke
+kei policy create --workspace <workspace> --group chat-users --allow tool:acme.orders.list_orders
+kei policy list --workspace <workspace>
 ```
 
-- `--src-pattern` names who: `user:<id>`, `group:<name>`, or `*`.
 - The `kei-proxy` in current images evaluates v1 policy bundles, where `model:invoke` permits decide model calls. In v2 bundles the agent's model profile assignment decides them instead (HAI-459), so keep the assignment from step 1.3 either way.
-- Put the chat agent in the group the permits name (`group:chat-users`) so it is covered like any member: `kei groups members add chat-users <user> --workspace <workspace>` (use `--service-principal <name>` instead of a user for a principal). `--agent-id` is deprecated and ignored: kei-cli v0.3.2 and later accept it but print a warning, and the catalog rejects an `agent_id` scope on a policy, so an agent gets access by being a member of a group the policy names.
+- Put the chat agent in the group the permits name (`chat-users`) so it is covered like any member: `kei groups members add chat-users <user> --workspace <workspace>` (use `--service-principal <name>` instead of a user for a principal). `--agent-id` is deprecated and ignored: kei-cli v0.3.2 and later accept it but print a warning, and the catalog rejects an `agent_id` scope on a policy, so an agent gets access by being a member of a group the policy names.
 - Kei policy alone decides. There is no confirmation step: a write tool runs as soon as a permit allows it.
 - A policy only applies to a tool that is registered for the installation. The image registers its pack's tools at boot ([section 3](#section-3-tool-packs)). Until then a call is refused `tool_not_registered` whatever the policies say.
 - Read/write isn't part of the request, so a policy that separates reads from writes names the read and write tools themselves.

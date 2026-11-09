@@ -151,7 +151,7 @@ npm start -- --fake
 
 ```text
 {"tool":"echo","decision":"allow",...,"reason_code":null,"hint":null,"result":"hello"}
-{"tool":"delete_everything","decision":"deny",...,"reason_code":"no_matching_policy","hint":"Add a policy for this tool: kei policies create"}
+{"tool":"delete_everything","decision":"deny",...,"reason_code":"no_matching_policy","hint":"Add a policy for this target: kei policy create --group <group> --allow <target> --workspace <workspace>"}
 ```
 
 `echo` matches the fake's allow policy, so the tool runs and returns `hello`. `delete_everything` matches no policy, and no matching policy is a deny: the tool never runs. The `reason_code` says why, and the `hint` says what to do next. Preserve and surface both, so the user can act on the denial.

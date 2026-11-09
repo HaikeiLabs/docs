@@ -17,7 +17,7 @@ To see how this approach differs from policy engines, MCP gateways and sandboxes
 flowchart TD
   subgraph Admin["Org admin / owner"]
     A1["Console → Policies<br/>(Create agent command policy)"]
-    A2["kei policies create<br/>(kei login)"]
+    A2["kei policy create<br/>(kei login)"]
   end
   subgraph CP["Kei control plane"]
     G["Groups & Roles<br/>admins ⊃ developer …"]
