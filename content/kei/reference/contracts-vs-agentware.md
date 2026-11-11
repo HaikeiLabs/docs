@@ -25,6 +25,10 @@ Kei checks agent tool calls through three layers that serve different roles:
 This page explains the split, where each layer lives, when you use one versus
 the other, and walks through a complete custom-connector example.
 
+For the full list of connectors and their status, see the
+[Connector catalog](/kei/connectors/connector-catalog), and for how each
+credential model works, see [Connector authentication](/kei/connectors/connector-auth).
+
 ## Contents
 
 - [Contract vs SDK vs runtime](#contract-vs-sdk-vs-runtime)

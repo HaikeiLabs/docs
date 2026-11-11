@@ -11,6 +11,8 @@ nav_order: 45
 
 A connector is a bridge between Kei and an external service — GitHub, Linear, Google Drive, a homegrown CRM API, or a remote MCP server. Connectors let agents read and write data through protected tool calls. Kei authorizes each call; the harness (Claude Code, Codex, the Agentware SDK) performs the actual request.
 
+See the [Connector catalog](/kei/connectors/connector-catalog) for the full list of connectors, their kinds, and their status, and [Connector authentication](/kei/connectors/connector-auth) for how each credential model works.
+
 ## How connectors work
 
 1. An admin creates a connector in the workspace and configures its credentials.
