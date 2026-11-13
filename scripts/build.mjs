@@ -65,7 +65,8 @@ function validatePage(relativePath, raw) {
   if (data.seo_title !== undefined && (typeof data.seo_title !== 'string' || !data.seo_title.trim())) throw new Error(`${relativePath}: seo_title must be a non-empty string`);
   if (data.nav_order !== undefined && (!Number.isInteger(data.nav_order) || data.nav_order < 0)) throw new Error(`${relativePath}: nav_order must be a non-negative integer`);
   const parts = relativePath.split('/');
-  if (['kei', 'agentware'].includes(parts[0]) && parts.length !== 3) throw new Error(`${relativePath}: pages must use content/${parts[0]}/<section>/<slug>.md`);
+  // Product-root hub pages (content/<product>/<slug>.md) are allowed alongside section pages.
+  if (['kei', 'agentware'].includes(parts[0]) && (parts.length < 2 || parts.length > 3)) throw new Error(`${relativePath}: pages must use content/${parts[0]}/<slug>.md or content/${parts[0]}/<section>/<slug>.md`);
   if (parts[0] === 'kei' && data.product !== 'kei') throw new Error(`${relativePath}: Kei pages require product: kei`);
   if (parts[0] === 'agentware' && data.product !== 'agentware') throw new Error(`${relativePath}: agentware pages require product: agentware`);
   if (parts[0] === 'tutorials' && parts.length !== 2) throw new Error(`${relativePath}: tutorials must use content/tutorials/<slug>.md`);
