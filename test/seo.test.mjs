@@ -7,7 +7,8 @@ import { buildDocs } from '../scripts/build.mjs';
 
 const assetsDir = new URL('../assets/', import.meta.url).pathname;
 const docs = 'https://docs.haikeilabs.com';
-const shareCard = `${docs}/assets/social/share-card-dark-1200x627.png`;
+const shareCard = `${docs}/assets/social/share-docs-1200x627.png`;
+const shareCardAlt = 'Haikei Labs docs. Build, use and protect AI agents.';
 
 async function fixture(pages = {}) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'haikei-docs-seo-'));
@@ -74,8 +75,10 @@ test('a rendered page carries canonical, description, Open Graph and Twitter tag
   assert.match(html, new RegExp(`<meta property="og:url" content="${url}">`));
   assert.match(html, /<meta property="og:type" content="article">/);
   assert.match(html, new RegExp(`<meta property="og:image" content="${shareCard}">`));
+  assert.match(html, new RegExp(`<meta property="og:image:alt" content="${shareCardAlt}">`));
   assert.match(html, /<meta property="og:site_name" content="Haikei docs">/);
   assert.match(html, /<meta name="twitter:card" content="summary_large_image">/);
+  assert.match(html, new RegExp(`<meta name="twitter:image" content="${shareCard}">`));
 }));
 
 test('the docs home is an og:type website pointing at the root URL', () => withBuild({}, async (paths) => {
