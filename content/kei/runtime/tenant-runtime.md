@@ -64,6 +64,8 @@ Before the bot accepts work, run `kei-proxy runtime bootstrap`. Keep `kei-proxy 
 
 For administrator installation and credential commands, see [CLI authentication and runtime setup](/kei/get-started/connect-this-machine). If bootstrap fails inside the container, see [Troubleshoot the runtime container](/kei/runtime/troubleshooting).
 
+If your connector secrets live in your own AWS Secrets Manager, Azure Key Vault, or GCP Secret Manager, see [Read connector secrets from your secret manager](/kei/runtime/secret-manager).
+
 For Open WebUI, the published `openwebui-kei` image already runs the connector runtime in its own container: see [Open WebUI with Kei](/kei/connect-your-harness/openwebui).
 
 ## Install with curl for a local coding harness
