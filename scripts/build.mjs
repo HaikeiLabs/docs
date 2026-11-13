@@ -24,7 +24,7 @@ const navGroups = ['Start here', 'Get started', 'Make and maintain', 'Reference'
 const navProducts = [['agentware', 'Agentware'], ['kei', 'Kei']];
 const maxDescriptionLength = 160;
 // C5 share card. design-system exports it; copy it into assets/social/ (no runtime fetch).
-const shareCardPath = '/assets/social/share-card-dark-1200x627.png';
+const shareCardPath = '/assets/social/share-docs-1200x627.png';
 const siteName = 'Haikei docs';
 // Docs home head and H1: the p-docs row of the PAGES table (study.txt 1116).
 const homeTitle = 'Haikei docs: build, use and protect AI agents';
@@ -254,9 +254,11 @@ function seoHead({ title, description, canonical, ogType }) {
     `<meta property="og:url" content="${escapeHtml(url)}">`,
     `<meta property="og:type" content="${ogType}">`,
     `<meta property="og:image" content="${docsUrl}${shareCardPath}">`,
+    '<meta property="og:image:alt" content="Haikei Labs docs. Build, use and protect AI agents.">',
     '<meta property="og:image:width" content="1200">',
     '<meta property="og:image:height" content="627">',
     '<meta name="twitter:card" content="summary_large_image">',
+    `<meta name="twitter:image" content="${docsUrl}${shareCardPath}">`,
   ].join('\n  ');
 }
 
