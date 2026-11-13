@@ -12,7 +12,7 @@ For workstation heartbeat service setup and status, see [Keep your runtime onlin
 
 Use this page when a container that runs the connector runtime (`kei-proxy`) beside your harness fails to start or never connects. Each entry lists a symptom, its root cause, the fix, and how to verify the fix. Find the entry whose symptom matches your container logs.
 
-For the normal installation steps, see [Tenant-side connector runtime](/kei/runtime/tenant-runtime). For `kei login` and CLI authentication failures, see [Troubleshooting `kei login`](/kei/reference/cli#sign-in-troubleshooting).
+For the normal installation steps, see [Tenant-side connector runtime](/kei/runtime/tenant-runtime). For `kei login` and CLI authentication failures, see [Troubleshooting `kei login`](/kei/reference/cli#sign-in-troubleshooting). For a connector that stays `pending` because the runtime can't find its secret in your secret manager, see [Read connector secrets from your secret manager](/kei/runtime/secret-manager#troubleshooting).
 
 For harness command-permission sync and its current limitations, see [Run your own harness with Kei permissions](/kei/connect-your-harness/harness-setup#harness-permissions).
 

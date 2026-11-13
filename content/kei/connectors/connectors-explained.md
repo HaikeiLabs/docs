@@ -92,7 +92,7 @@ Kei supports several credential models:
 | ----- | ------------------------- | ------------------ |
 | **Per-user OAuth** | Each user connects their own account. Kei stores an encrypted OAuth token. | Google Drive, GitHub, Linear |
 | **Shared OAuth** | One organization account is connected. All users share the credential. | Google Drive (shared drive), GitHub (bot account) |
-| **Opaque reference** | A reference to a secret in your secret manager (AWS Secrets Manager, Azure Key Vault, or a file). The runtime resolves it at call time. | http\_api, skills\_repo |
+| **Opaque reference** | A reference to a secret in your secret manager (AWS Secrets Manager, Azure Key Vault, or GCP Secret Manager). The runtime resolves it at call time. See [Read connector secrets from your secret manager](/kei/runtime/secret-manager). | http\_api, skills\_repo |
 | **Service account** | A service account key is stored in your secret manager and referenced by the connector. | Gmail (GSuite delegation), Google Drive (domain delegation) |
 
 - Kei never stores plain-text secrets. Opaque references are stored; the actual secret value lives in your secret manager.
