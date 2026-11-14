@@ -151,6 +151,24 @@ test('tutorials must sit directly under content/tutorials/', () => withSite({
   await assert.rejects(buildDocs(paths), /tutorials\/nested\/deep\.md: tutorials must use content\/tutorials\/<slug>\.md/);
 }));
 
+test('kei pages: product-root and section paths build, deeper nesting is rejected', () => withSite({
+  'kei/runtime-cli-and-policies.md': page({ title: 'Runtime, CLI and policies' }),
+}, async (paths) => {
+  await buildDocs(paths);
+  const hub = await read(paths, 'kei/runtime-cli-and-policies.html');
+  assert.match(hub, new RegExp(`<link rel="canonical" href="${docs}/kei/runtime-cli-and-policies">`));
+  const section = await read(paths, 'kei/get-started/sign-in.html');
+  assert.match(section, new RegExp(`<link rel="canonical" href="${docs}/kei/get-started/sign-in">`));
+  const manifest = JSON.parse(await read(paths, 'index.json'));
+  assert.ok(manifest.some((entry) => entry.slug === 'kei/runtime-cli-and-policies' && entry.path === '/kei/runtime-cli-and-policies'));
+}));
+
+test('kei pages must not nest deeper than a section', () => withSite({
+  'kei/a/b/c.md': page({ title: 'Deep' }),
+}, async (paths) => {
+  await assert.rejects(buildDocs(paths), /kei\/a\/b\/c\.md: pages must use content\/kei\/<slug>\.md or content\/kei\/<section>\/<slug>\.md/);
+}));
+
 test('a link to a missing tutorial fails the link check', () => withSite({
   'kei/reference/cli.md': page({ title: 'Reference: kei CLI', type: 'reference', body: '[Missing](/tutorials/missing-agent)' }),
 }, async (paths) => {
