@@ -325,10 +325,17 @@ function renderPage(page, pages, links = siteLinks(pages)) {
     ? `<p class="validated">Last validated ${escapeHtml(page.validated)} with ${escapeHtml(page.validated_with)}</p>`
     : '';
   const env = { appSource: `docs-${pageSlug(page).split('/').pop()}-console` };
-  const rendered = markdown.render(stripHtmlComments(stripLeadingTitle(page.body)), env);
+  let rendered = markdown.render(stripHtmlComments(stripLeadingTitle(page.body)), env);
+  if (tutorialSlug(page)) {
+    const checkpoints = { run: ['tutorial_success', 'It ran'], tool: ['first_custom_tool', 'I added a tool'] };
+    rendered = rendered.replace(/<p>\[checkpoint:(run|tool)\]<\/p>/g, (_, kind) => {
+      const [event, label] = checkpoints[kind];
+      return `<p class="tutorial-checkpoint"><button type="button" data-checkpoint="${event}" data-language="${escapeHtml(page.language ?? '')}">${label}</button><span aria-live="polite"></span></p>`;
+    });
+  }
   const pageLinks = `<a class="markdown-link" href="/${escapeHtml(page.relativePath)}">View as Markdown</a><a class="markdown-link" href="${repoUrl}/edit/main/content/${escapeHtml(page.relativePath)}">Edit on GitHub</a>`;
   const listing = page.relativePath === 'tutorials/index.md' ? tutorialList(pages) : '';
-  const body = `<div class="title-row"><h1>${escapeHtml(page.title)}</h1><div class="page-links">${pageLinks}</div></div>${validation}<article class="prose">${rendered}${listing}</article>${pager(orderedPages(pages), page)}`;
+  const body = `<div class="title-row"><h1>${escapeHtml(page.title.replace(/ \| Agentware$/, ''))}</h1><div class="page-links">${pageLinks}</div></div>${validation}<article class="prose">${rendered}${listing}</article>${pager(orderedPages(pages), page)}`;
   const fullTitle = page.seo_title ?? `${page.title} · ${siteName}`;
   return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath, links), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"'), description: page.description.trim(), canonical: pageHref(page), ogType: 'article', fullTitle, links, currentPath: page.relativePath, tutorial: tutorialSlug(page) }) };
 }
@@ -436,6 +443,11 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     '/agentware/build/ /agentware/build/overview 301',
     '/agentware/build/quickstart /agentware/build/overview 301',
     '/agentware/build/quickstart/ /agentware/build/overview 301',
+    // Moved pages keep their old addresses working.
+    '/agentware/languages/ /agentware/reference/languages 301',
+    '/agentware/languages /agentware/reference/languages 301',
+    '/agentware/languages/go /agentware/build/go 301',
+    '/tutorials/build-a-protected-agent /tutorials/add-permissions-and-audit 301',
     '',
   ].join('\n'));
   await writeFile(path.join(outputDir, 'index.html'), renderHome(pages));

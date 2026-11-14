@@ -1,10 +1,11 @@
 ---
 title: Build a Hacker News research agent in TypeScript | Agentware
-description: "Build an AI agent that reads today's top Hacker News stories and answers questions. About 15 minutes; needs Node 22.18+ and an OpenAI-compatible API key."
+description: "Build a Hacker News research agent in TypeScript. No Kei account required. Needs Node 22.18+ and an OpenAI-compatible API key."
 type: read-and-use
 product: agentware
 nav_group: Start here
 nav_order: 3
+language: typescript
 ---
 
 # Build a Hacker News research agent
@@ -96,9 +97,13 @@ DENIED hn_post_comment: denied by policy: Only reading stories is allowed
 
 That deny is a guardrail with no Kei involved: `withPolicy` in `agent.ts` holds the rule. The comment tool is not registered with the model, so only your code can call it, and the policy still stops it.
 
+[checkpoint:run]
+
 ## 5. Add your own tool
 
 Add a tool to the registry in `agent.ts`, give it a name, description and input schema, and route its execution through `client.execute`. Add its implementation and an allow rule to the local evaluator. Try a new prompt that asks the model to use it.
+
+[checkpoint:tool]
 
 ## Next steps
 

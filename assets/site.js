@@ -96,6 +96,16 @@
     if (destination) track('outbound_click', { destination: destination });
   });
 
+  document.addEventListener('click', function (event) {
+    var button = event.target.closest && event.target.closest('button[data-checkpoint]');
+    if (!button) return;
+    var main = button.closest('main[data-tutorial]');
+    if (!main) return;
+    track(button.getAttribute('data-checkpoint'), { tutorial: main.getAttribute('data-tutorial'), language: button.getAttribute('data-language') });
+    var confirmation = button.nextElementSibling;
+    if (confirmation) confirmation.textContent = 'Nice.';
+  });
+
   // tutorial_start: once the reader scrolls past the "Before you start" heading.
   var tutorialMain = document.querySelector('main[data-tutorial]');
   var start = tutorialMain && tutorialMain.querySelector('#before-you-start');
