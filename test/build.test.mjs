@@ -298,6 +298,22 @@ test('build rejects an order that is not a positive integer', async () => {
   }
 });
 
+test('_redirects 301s moved Agentware and tutorial pages to their new homes', async () => {
+  const paths = await fixture();
+  try {
+    await buildDocs({ ...paths, assetsDir });
+    const redirects = await readFile(path.join(paths.outputDir, '_redirects'), 'utf8');
+    for (const line of [
+      '/agentware/languages/ /agentware/reference/languages 301',
+      '/agentware/languages /agentware/reference/languages 301',
+      '/agentware/languages/go /agentware/build/go 301',
+      '/tutorials/build-a-protected-agent /tutorials/add-permissions-and-audit 301',
+    ]) assert.ok(redirects.includes(`${line}\n`), `missing redirect: ${line}`);
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
+
 test('header and footer link the Discord community, opening safely in a new tab', async () => {
   const paths = await fixture();
   try {
@@ -313,5 +329,23 @@ test('header and footer link the Discord community, opening safely in a new tab'
     }
   } finally {
     await rm(paths.root, { recursive: true, force: true });
+  }
+});
+
+test('real content: h1s drop the " | Agentware" suffix and the Hacker News tutorial says no Kei account is needed', async () => {
+  const contentDir = new URL('../content/', import.meta.url).pathname;
+  const outputDir = await mkdtemp(path.join(os.tmpdir(), 'haikei-docs-real-'));
+  try {
+    await buildDocs({ contentDir, outputDir, assetsDir });
+    for (const file of await htmlFiles(outputDir)) {
+      const h1 = (await readFile(file, 'utf8')).match(/<h1>([^<]*)<\/h1>/);
+      if (h1) assert.doesNotMatch(h1[1], / \| Agentware$/, `${path.relative(outputDir, file)} h1 keeps the suffix`);
+    }
+    const source = await readFile(path.join(contentDir, 'tutorials/hacker-news-research-agent.md'), 'utf8');
+    const description = source.match(/^description: "(.*)"$/m)[1];
+    assert.match(description, /No Kei account required/);
+    assert.ok(description.length <= 160);
+  } finally {
+    await rm(outputDir, { recursive: true, force: true });
   }
 });

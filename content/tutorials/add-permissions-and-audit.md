@@ -5,6 +5,7 @@ type: read-and-use
 product: agentware
 nav_group: Start here
 nav_order: 8
+language: typescript
 ---
 
 # Add permissions and audit to your agent
@@ -165,6 +166,8 @@ npm start
 ```
 
 The same two calls run, and the decisions come from the policy bundle in your workspace. The allow carries the ID of the policy that matched, and a denial carries its reason code and hint. Every decision is recorded in the Kei audit log. Open **Audit Logs** in the [Kei console](https://app.haikeilabs.com/?source=docs-add-permissions-and-audit-audit-logs&utm_source=docs&utm_medium=docs&utm_campaign=launch-2027-01). Each record shows the time, the person who started the call (the `invoking_subject`), the agent, the tool, `permit` or `deny`, the policy that matched and, on a denial, the reason code and hint. See [Audit logs](/kei/audit/logs) for the recorded fields.
+
+[checkpoint:run]
 
 ## Next steps
 

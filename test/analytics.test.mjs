@@ -14,7 +14,7 @@ const page = ({ title, product = 'kei', nav = '', body = 'Body.' }) =>
 const site = {
   'agentware/build/overview.md': page({ title: 'Build on Agentware', product: 'agentware', nav: 'nav_group: Start here\nnav_order: 1\n' }),
   'tutorials/index.md': page({ title: 'Tutorials', product: 'agentware', nav: 'nav_group: Start here\nnav_order: 2\n' }),
-  'tutorials/hacker-news-research-agent.md': page({ title: 'Build a Hacker News research agent', product: 'agentware', nav: 'nav_group: Start here\nnav_order: 3\n', body: '## Before you start\n\nNode.' }),
+  'tutorials/hacker-news-research-agent.md': page({ title: 'Build a Hacker News research agent | Agentware', product: 'agentware', nav: 'nav_group: Start here\nnav_order: 3\nlanguage: typescript\n', body: '## Before you start\n\nNode.\n\n[checkpoint:run]\n\n[checkpoint:tool]'  }),
   'skills.md': page({ title: 'Install Haikei Skills', nav: 'nav_group: Start here\nnav_order: 4\n', body: '```bash\nnpx skills add HaikeiLabs/skills --skill haikei -a claude-code -y\n```\n\n```bash\nkei skills add\n```\n' }),
   'kei/get-started/sign-in.md': page({ title: 'Sign in to Kei', nav: 'nav_group: Get started\nnav_order: 1\n', body: 'Open the [Kei console](https://app.haikeilabs.com) and the [audit logs](https://app.haikeilabs.com/?source=docs-x-y&utm_source=docs&utm_medium=docs&utm_campaign=launch-2027-01).' }),
 };
@@ -140,4 +140,31 @@ test('site.js: outbound destination classification', async () => {
   assert.equal(outboundDestination('https://haikeilabs.substack.com/p/x'), 'substack');
   assert.equal(outboundDestination('https://app.haikeilabs.com/'), null);
   assert.equal(outboundDestination('/kei/get-started/sign-in'), null);
+});
+
+test('tutorial checkpoints render at their markers and keep SEO titles intact', () => withSite(async (read) => {
+  const html = await read('tutorials/hacker-news-research-agent.html');
+  assert.match(html, /<h1>Build a Hacker News research agent<\/h1>/);
+  assert.match(html, /<title>Build a Hacker News research agent \| Agentware · Haikei docs<\/title>/);
+  assert.match(html, /<button type="button" data-checkpoint="tutorial_success" data-language="typescript">It ran<\/button><span aria-live="polite"><\/span>/);
+  assert.match(html, /<button type="button" data-checkpoint="first_custom_tool" data-language="typescript">I added a tool<\/button><span aria-live="polite"><\/span>/);
+}));
+
+test('checkpoint clicks send only tutorial and language, then confirm inline', async () => {
+  const source = await readFile(path.join(assetsDir, 'site.js'), 'utf8');
+  const listeners = [];
+  const element = () => ({ addEventListener() {}, setAttribute() {}, querySelector: () => null, dataset: {}, textContent: '' });
+  const document = { documentElement: { dataset: {} }, body: { classList: { toggle() {} } }, querySelector: () => element(), querySelectorAll: () => [], addEventListener: (type, fn) => { if (type === 'click') listeners.push(fn); } };
+  const events = [];
+  const window = { gtag: (...args) => events.push(JSON.parse(JSON.stringify(args))) };
+  vm.runInNewContext(source, { window, document, location: {}, navigator: {}, setTimeout, URL });
+  for (const name of ['tutorial_success', 'first_custom_tool']) {
+    const confirmation = { textContent: '' };
+    const main = { getAttribute: () => 'example' };
+    const button = { getAttribute: (key) => key === 'data-checkpoint' ? name : 'typescript', closest: () => main, nextElementSibling: confirmation };
+    const target = { closest: (selector) => selector === 'button[data-checkpoint]' ? button : null };
+    listeners.forEach((fn) => fn({ target }));
+    assert.equal(confirmation.textContent, 'Nice.');
+  }
+  assert.deepEqual(events, [['event', 'tutorial_success', { tutorial: 'example', language: 'typescript' }], ['event', 'first_custom_tool', { tutorial: 'example', language: 'typescript' }]]);
 });
