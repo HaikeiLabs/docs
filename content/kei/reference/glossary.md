@@ -20,7 +20,7 @@ The record Kei writes for every protected tool call: who invoked the agent, the 
 
 ## Coding agent
 
-A coding assistant such as Claude Code, Codex, Cursor, OpenCode, or Pi that an engineer runs to change code with tools.
+A coding assistant such as Claude Code, Codex, Cursor, OpenCode, or Pi that an engineer runs to change code with tools. A coding agent is a harness built for writing code; the site's "Bring your own coding agent" path means connecting one of these to Kei.
 
 ## Connector
 
@@ -40,7 +40,7 @@ Instructions you install into a coding assistant (Claude Code, Codex, Cursor, Op
 
 ## Harness
 
-Software that lets an agent use tools. A harness connects through an integration that sends protected operations to the Kei runtime. You build one with Agentware, or use an existing one such as Claude Code.
+The model proposes answers or tool calls; the agent is the loop that decides, calls a tool, observes the result, and continues or stops. The harness runs and steers that loop: it supplies prompts and skills, selects tools, validates calls, handles failures, and tracks context. A harness sends protected operations to the Kei runtime; build one with Agentware, or use an existing one such as Claude Code, Codex, OpenCode, or Pi. See [Anatomy of an Agent Harness](https://substack.com/home/post/p-223279678).
 
 ## Kei
 
