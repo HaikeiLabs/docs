@@ -23,6 +23,14 @@ See the [Connector catalog](/kei/connectors/connector-catalog) for the full list
 
 Credentials stay in your environment — your secret manager, an OAuth token issued to your user, or a service account key. Kei never stores secret material in plain text and never performs data operations itself.
 
+## Operation contracts
+
+Each shipped connector has an **operation contract**: a proto definition of every operation the connector exposes, under `proto/kei/connectors/<connector>/v1/` in [`kei-connector-contracts`](https://github.com/HaikeiLabs/kei-connector-contracts). An operation id is a dotted name such as `github.issues.get` or `database.query.run`, and it is also the policy target (`connector:github.*` matches every GitHub operation).
+
+Proto is the schema language. buf generates plain Go, Python, TypeScript, and Rust types from the same files — there are no gRPC services, no grpc-gateway, and no generated HTTP clients that relay calls. The generated types describe the request the harness sends and the response it unmarshals; the harness still makes the provider call, and the runtime stays decision-only. Operation contracts carry no provider payloads, results, customer content, or credential values.
+
+The contracts shipped today cover GitHub, Linear, the generic HTTP API, and the generic database connector; the [Connector catalog](/kei/connectors/connector-catalog) lists each operation and links to its proto file. Contracts are additive within a version, and `buf breaking` enforces it.
+
 ## Connector kinds
 
 ### Native connectors

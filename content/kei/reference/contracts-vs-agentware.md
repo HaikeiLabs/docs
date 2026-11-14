@@ -12,9 +12,9 @@ nav_order: 55
 Kei checks agent tool calls through three layers that serve different roles:
 
 - **kei-connector-contracts** is the platform specification — the canonical
-  schemas and validators that define what a tool definition looks like, which
-  operations a connector exposes, and what a harness must send to get an
-  allow or deny from the runtime.
+  operation contracts (proto), schemas, and validators that define what a tool
+  definition looks like, which operations a connector exposes, and what a
+  harness must send to get an allow or deny from the runtime.
 - **Agentware** is the SDK that implements the specification — it imports
   contracts, validates tool call templates, registers tools in one sync, and
   builds the provider HTTP call after the runtime allows it.
@@ -33,6 +33,7 @@ credential model works, see [Connector authentication](/kei/connectors/connector
 
 - [Contract vs SDK vs runtime](#contract-vs-sdk-vs-runtime)
 - [kei-connector-contracts: the platform specification](#kei-connector-contracts-the-platform-specification)
+- [Operation contracts](#operation-contracts)
 - [Agentware: the SDK and engine](#agentware-the-sdk-and-engine)
 - [The runtime is decision-only](#the-runtime-is-decision-only)
 - [The providers package: when to use it versus a template](#the-providers-package-when-to-use-it-versus-a-template)
@@ -42,7 +43,7 @@ credential model works, see [Connector authentication](/kei/connectors/connector
 
 | Layer | Repository | What it is | Who uses it |
 |-------|-----------|------------|-------------|
-| **Contracts** | `github.com/HaikeiLabs/kei-connector-contracts` | Platform spec: tool definition schemas, call template validator, capability declarations, provider client interfaces, conformance tests | Every harness that goes through the runtime must meet this contract. The catalog uses it as a spec library. |
+| **Contracts** | `github.com/HaikeiLabs/kei-connector-contracts` | Platform spec: operation contracts (proto), tool definition schemas, call template validator, capability declarations, provider client interfaces, conformance tests | Every harness that goes through the runtime must meet this contract. The catalog uses it as a spec library. |
 | **Agentware** | `github.com/HaikeiLabs/agentware` | SDK and generic engine: imports contracts, validates templates, converts them to tool registrations, builds provider requests after an allow, syncs tool manifests | Harness developers who add Kei policies to a custom agent. |
 | **Runtime** | `github.com/HaikeiLabs/kei-connector-runtime` | `kei-proxy` — the local decision point (authorize, credential pass-through, audit). No provider calls, no data storage. | Every agent installation on a developer machine or server. |
 
@@ -125,6 +126,55 @@ all of this plus the secret checks that JSON Schema cannot express.
    (for example `base64`), then inject the credential that the runtime
    released at the `auth.placement` / `auth.name` / `auth.scheme` the
    template declares. The template itself never holds a credential.
+
+## Operation contracts {#operation-contracts}
+
+An operation contract is the typed description of one connector operation. It
+lives in `proto/kei/connectors/<connector>/v1/<resource>.proto`, one file per
+resource, with an `<Op>Request` and `<Op>Response` message pair for each
+operation. GitHub, Linear, the generic HTTP API, and the generic database
+connector ship contracts today; the [connector catalog](/kei/connectors/connector-catalog)
+links every shipped operation to its proto file.
+
+Each request message carries the operation option defined in
+`proto/kei/contracts/v1/options.proto`:
+
+```protobuf
+option (kei.contracts.v1.operation) = {
+  id: "github.issues.get"
+  connector: "github"
+  class: OPERATION_CLASS_READ
+  http_method: "GET"
+  path_template: "/repos/{owner}/{repository}/issues/{issue_number}"
+  scopes: ["issues:read"]
+  credential_placement: CREDENTIAL_PLACEMENT_HEADER_BEARER
+};
+```
+
+The option records the operation id, its connector, whether it is a read or a
+write, the HTTP method and path template, the OAuth scopes it needs, and where
+the credential is placed. It never records a credential value.
+
+Proto is the **schema language only**:
+
+- buf generates plain Go, Python, TypeScript, and Rust structs and types from
+  the same files, so one generated type unmarshals the provider's real payload
+  in any supported language.
+- There are no gRPC services, no grpc-gateway, and no generated HTTP clients
+  that relay calls. The harness makes every provider call.
+- The runtime (`kei-proxy`) stays decision-only (ADR-039): it authorizes,
+  releases the credential, and audits; it never executes the operation.
+
+Operation ids are policy targets under the existing dot-segment matching:
+`connector:github.*` matches `github.issues.get`, and `connector:github.contents.*`
+matches only the contents operations. No policy schema change is needed.
+
+Contracts are additive within a version and `buf breaking` enforces it; a
+breaking change takes a v2. Runtime unmarshal discards unknown fields so a
+provider can add a key without breaking a release, while a strict drift check
+uses the same synthetic fixtures to catch a payload that no longer fits the
+declared shape. Fixtures are synthetic or sanitized only — never customer data
+and never a credential value.
 
 ## Agentware: the SDK and engine
 
@@ -215,7 +265,7 @@ The `kei-proxy` binary (kei-connector-runtime) implements ADR-039: it is a
   credentials) to the `KEI_PROXY_AUDIT` JSONL file for collection and upload.
 
 The runtime **never** executes a provider call, stores provider data, or
-routes MCP calls (HAI-724 removes `/mcp` routing). Provider execution is the
+routes MCP calls (the runtime no longer routes `/mcp`). Provider execution is the
 harness's responsibility — Agentware's `BuildRequest` helps the harness build
 the call, but the runtime itself only decides.
 
@@ -251,7 +301,7 @@ Only credential release and audit upload are online operations.
 The `providers` package in `kei-connector-contracts` is a **stable,
 harness-consumable Go library** of protected connector clients (ADR-036
 section 9.2). It is **kept, not retired** — the owner confirmed this on
-2026-10-24. HAI-724 deletes the runtime executors that imported it, but the
+2026-10-24. The runtime no longer runs the executors that imported it, but the
 package itself and its two `kei` CLI users stay.
 
 ### What the providers package is
@@ -569,4 +619,4 @@ it transparently.
 - [Tools and capabilities](/kei/reference/tools-and-capabilities) — capability target semantics
 - [Agentware SDK repository](https://github.com/HaikeiLabs/agentware)
 - [kei-connector-contracts repository](https://github.com/HaikeiLabs/kei-connector-contracts)
-- [Tool call templates design (HAI-856)](https://github.com/HaikeiLabs/kei-connector-contracts/blob/main/docs/tool-call-templates.md)
+- [Tool call templates design](https://github.com/HaikeiLabs/kei-connector-contracts/blob/main/docs/tool-call-templates.md)
