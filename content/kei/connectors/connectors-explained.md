@@ -122,6 +122,7 @@ Kei never initiates a connection to an external service, never stores data from 
 
 ## Learn more
 
+- [Workspaces, explained](/kei/workspaces) — what a workspace scopes, and how to set one up
 - [Grant a connector](/kei/connectors/grant-a-connector) — create a connector and grant access to a group
 - [Connectors (setup guide)](/kei/connectors/connectors) — add, connect, and grant access in the console
 - [How Kei decides](/kei/reference/how-kei-decides) — policy ordering and precedence

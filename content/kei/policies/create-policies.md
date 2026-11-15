@@ -20,6 +20,7 @@ A policy says who may do what, and whether it is allowed or denied. Kei does not
 | If you want to | See |
 | -------------- | --- |
 | Create your first allow or deny rule step by step | [Your first policy](/kei/policies/your-first-policy) |
+| Choose the workspace your policies belong to | [Workspaces, explained](/kei/workspaces) |
 | Manage groups and use autogroups as policy sources | [Groups & autogroups](/kei/policies/groups-and-autogroups) |
 | Control shell commands, skills, and file paths in harnesses | [Govern harness commands](/kei/policies/govern-harness-commands) |
 | Test policies before syncing to desktop harnesses | [Test before you sync](/kei/policies/test-before-you-sync) |
