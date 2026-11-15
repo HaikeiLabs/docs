@@ -46,6 +46,7 @@ Desktop harnesses (Claude Code, Codex, OpenCode) receive the policy as native pe
 
 ## Learn more
 
+- [Workspaces, explained](/kei/workspaces) — what a workspace scopes, and how to set one up
 - [How Kei decides](/kei/reference/how-kei-decides) — policy ordering and precedence
 - [What can I do here?](/kei/policies/what-can-i-do-here) — your next steps based on your role
 - [Ask for access](/kei/policies/ask-for-access) — request access to a workspace or capability

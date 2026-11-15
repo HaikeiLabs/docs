@@ -13,7 +13,7 @@ The `kei` CLI is for people administering Kei runtime installations. Use `kei he
 | Task | Command |
 | --- | --- |
 | Sign in as an organization owner or admin | `kei login` |
-| List or create workspaces | `kei workspaces list` / `kei workspaces create --name NAME` |
+| List, create, or switch workspaces | `kei workspaces list` / `kei workspaces create --name NAME` / `kei workspaces use NAME` |
 | List or create groups in a workspace | `kei groups list --workspace WORKSPACE` / `kei groups create --name NAME --workspace WORKSPACE` |
 | List or create, update, or resolve users | `kei users list` / `kei users create --email EMAIL` / `kei users update USER` / `kei users resolve --email EMAIL` |
 | List, get, create, delete, or test workspace policies | `kei policy list|get|create|delete|test --workspace WORKSPACE` |
@@ -25,7 +25,7 @@ The `kei` CLI is for people administering Kei runtime installations. Use `kei he
 | Preview or apply harness configuration | `kei harness sync --dry-run` / `kei harness sync` |
 | Show the CLI version | `kei --version` |
 
-The CLI can manage workspaces, groups, users, policies, and connectors as shown above. It does not create organizations. Group management has no update command; `kei groups delete` is available and may require `--force` when policies reference the group. User commands also include `get` and identity lookup; connector commands include manifest list, show, and approve. Use `kei --help`, then `kei <command> -h`, to see the syntax supported by your installed version. Do not pass runtime credentials as command-line arguments. See [Connect this machine](/kei/get-started/connect-this-machine) for installation instructions.
+The CLI can manage workspaces, groups, users, policies, and connectors as shown above. It does not create organizations. When a command takes `--workspace`, the CLI uses that name, then `KEI_WORKSPACE`, then the workspace saved with `kei workspaces use`, and finally the organization's default workspace. Group management has no update command; `kei groups delete` is available and may require `--force` when policies reference the group. User commands also include `get` and identity lookup; connector commands include manifest list, show, and approve. Use `kei --help`, then `kei <command> -h`, to see the syntax supported by your installed version. Do not pass runtime credentials as command-line arguments. See [Connect this machine](/kei/get-started/connect-this-machine) for installation instructions, and [Workspaces, explained](/kei/workspaces) for how workspaces are scoped.
 
 ## Sign-in troubleshooting
 
