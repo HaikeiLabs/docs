@@ -91,7 +91,12 @@
     var link = event.target.closest && event.target.closest('a[href]');
     if (!link) return;
     var card = link.closest('.path-card[data-path]');
-    if (card) track('path_choice', { path: card.getAttribute('data-path') });
+    if (card) {
+      var params = { path: card.getAttribute('data-path') };
+      var placement = link.getAttribute('data-placement');
+      if (placement) params.placement = placement;
+      track('path_choice', params);
+    }
     var destination = outboundDestination(link.href);
     if (destination) track('outbound_click', { destination: destination });
   });

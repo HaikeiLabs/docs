@@ -168,3 +168,18 @@ test('checkpoint clicks send only tutorial and language, then confirm inline', a
   }
   assert.deepEqual(events, [['event', 'tutorial_success', { tutorial: 'example', language: 'typescript' }], ['event', 'first_custom_tool', { tutorial: 'example', language: 'typescript' }]]);
 });
+
+test('quickstart click records its placement on the existing path choice event', async () => {
+  const source = await readFile(path.join(assetsDir, 'site.js'), 'utf8');
+  const listeners = [];
+  const element = () => ({ addEventListener() {}, setAttribute() {}, querySelector: () => null, dataset: {} });
+  const document = { documentElement: { dataset: {} }, body: { classList: { toggle() {} } }, querySelector: () => element(), querySelectorAll: () => [], addEventListener: (type, fn) => { if (type === 'click') listeners.push(fn); } };
+  const events = [];
+  const window = { gtag: (...args) => events.push(JSON.parse(JSON.stringify(args))) };
+  vm.runInNewContext(source, { window, document, location: {}, navigator: {}, setTimeout, URL });
+  const card = { getAttribute: () => 'build' };
+  const link = { href: 'https://docs.haikeilabs.com/agentware/build/overview', closest: () => card, getAttribute: () => 'docs-home-quickstart' };
+  const target = { closest: (selector) => selector === 'a[href]' ? link : null };
+  listeners.forEach((fn) => fn({ target }));
+  assert.deepEqual(events, [['event', 'path_choice', { path: 'build', placement: 'docs-home-quickstart' }]]);
+});

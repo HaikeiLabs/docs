@@ -343,7 +343,7 @@ function renderPage(page, pages, links = siteLinks(pages)) {
 // Two paths (C3a): build your own agent, or bring the agent you use. Both link /skills/.
 function renderHome(pages) {
   const links = siteLinks(pages);
-  const card = ({ eyebrow, heading, id, path: choice, text, actions }) => `<section class="path-card" data-path="${choice}" aria-labelledby="${id}"><p class="path-eyebrow">${eyebrow}</p><h2 id="${id}">${heading}</h2><p>${text}</p><ul class="path-actions">${actions.filter(Boolean).map(([href, label], index) => `<li><a${index === 0 ? ' class="path-primary"' : ''} href="${href}">${escapeHtml(label)}</a></li>`).join('')}</ul></section>`;
+  const card = ({ eyebrow, heading, id, path: choice, text, actions }) => `<section class="path-card" data-path="${choice}" aria-labelledby="${id}"><p class="path-eyebrow">${eyebrow}</p><h2 id="${id}">${heading}</h2><p>${text}</p><ul class="path-actions">${actions.filter(Boolean).map(([href, label, placement], index) => `<li><a${index === 0 ? ' class="path-primary"' : ''} href="${href}"${placement ? ` data-placement="${placement}"` : ''}>${escapeHtml(label)}</a></li>`).join('')}</ul></section>`;
   const cards = [
     card({
       eyebrow: 'Agentware',
@@ -352,7 +352,7 @@ function renderHome(pages) {
       path: 'build',
       text: 'Write tools and run the agent loop with Agentware in TypeScript, Go or Python, on any OpenAI-compatible model. You need a model API key, not a Kei account.',
       actions: [
-        [links.agentware, 'Build on Agentware'],
+        [links.agentware, 'Start the quickstart', 'docs-home-quickstart'],
         [links.tutorial.href, links.tutorial.label],
         [links.skills, 'Install Haikei Skills'],
       ],
@@ -448,6 +448,7 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     '/agentware/languages /agentware/reference/languages 301',
     '/agentware/languages/go /agentware/build/go 301',
     '/tutorials/build-a-protected-agent /tutorials/add-permissions-and-audit 301',
+    '/tutorials/build-a-protected-agent/ /tutorials/add-permissions-and-audit 301',
     '',
   ].join('\n'));
   await writeFile(path.join(outputDir, 'index.html'), renderHome(pages));
