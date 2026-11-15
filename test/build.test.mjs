@@ -349,3 +349,22 @@ test('real content: h1s drop the " | Agentware" suffix and the Hacker News tutor
     await rm(outputDir, { recursive: true, force: true });
   }
 });
+
+test('onboarding prototype redirects use permanent canonical locations for both slash variants', async () => {
+  const paths = await fixture();
+  try {
+    await buildDocs({ ...paths, assetsDir });
+    const rules = (await readFile(path.join(paths.outputDir, '_redirects'), 'utf8')).trim().split('\n').map((line) => line.split(/\s+/));
+    for (const [from, destination] of [
+      ['/agentware/languages', '/agentware/reference/languages'],
+      ['/agentware/languages/', '/agentware/reference/languages'],
+      ['/tutorials/build-a-protected-agent', '/tutorials/add-permissions-and-audit'],
+      ['/tutorials/build-a-protected-agent/', '/tutorials/add-permissions-and-audit'],
+    ]) {
+      const rule = rules.find(([source]) => source === from);
+      assert.deepEqual(rule, [from, destination, '301']);
+    }
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});

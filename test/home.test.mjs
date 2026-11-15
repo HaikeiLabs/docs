@@ -64,6 +64,12 @@ test('docs home: PAGES title, H1 and description, two path cards in order', () =
   assert.deepEqual(bring, ['/kei/get-started/bring-your-agent', '/skills/']);
 }));
 
+test('docs home: quickstart CTA links to the canonical quickstart', () => withSite({}, async (paths) => {
+  await buildDocs(paths);
+  const html = await read(paths, 'index.html');
+  assert.match(html, /<a class="path-primary" href="\/agentware\/build\/overview" data-placement="docs-home-quickstart">Start the quickstart<\/a>/);
+}));
+
 test('docs home: until peer pages land, cards fall back to pages that exist', () => withSite({
   'tutorials/hacker-news-research-agent.md': null,
   'kei/get-started/bring-your-agent.md': null,
