@@ -32,7 +32,7 @@ This page covers Postgres, Supabase, MySQL, and Microsoft SQL Server. Snowflake 
 ## Before you start
 
 - A Kei runtime installed beside your harness, bootstrapped, and sending heartbeats. See [Tenant-side connector runtime](/kei/runtime/tenant-runtime).
-- kei-proxy 0.8.1 or later, run as `kei-proxy serve` with `KEI_CREDENTIAL_RELEASE=identity`. Earlier releases cannot release a connection string from your secret store.
+- kei-proxy 0.8.0 or later, run as `kei-proxy serve` with `KEI_CREDENTIAL_RELEASE=identity`. Earlier releases cannot release a connection string from your secret store.
 - A secret backend for the runtime (`KEI_SECRETS_BACKEND`) and read access to the secret for the runtime's cloud identity. See [Read connector secrets from your secret manager](/kei/runtime/secret-manager).
 - The owner or admin role in the Kei organization, signed in with `kei login`.
 - An administrator account on the database, to create the read-only role.
