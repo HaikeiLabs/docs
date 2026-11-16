@@ -22,3 +22,17 @@ test('small text on ground uses muted rather than faint', async () => {
     assert.match(css, new RegExp(`\\.${selector}\\s*\\{[^}]*color:\\s*var\\(--color-muted\\)`));
   }
 });
+
+test('home uses clean ground and shared card components', async () => {
+  const css = await readFile('assets/site.css', 'utf8');
+  const build = await readFile('scripts/build.mjs', 'utf8');
+  assert.doesNotMatch(css, /radial-gradient/);
+  assert.match(css, /\.path-card\s*\{[^}]*border-radius:\s*1rem/);
+  assert.match(build, /class="path-eyebrow eyebrow"/);
+  assert.match(build, /class="[^"]*button-primary/);
+});
+
+test('mobile menu stays below the header with its own scrollable height', async () => {
+  const css = await readFile('assets/site.css', 'utf8');
+  assert.match(css, /html\.js body\.nav-open \.sidebar\s*\{[^}]*height:\s*calc\(100vh - 3\.5rem\)/);
+});

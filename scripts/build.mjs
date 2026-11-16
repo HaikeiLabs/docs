@@ -344,7 +344,7 @@ function renderPage(page, pages, links = siteLinks(pages)) {
 // Two paths (C3a): build your own agent, or bring the agent you use. Both link /skills/.
 function renderHome(pages) {
   const links = siteLinks(pages);
-  const card = ({ eyebrow, heading, id, path: choice, text, actions }) => `<section class="path-card" data-path="${choice}" aria-labelledby="${id}"><p class="path-eyebrow">${eyebrow}</p><h2 id="${id}">${heading}</h2><p>${text}</p><ul class="path-actions">${actions.filter(Boolean).map(([href, label, placement], index) => `<li><a${index === 0 ? ' class="path-primary"' : ''} href="${href}"${placement ? ` data-placement="${placement}"` : ''}>${escapeHtml(label)}</a></li>`).join('')}</ul></section>`;
+  const card = ({ eyebrow, heading, id, path: choice, text, actions }) => `<section class="path-card" data-path="${choice}" aria-labelledby="${id}"><p class="path-eyebrow eyebrow">${eyebrow}</p><h2 id="${id}">${heading}</h2><p>${text}</p><ul class="path-actions">${actions.filter(Boolean).map(([href, label, placement], index) => `<li><a${index === 0 ? ' class="path-primary button-primary"' : ''} href="${href}"${placement ? ` data-placement="${placement}"` : ''}>${escapeHtml(label)}</a></li>`).join('')}</ul></section>`;
   const cards = [
     card({
       eyebrow: 'Agentware',
