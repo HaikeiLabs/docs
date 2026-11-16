@@ -382,3 +382,19 @@ test('build emits brand 0.8.0 CSS with amber risk tokens', async () => {
     await rm(paths.root, { recursive: true, force: true });
   }
 });
+
+test('404 uses the shared shell and offers both starting paths', async () => {
+  const paths = await fixture();
+  try {
+    await buildDocs({ ...paths, assetsDir });
+    const html = await readFile(path.join(paths.outputDir, '404.html'), 'utf8');
+    assert.match(html, /<meta name="viewport"/);
+    assert.match(html, /<title>Page not found · Haikei docs<\/title>/);
+    assert.match(html, /href="\/assets\/images\/favicon\.svg"/);
+    assert.match(html, /class="theme-toggle"/);
+    assert.match(html, /class="nav-toggle"/);
+    assert.match(html, /Go to docs home/);
+    assert.match(html, /Build your own agent/);
+    assert.match(html, /Bring the agent you use/);
+  } finally { await rm(paths.root, { recursive: true, force: true }); }
+});

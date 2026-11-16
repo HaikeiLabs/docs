@@ -61,7 +61,7 @@ test('docs home: PAGES title, H1 and description, two path cards in order', () =
   const build = hrefs(cards[0]);
   assert.deepEqual(build, ['/agentware/build/overview', '/tutorials/hacker-news-research-agent', '/skills/']);
   const bring = hrefs(cards[1]);
-  assert.deepEqual(bring, ['/kei/get-started/bring-your-agent', '/skills/']);
+  assert.deepEqual(bring, ['/kei/reference/glossary#harness', '/kei/get-started/bring-your-agent', '/skills/']);
 }));
 
 test('docs home: quickstart CTA links to the canonical quickstart', () => withSite({}, async (paths) => {
@@ -78,7 +78,7 @@ test('docs home: until peer pages land, cards fall back to pages that exist', ()
   const html = await read(paths, 'index.html');
   const cards = [...html.matchAll(/<section class="path-card"[\s\S]*?<\/section>/g)].map((match) => match[0]);
   assert.deepEqual(hrefs(cards[0]), ['/agentware/build/overview', '/tutorials/', '/skills/']);
-  assert.deepEqual(hrefs(cards[1]), ['/kei/get-started/sign-in', '/skills/']);
+  assert.deepEqual(hrefs(cards[1]), ['/kei/reference/glossary#harness', '/kei/get-started/sign-in', '/skills/']);
 }));
 
 test('sidebar: the Agentware Start here group comes first, then Kei', () => withSite({}, async (paths) => {
@@ -200,5 +200,17 @@ test('real content: Install Haikei Skills continues to the next step, not the pr
   const startHere = pages.filter((entry) => entry.nav_group === 'Start here').map((entry) => entry.relativePath);
   for (const required of ['agentware/build/overview.md', 'tutorials/index.md', 'skills.md', 'agentware/build/typescript.md', 'agentware/build/go.md', 'agentware/build/python.md']) {
     assert.ok(startHere.includes(required), `${required} is in Start here`);
+  }
+});
+
+test('entry pages define harness and label language setups as agents', async () => {
+  const build = await readFile(new URL('../scripts/build.mjs', import.meta.url), 'utf8');
+  const entry = await readFile(new URL('../content/kei/get-started/connect-your-agent.md', import.meta.url), 'utf8');
+  assert.match(build, /Your coding agent/);
+  assert.match(build, /harness<\/a> \(the program that runs it and makes its tool calls\)/);
+  assert.match(entry, /\[harness\]\([^)]*glossary[^)]*\).*program that runs/i);
+  for (const language of ['typescript', 'go', 'python']) {
+    const page = await readFile(new URL(`../content/agentware/build/${language}.md`, import.meta.url), 'utf8');
+    assert.match(page, new RegExp(`title: Set up a ${language === 'typescript' ? 'TypeScript' : language === 'go' ? 'Go' : 'Python'} agent`));
   }
 });

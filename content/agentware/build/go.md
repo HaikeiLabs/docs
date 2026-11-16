@@ -1,5 +1,5 @@
 ---
-title: Set up a Go harness
+title: Set up a Go agent
 description: "Add Kei policies to a Go agent with the runtimesocket client, which sends each tool call to kei-proxy over a local Unix socket."
 type: read-and-use
 product: agentware
@@ -7,7 +7,7 @@ nav_group: Start here
 nav_order: 6
 ---
 
-Add Kei policies to a Go agent harness with the `runtimesocket` client. Kei policies are deterministic guardrails for the tool calls your agent can make: the socket client sends each tool call to `kei-proxy authorize` over the local Unix socket and returns the decision.
+Add Kei policies to a Go agent [harness](/kei/reference/glossary#harness) (the program that runs it and makes its tool calls) with the `runtimesocket` client. Kei policies are deterministic guardrails for the tool calls your agent can make: the socket client sends each tool call to `kei-proxy authorize` over the local Unix socket and returns the decision.
 
 For the Agentware, kei-proxy and kei-cli versions that work together, see [Compatible versions](/content/agentware/build/overview.html#compatible-versions). For the full API reference, see the [Go module documentation](https://github.com/haikeilabs/agentware/tree/main/go).
 

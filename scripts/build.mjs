@@ -263,7 +263,7 @@ function seoHead({ title, description, canonical, ogType }) {
   ].join('\n  ');
 }
 
-function layout(title, nav, content, { toc = '', mermaid = false, description = homeDescription, canonical = '/', ogType = 'website', fullTitle = `${title} · ${siteName}`, links, currentPath = '', tutorial = '' } = {}) {
+function layout(title, nav, content, { toc = '', mermaid = false, description = homeDescription, canonical = '/', ogType = 'website', fullTitle = `${title} · ${siteName}`, links, currentPath = '', tutorial = '', notFound = false } = {}) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -283,7 +283,7 @@ function layout(title, nav, content, { toc = '', mermaid = false, description = 
   ${mermaid ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js" defer></script>' : ''}
   <script src="/assets/site.js" defer></script>
 </head>
-<body>
+<body${notFound ? ' class="not-found-page"' : ''}>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" >Menu</button>
@@ -294,7 +294,7 @@ function layout(title, nav, content, { toc = '', mermaid = false, description = 
     <a class="header-link" href="${escapeHtml(appLink(`${consoleUrl}/`, 'docs-header-console'))}">Console</a>
     <button class="theme-toggle" type="button" aria-label="Switch color theme"></button>
   </header>
-  <div class="layout">${nav}<main id="main" class="content"${tutorial ? ` data-tutorial="${escapeHtml(tutorial)}"` : ''}>${content}<footer class="footer"><p>Public guidance for people building and using agents with Kei.</p><p>Questions? Join the developer community on <a href="${discordUrl}" target="_blank" rel="noopener noreferrer">Discord</a>.</p></footer></main>${toc}</div>
+  <div class="layout">${nav}<main id="main" class="content"${tutorial ? ` data-tutorial="${escapeHtml(tutorial)}"` : ''}>${content}<footer class="footer">${notFound ? '' : '<p>Public guidance for people building and using agents with Kei.</p>'}<p>Questions? Join the developer community on <a href="${discordUrl}" target="_blank" rel="noopener noreferrer">Discord</a>.</p></footer></main>${toc}</div>
 </body>
 </html>
 `;
@@ -359,11 +359,11 @@ function renderHome(pages) {
       ],
     }),
     card({
-      eyebrow: 'Claude Code, Codex, OpenCode, Pi, Open WebUI',
+      eyebrow: 'Your coding agent',
       heading: 'Bring the agent you use',
       id: 'bring-the-agent-you-use',
       path: 'bring',
-      text: 'Install the kei CLI and connect the agent you already use. Then add Kei policies: deterministic guardrails for the tool calls your agent can make.',
+      text: 'Claude Code, Codex, OpenCode, Pi or Open WebUI. Install the kei CLI, connect your agent’s <a href="/kei/reference/glossary#harness">harness</a> (the program that runs it and makes its tool calls), then add Kei policies: deterministic guardrails for those calls.',
       actions: [
         links.bring && [links.bring.href, links.bring.label],
         [links.skills, 'Install Haikei Skills'],
@@ -460,7 +460,9 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   await writeFile(path.join(outputDir, 'sitemap.xml'), sitemapXml(manifest));
   await writeFile(path.join(outputDir, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${docsUrl}/sitemap.xml\n`);
   await writeFile(path.join(outputDir, '_headers'), markdownCopyHeaders(orderedPages(pages)));
-  await writeFile(path.join(outputDir, '404.html'), '<!doctype html><html lang="en"><meta charset="utf-8"><title>Not found · Haikei docs</title><h1>Page not found</h1><p><a href="/">Return to the documentation home.</a></p></html>\n');
+  const notFoundLinks = siteLinks(pages);
+  const notFound = `<div class="not-found"><p class="eyebrow">404 · Page not found</p><h1>We couldn't find that page</h1><p>It may have moved when the docs were reorganized. Start from the docs home, or open one of the two ways to start.</p><a class="button-primary" href="/">Go to docs home</a><div class="not-found-links"><a href="${notFoundLinks.agentware}">Build your own agent <span aria-hidden="true">→</span></a><a href="${notFoundLinks.kei}">Bring the agent you use <span aria-hidden="true">→</span></a></div></div>`;
+  await writeFile(path.join(outputDir, '404.html'), layout('Page not found', sidebar(pages, '', notFoundLinks), notFound, { description: 'Find your way back to Haikei documentation.', canonical: '/404', links: notFoundLinks, notFound: true }));
   await checkBuiltRoutes(outputDir);
   return pages;
 }
