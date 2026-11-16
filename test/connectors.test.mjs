@@ -218,7 +218,11 @@ test('database connectors page covers the four engines and the Snowflake preview
   }
   assert.match(source, /Per-user database credentials are not supported yet/);
   assert.match(source, /Writes are not modelled/);
-  assert.match(source, /Available in the next kei CLI release/);
+  assert.match(source, /Available from the next kei CLI release/);
+  for (const flag of ['--provider postgres', '--provider mysql', '--provider mssql', '--secret-file', '--credential-ref']) {
+    assert.ok(source.includes(flag), `missing create flag ${flag}`);
+  }
+  assert.match(source, /--account-model per_user` is rejected/);
   assert.match(source, /RunQueryResponse/);
   assert.match(source, /\/kei\/runtime\/secret-manager/);
   assert.doesNotMatch(source, /HAI-\d+/);

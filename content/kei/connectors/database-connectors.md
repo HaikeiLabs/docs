@@ -13,7 +13,7 @@ A database connector lets an agent run read-only SQL against one of your databas
 
 This page covers Postgres, Supabase, MySQL, and Microsoft SQL Server. Snowflake is in preview; see [Snowflake (preview)](#snowflake-preview).
 
-> **Release status.** The Postgres, MySQL, and Microsoft SQL Server connector templates are live in Kei, and the runtime releases their connection strings today. The steps to **create** the connector are available in the next kei CLI release and the matching console update. Until then, the [Connector catalog](/kei/connectors/connector-catalog) lists these connectors as not yet usable. You can do everything else on this page now: create the read-only role, store the DSN, and prepare the runtime.
+> **Release status.** The Postgres, MySQL, and Microsoft SQL Server connector templates are live in Kei, and the runtime releases their connection strings today. The steps to **create** the connector are available from the next kei CLI release. Until then, the [Connector catalog](/kei/connectors/connector-catalog) lists these connectors as not yet usable. You can do everything else on this page now: create the read-only role, store the DSN, and prepare the runtime.
 
 ## What you get
 
@@ -126,9 +126,14 @@ The connector stores one secret field, `dsn`: the connection string your harness
 - The connection string must be between 8 and 4096 characters long.
 - `<password>`, `<project ref>`, and `<pooler host>` are placeholders. Never paste a real connection string into a ticket, a chat, or a command-line argument.
 
-## 3. Store the connection string
+## 3. Choose where the connection string lives
 
-Put the DSN in the secret manager the runtime reads from. Kei stores only the secret's name, never the value. The runtime reads the value with its own cloud identity, only after Kei allows a query.
+The runtime reads the DSN from its one secret backend. Kei never stores or shows the value. There are two ways to get it there:
+
+- **You store it (recommended when you already manage secrets).** Put the DSN in your secret manager yourself, then create the connector with `--credential-ref` and the secret's name. The DSN never passes through the kei CLI.
+- **The kei CLI delivers it.** Give the DSN to `kei connectors create`. The CLI seals it to the workspace's runtimes before it sends anything, and `kei-proxy credential sync` writes it into the runtime's secret store. This needs a credential store and a runtime with a credential-sync key; see [Tenant-side connector runtime](/kei/runtime/tenant-runtime).
+
+To store it yourself:
 
 1. Create the secret in AWS Secrets Manager, Azure Key Vault, or GCP Secret Manager as a text secret holding the DSN. Write it from your password manager or a pipe, not from a value typed on the command line.
 2. Grant the runtime's identity read access to that one secret.
@@ -138,32 +143,45 @@ The backend settings, IAM statements, and the reference format for each cloud ar
 
 ## 4. Create the connector
 
-> **Available in the next kei CLI release.** The current kei CLI does not offer the `postgres`, `mysql`, or `mssql` providers yet, and the console's **Add Connector** gallery does not list them yet. The commands below show the shape of the next release. Check `kei connectors create --help` on your installed version before you run them.
+> **Available from the next kei CLI release.** The `postgres`, `mysql`, and `mssql` providers arrive in the next kei CLI release. Earlier releases reject them with `--provider must be one of …`. Run `kei connectors create --help` and look for the database providers before you start.
 
 ### With the CLI
 
-Create the connector with the secret's name as its credential reference:
+If the DSN is already in your secret manager, pass the secret's name:
 
 ```bash
 kei connectors create \
+  --workspace my-workspace \
   --provider postgres \
   --name analytics-ro \
-  --credential-ref analytics-ro-dsn \
-  --workspace my-workspace
+  --credential-ref analytics-ro-dsn
 ```
 
-- Use `--provider mysql` for MySQL and `--provider mssql` for Microsoft SQL Server. Supabase uses `--provider postgres`.
-- The account model is shared, and it is the only one these providers offer, so there is no `--account-model` to choose.
-- The DSN is a secret field. The CLI never accepts it as a flag. Pass `--credential-ref` with the secret's name, as above. Without `--credential-ref`, the CLI asks for the DSN without echo, or reads it from stdin. It then seals the DSN to your runtimes, and `kei-proxy credential sync` writes it into your secret store. That path needs a credential store and a runtime with a credential-sync key; see [Tenant-side connector runtime](/kei/runtime/tenant-runtime).
+To have the CLI deliver the DSN, leave out `--credential-ref`. The CLI reads the DSN in one of three ways:
+
+```bash
+# 1. From a prompt that does not echo what you type
+kei connectors create --workspace my-workspace --provider postgres --name analytics-ro
+
+# 2. From one line on stdin, piped straight from your secret manager
+<secret-manager read> | kei connectors create --workspace my-workspace --provider mysql --name orders-ro
+
+# 3. From a file, for example one your secret manager mounts
+kei connectors create --workspace my-workspace --provider mssql --name finance-ro --secret-file ./finance-ro.dsn
+```
+
+- `--provider` is `postgres`, `mysql`, or `mssql`. Supabase uses `postgres`.
+- The DSN is never accepted as a flag. `--set dsn=…` is rejected, and the error does not repeat the value. `--secret-file` cannot be combined with `--credential-ref`.
+- The CLI checks the DSN's length before it sends anything, then seals it to the workspace's runtimes. The value never appears in its output.
+- The account model is shared. You can pass `--account-model shared`, but you do not need to. `--account-model per_user` is rejected before anything is sent.
+- The connector's capability is `query.run`, the only one these providers offer.
 - `--name` becomes the connector's slug, which policies use as `connector:<slug>`. The slug cannot be changed after creation.
 - By default, creating the connector also allows the `admins` group to use it. Pass `--no-default-access` to grant access only through the policy in step 5.
+- Delete a `--secret-file` once the connector is created, unless your secret manager owns that file.
 
 ### In the console
 
-1. Open **Data Connections** in the left navigation.
-2. Choose **Add Connector**, then **PostgreSQL**, **MySQL**, or **Microsoft SQL Server**.
-3. Enter a name and the secret's name as the credential reference.
-4. Choose **Create**.
+The console's **Add Connector** gallery does not list the database providers yet. Use the kei CLI until a console update adds them.
 
 ### Check it is active
 
