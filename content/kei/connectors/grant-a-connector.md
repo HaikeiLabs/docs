@@ -148,6 +148,43 @@ kei policy create \
 
 When several policies match, any matching deny wins over every allow. See [How Kei decides](/kei/reference/how-kei-decides).
 
+### Grants and connector credentials {#grants-and-connector-credentials}
+
+A grant on `tool:<name>` lets a group call the tool. When a harness tool runs against a connector, such as a query tool that uses a MySQL connector, the tool also needs that connector's credential. `kei-proxy` releases the credential only when the permit that allowed the call names that exact connector. A tool-only grant still allows the call, but the release is denied with reason `connector_not_named` and the tool gets no credential. A grant on a capability alone never allows a harness tool.
+
+Name the connector when you grant the tool:
+
+```bash
+kei policy create \
+  --workspace Main \
+  --group db-readers \
+  --allow tool:mysql_query \
+  --connector mysql-seed
+```
+
+`--connector` takes the ID, name, display name, or slug of a connector in the workspace. If it matches none, the command fails and creates nothing. The grant is stored with the selector `{"tool": "mysql_query", "connector_id": "<connector ID>"}`, and the output adds a `Connector: NAME (ID)` line.
+
+If you leave out `--connector`:
+
+- When the workspace has exactly one connector, the CLI uses it and says so on stderr.
+- When the workspace has no connectors or several, the CLI creates a tool-only grant and warns on stderr: `Warning: This tool will not receive connector credentials`. With several, it lists them so you can rerun with `--connector`.
+
+For a tool that needs no connector credential, pass `--no-connector`. It skips the lookup and creates a tool-only grant on purpose, with the same warning:
+
+```bash
+kei policy create \
+  --workspace Main \
+  --group db-readers \
+  --allow tool:web_search \
+  --no-connector
+```
+
+`--connector` and `--no-connector` apply only to `--allow tool:<name>`. On a deny or any other target they are a usage error (exit code 2), because narrowing a deny to one connector would weaken it. Denies and other targets work as before.
+
+In the console, when you choose a harness tool under **Tool call**, the policy form shows a **Connector** picker with the workspace's connectors. It preselects the connector when the workspace has only one. Leaving it on **No connector** is allowed and shows the note *This tool will not receive connector credentials*. Tools that already have a fixed connector binding don't show the picker.
+
+> **Note:** `--connector` and `--no-connector` ship in the first `kei` release after v0.4.0; check `kei policy create --help`. The `kei-proxy` check that denies the release with `connector_not_named` ships in a later `kei-proxy` release. Name the connector now so your tool grants keep their credentials when it does.
+
 ## Check it worked
 
 Validate access with `kei policy test`:
@@ -198,6 +235,7 @@ If you see unexpected results, review the policy target syntax and group members
 - Use `--no-default-access` on creation if you prefer to grant access explicitly rather than relying on the default admin policy.
 - Test the connector with `kei connectors test` before creating policies, so you know credential issues are separate from policy issues.
 - For MCP connectors, use `mcp:<slug>` to grant access to the whole server or `mcp:<slug>.<tool>` for individual tools.
+- When you grant a harness tool that uses a connector, name the connector with `--connector` (or the console's **Connector** picker). A tool-only grant gets no connector credential.
 
 ## Learn more
 

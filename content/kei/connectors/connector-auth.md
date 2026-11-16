@@ -9,7 +9,7 @@ nav_order: 47
 
 # Connector authentication
 
-A connector's credential decides which account a call runs as. Kei keeps the credential out of your harness: it decides whether a call is allowed, and only on allow does it release the credential for that session. Authentication and authorization are separate questions — the credential model selects the account, while Kei policies decide whether the call is permitted at all.
+A connector's credential decides which account a call runs as. Kei keeps the credential out of your harness: it decides whether a call is allowed, and only on allow does it release the credential for that session. Authentication and authorization are separate questions — the credential model selects the account, while Kei policies decide whether the call is permitted at all. For a harness tool, the permit must also name the connector before its credential is released; see [Grants and connector credentials](/kei/connectors/grant-a-connector#grants-and-connector-credentials).
 
 This page explains the credential models Kei supports or is building. For which connector uses which model, see the [Connector catalog](/kei/connectors/connector-catalog).
 
