@@ -76,7 +76,9 @@ The [Connector catalog](/kei/connectors/connector-catalog) carries the full row 
 | Notion | `oauth` or `secret_ref` | Per user; shared |
 | Power BI | `oauth` (Entra on-behalf-of), moving to `kei_token_exchange` | Per user |
 | Gmail | `oauth` (tier 1, hard-coded SSO app) | Per user |
-| Postgres | `secret_ref` (DSN, read-only role) | Shared |
-| Supabase, MySQL, MSSQL, Google Sheets, Airtable, HubSpot, Atlassian, Omni, Sentry | planned, TBD | Planned |
+| Postgres and Supabase | `secret_ref` (DSN, read-only role) | Shared |
+| MySQL | `secret_ref` (DSN, read-only user) | Shared |
+| Microsoft SQL Server | `secret_ref` (DSN, read-only login) | Shared |
+| Google Sheets, Airtable, HubSpot, Atlassian, Omni, Sentry | planned, TBD | Planned |
 
 For which connectors are available today, see the [Connector catalog](/kei/connectors/connector-catalog). For how Kei checks each call, see [Connectors, explained](/kei/connectors/connectors-explained).
