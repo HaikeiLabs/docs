@@ -157,7 +157,7 @@ function sidebar(pages, currentPath = '', links = siteLinks(pages)) {
     const entries = section.pages.map((page) => `<li><a href="${pageHref(page)}"${page.relativePath === currentPath ? ' aria-current="page"' : ''}>${escapeHtml(page.title)}</a></li>`).join('');
     return `${heading}<div class="nav-section">${section.group}</div><ul>${entries}</ul>`;
   }).join('');
-  return `<aside class="sidebar" id="site-nav">${globalNav(links, currentPath, 'sidebar-global')}<nav aria-label="Documentation">${groups}</nav></aside>`;
+  return `<aside class="sidebar" id="site-nav"><div class="menu-hint">Press <kbd>Esc</kbd> to close <span>Focus returns to Menu</span></div>${globalNav(links, currentPath, 'sidebar-global')}<nav aria-label="Documentation">${groups}</nav></aside>`;
 }
 
 // Targets shared by the home cards and the global nav. A C3a page that has not landed
@@ -286,7 +286,7 @@ function layout(title, nav, content, { toc = '', mermaid = false, description = 
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
-    <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Menu"><span></span></button>
+    <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" >Menu</button>
     <a class="brand" href="${siteUrl}" aria-label="Haikei Labs home">${logoMark}<span class="wordmark">Haikei Labs</span></a>
     <a class="docs-label" href="/">Docs</a>
     ${globalNav(links, currentPath)}
