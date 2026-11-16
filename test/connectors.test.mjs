@@ -32,7 +32,21 @@ const CONTRACT_OPERATIONS = {
 };
 
 // Connectors with a proto contract under proto/kei/connectors/.
-const CONTRACTED_CONNECTORS = ['GitHub', 'Linear', 'Generic HTTP API', 'Database'];
+// The database engines run database.query.run with their own dialect.
+const CONTRACTED_CONNECTORS = [
+  'GitHub',
+  'Linear',
+  'Generic HTTP API',
+  'Database',
+  'Postgres',
+  'Supabase',
+  'MySQL',
+  'Microsoft SQL Server',
+  'Snowflake',
+];
+
+// Connectors in preview: documented, not creatable yet.
+const PREVIEW = ['Snowflake'];
 
 // Connectors creatable today with `kei connectors create`: the CLI's built-in
 // provider list plus MCP catalog templates. Source of truth:
@@ -54,11 +68,6 @@ const PLANNED_CONTRACT_CONNECTORS = [
   'Notion',
   'Omni',
   'Power BI',
-  'Snowflake',
-  'Postgres',
-  'Supabase',
-  'MySQL',
-  'MSSQL',
   'Google Sheets',
   'Airtable',
   'HubSpot',
@@ -95,8 +104,8 @@ test('every catalog row states usable today and operation contract', async () =>
   for (const row of rows) {
     assert.match(
       row.at(-2),
-      /^(?:Yes|No)$/,
-      `${row[0]} must state Usable today Yes or No`,
+      /^(?:Yes|No|Preview)$/,
+      `${row[0]} must state Usable today Yes, No, or Preview`,
     );
     assert.match(
       row.at(-1),
@@ -115,6 +124,10 @@ test('usable today matches the kei connectors create provider list', async () =>
   }
   for (const row of dataRows(source)) {
     if (USABLE_TODAY.some((n) => row[0].startsWith(n))) continue;
+    if (PREVIEW.some((n) => row[0].startsWith(n))) {
+      assert.equal(row.at(-2), 'Preview', `${row[0]} is in preview`);
+      continue;
+    }
     assert.equal(row.at(-2), 'No', `${row[0]} is not in the kei connectors create provider list yet`);
   }
 });
@@ -193,4 +206,25 @@ test('explained and contracts pages describe operation contracts', async () => {
   assert.match(contracts, /no gRPC services/);
   assert.match(contracts, /buf breaking/);
   assert.match(contracts, /decision-only/);
+});
+
+test('database connectors page covers the four engines and the Snowflake preview', async () => {
+  const source = await page('connectors/database-connectors.md');
+  for (const heading of ['### Postgres', '### Supabase', '### MySQL', '### Microsoft SQL Server', '## Snowflake (preview)']) {
+    assert.ok(source.includes(heading), `missing section ${heading}`);
+  }
+  for (const dialect of ['DIALECT_POSTGRES', 'DIALECT_SUPABASE', 'DIALECT_MYSQL', 'DIALECT_MSSQL', 'DIALECT_SNOWFLAKE']) {
+    assert.ok(source.includes(dialect), `missing dialect ${dialect}`);
+  }
+  assert.match(source, /Per-user database credentials are not supported yet/);
+  assert.match(source, /Writes are not modelled/);
+  assert.match(source, /Available in the next kei CLI release/);
+  assert.match(source, /RunQueryResponse/);
+  assert.match(source, /\/kei\/runtime\/secret-manager/);
+  assert.doesNotMatch(source, /HAI-\d+/);
+});
+
+test('catalog links the database setup page', async () => {
+  const source = await page('connectors/connector-catalog.md');
+  assert.match(source, /\/kei\/connectors\/database-connectors/);
 });
