@@ -1,6 +1,6 @@
 ---
 title: Time-bound access
-description: "Grant a user or group temporary access to a workspace or capability from the Kei console, for incidents or short tasks."
+description: "Grant a user or group temporary access to a workspace or capability from the Kei console or CLI, for incidents or short tasks."
 type: make-and-maintain
 product: kei
 validated: 2026-10-21
@@ -13,7 +13,18 @@ nav_order: 11
 
 Time-bound (just-in-time) access lets you grant a user or group temporary access to a workspace or capability. This is useful for short-term collaboration, incident response, or limited-scope tasks.
 
-> **Note:** Time-bound access is currently available only through the Kei console. There is no CLI command for granting time-bound access.
+## Grant time-bound access with the CLI
+
+```bash
+kei access grant create \
+  --workspace my-workspace \
+  --principal user:<user-id> \
+  --target shell:git \
+  --ttl 4h \
+  --reason "incident follow-up"
+```
+
+`--principal` takes a typed ID such as `user:<id>` or `agent:<id>`, and `--ttl` sets how long the grant lasts.
 
 ## Grant time-bound access in the console
 
