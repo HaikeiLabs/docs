@@ -225,7 +225,21 @@ Check the decision before an agent depends on it:
 kei policy test "connector:analytics-ro" --workspace my-workspace --as group:analysts
 ```
 
-For temporary access for one person, use an access grant with an expiry instead of a new policy. See [Grant a connector](/kei/connectors/grant-a-connector) and [How Kei decides](/kei/reference/how-kei-decides).
+### If your harness queries through its own tool
+
+If the harness runs the SQL from its own tool, such as `mysql_query`, rather than a tool bound to the connector, grant that tool and name the connector. The runtime releases the DSN only to an allow that names this connector:
+
+```bash
+kei policy create \
+  --workspace my-workspace \
+  --group analysts \
+  --allow tool:mysql_query \
+  --connector analytics-ro
+```
+
+A grant on the tool without `--connector` still allows the call, but the DSN release is denied with `connector_not_named`. When the workspace has only one connector, the CLI names it for you. `--connector` is available from the next kei CLI release. In the console, choose the connector in the **Connector** picker on the tool grant. See [Name the connector when you grant a harness tool](/kei/connectors/grant-a-connector#name-the-connector-when-you-grant-a-harness-tool).
+
+Time-bound access grants cannot name a connector yet, so they release no DSN. For temporary access, add the person to a group whose grant names the connector, and remove them afterwards. See [Grant a connector](/kei/connectors/grant-a-connector) and [How Kei decides](/kei/reference/how-kei-decides).
 
 ## What the harness does
 
@@ -243,6 +257,7 @@ Audit records the decision and whether a credential was released. They never hol
 | Denial reason code | What it means |
 | --- | --- |
 | `credential_unavailable` | The runtime could not read the secret: credential sync has not found it yet, the runtime lacks read permission, or the name is wrong. |
+| `connector_not_named` | The allow that permitted the call names no connector, or names a different one. Grant the tool with `--connector`, or pick the connector in the console's **Connector** picker. |
 | `account_model_not_supported` | The connector is not shared. Database connectors are shared only. |
 | `credential_source_not_supported` | The request was not tied to a registered connector tool, or this runtime release cannot release tenant-stored credentials. |
 

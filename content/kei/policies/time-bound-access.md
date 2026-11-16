@@ -33,6 +33,8 @@ The grant is recorded in the audit log. After granting access, the user can use 
 - Does not override existing policies — the user or group still needs matching allow policies for the operations they want to perform.
 - The grant is recorded in the audit log with the expiration time.
 
+> **Known limitation: no connector credentials.** A time-bound access grant cannot name a connector yet, in the console or the CLI. The Kei runtime releases a connector's credential only to an allow that names that connector, so a time-bound grant on a tool allows the call but releases no credential. The release is denied with `connector_not_named`. To give temporary use of a connector, add the person to a group whose tool grant names the connector, and remove them when the work is done. See [Name the connector when you grant a harness tool](/kei/connectors/grant-a-connector#name-the-connector-when-you-grant-a-harness-tool).
+
 ## Check it worked
 
 1. Verify the grant appears in the **Approvals** page.

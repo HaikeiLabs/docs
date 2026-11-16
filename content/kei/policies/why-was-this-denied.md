@@ -50,6 +50,7 @@ This lets you verify a denial without making the actual call.
 | ------- | ------------ |
 | A command you expect to work is denied | A deny policy matches the request. A matching deny wins over every allow. Check the audit log for the **Decided by** policy. |
 | A tool call is denied on a connector | The connector capability is not allowed by any policy for your user or group. Ask an admin to add a policy. |
+| The tool call is allowed, but its connector credential is denied with `connector_not_named` | The grant on the tool names no connector, names a different one, or is a time-bound access grant, which cannot name a connector yet. An admin can re-create the tool grant with `--connector`, or pick the connector in the console's **Connector** picker. See [Name the connector when you grant a harness tool](/kei/connectors/grant-a-connector#name-the-connector-when-you-grant-a-harness-tool). |
 | A command is denied for a teammate but works for you | A group- or user-specific policy applies to them. Check if you are in the same group. |
 | A command asks for confirmation instead of running | No matching deny; no matching allow either. The harness used its default (ask) mode. An admin can add an allow policy. |
 | Everything is denied on a new harness | The policy bundle may not be synced yet. Run `kei harness sync`. |
