@@ -237,6 +237,10 @@ If you see unexpected results, review the policy target syntax and group members
 - For MCP connectors, use `mcp:<slug>` to grant access to the whole server or `mcp:<slug>.<tool>` for individual tools.
 - When you grant a harness tool that uses a connector, name the connector with `--connector` (or the console's **Connector** picker). A tool-only grant gets no connector credential.
 
+## Known limitations
+
+- **Time-bound access grants can't name a connector yet.** A time-bound grant on a harness tool, made with `kei access grant create` or from the console's **Approvals** page, names only the tool. Once `kei-proxy` enforces the check above, such a grant allows the tool call but releases no connector credential. Until access grants can name a connector, add the user to a group with a policy grant that names the connector. See [Time-bound access](/kei/policies/time-bound-access#known-limitations).
+
 ## Learn more
 
 - [Connectors, explained](/kei/connectors/connectors-explained) — connector kinds, credentials, and how authorization works
