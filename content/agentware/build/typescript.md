@@ -1,13 +1,13 @@
 ---
 description: Install the Agentware TypeScript SDK and run an offline harness that demonstrates allowed and denied tool calls.
-title: Set up a TypeScript harness
+title: Set up a TypeScript agent
 type: read-and-use
 product: agentware
 nav_group: Start here
 nav_order: 5
 ---
 
-Add Kei policies to a TypeScript agent harness. Kei policies are deterministic guardrails for the tool calls your agent can make. The SDK provides the `KeiProxySocketAuthorizeClient` and tool registration helpers.
+Add Kei policies to a TypeScript agent [harness](/kei/reference/glossary#harness) (the program that runs it and makes its tool calls). Kei policies are deterministic guardrails for the tool calls your agent can make. The SDK provides the `KeiProxySocketAuthorizeClient` and tool registration helpers.
 
 For Kei compatibility with your installed SDK version, check the [Agentware compatibility table](https://github.com/HaikeiLabs/agentware#compatibility). Requires Node 22.18 or later. For the full API reference, see the [TypeScript package source](https://github.com/haikeilabs/agentware/tree/main/typescript).
 

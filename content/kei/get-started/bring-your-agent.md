@@ -71,7 +71,7 @@ kei doctor
 
 Every line should start with `PASS`, including `runtime service`, `heartbeat`, `harness claude_code: Kei hook installed` (or `harness codex`) and `policy bundle: bundle … active`.
 
-Go deeper: [Connect your agent](/kei/get-started/connect-your-agent) and [Connect a harness to an agent](/kei/connect-your-harness/harness-setup#claude-code).
+Go deeper: [Connect your agent](/kei/get-started/connect-your-agent) and [Set up your coding agent](/kei/connect-your-harness/harness-setup#claude-code).
 
 ## 3. Install Haikei Skills
 
@@ -130,7 +130,7 @@ kei harness sync
 
 The dry run prints a diff of the entries Kei will add. Kei edits only the entries it manages and saves a `.kei-backup-<timestamp>` copy of the file before it writes. Claude Code gets an allow and a deny entry in `~/.claude/settings.json`; Codex gets the rules in `~/.codex/rules/kei.rules`, with the deny as `forbidden`.
 
-Go deeper: [Your first policy](/kei/policies/your-first-policy), [Test before you sync](/kei/policies/test-before-you-sync) and [Govern harness commands](/kei/policies/govern-harness-commands).
+Go deeper: [Your first policy](/kei/policies/your-first-policy), [Test before you sync](/kei/policies/test-before-you-sync) and [Govern coding agent commands](/kei/policies/govern-harness-commands).
 
 ## 5. Run one allowed and one denied call
 
