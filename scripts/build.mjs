@@ -277,6 +277,7 @@ function layout(title, nav, content, { toc = '', mermaid = false, description = 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+  <link rel="stylesheet" href="/assets/brand.css">
   <link rel="stylesheet" href="/assets/tokens.css">
   <link rel="stylesheet" href="/assets/site.css">
   ${mermaid ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js" defer></script>' : ''}
@@ -410,6 +411,7 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   await checkLinks(contentDir);
   await rm(outputDir, { recursive: true, force: true });
   await mkdir(path.join(outputDir, 'assets'), { recursive: true });
+  await cp(path.join(repoRoot, 'node_modules/@haikeilabs/brand/dist/styles.flat.css'), path.join(outputDir, 'assets/brand.css'));
   await cp(path.join(assetsDir, 'tokens.css'), path.join(outputDir, 'assets/tokens.css'));
   await cp(path.join(assetsDir, 'site.css'), path.join(outputDir, 'assets/site.css'));
   await cp(path.join(assetsDir, 'site.js'), path.join(outputDir, 'assets/site.js'));

@@ -368,3 +368,17 @@ test('onboarding prototype redirects use permanent canonical locations for both 
     await rm(paths.root, { recursive: true, force: true });
   }
 });
+
+test('build emits brand 0.8.0 CSS with amber risk tokens', async () => {
+  const paths = await fixture();
+  try {
+    await buildDocs({ ...paths, assetsDir });
+    const css = await readFile(path.join(paths.outputDir, 'assets/brand.css'), 'utf8');
+    assert.match(css, /--color-risk-ink:\s*#b45309/i);
+    assert.match(css, /\.button-primary/);
+    const html = await readFile(path.join(paths.outputDir, 'index.html'), 'utf8');
+    assert.match(html, /href="\/assets\/brand\.css"/);
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
