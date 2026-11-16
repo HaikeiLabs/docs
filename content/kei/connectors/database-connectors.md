@@ -181,7 +181,7 @@ kei connectors create --workspace my-workspace --provider mssql --name finance-r
 
 ### In the console
 
-The console's **Add Connector** gallery does not list the database providers yet. Use the kei CLI until a console update adds them.
+Console: available once the console update ships. Until then, use the kei CLI.
 
 ### Check it is active
 
