@@ -71,6 +71,16 @@
   nav.addEventListener('click', function () {
     var open = document.body.classList.toggle('nav-open');
     nav.setAttribute('aria-expanded', String(open));
+    nav.textContent = open ? 'Close menu' : 'Menu';
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && document.body.classList.contains('nav-open')) {
+      document.body.classList.remove('nav-open');
+      nav.setAttribute('aria-expanded', 'false');
+      nav.textContent = 'Menu';
+      nav.focus();
+    }
   });
 
   document.addEventListener('click', function (event) {
