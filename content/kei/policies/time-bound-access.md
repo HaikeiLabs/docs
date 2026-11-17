@@ -58,7 +58,7 @@ kei policy test --as user:<user-id> "shell:git push" --workspace my-workspace
 
 ## Known limitations
 
-- **A time-bound grant can't name a connector yet.** A grant on a harness tool names only the tool. A harness tool that runs against a connector gets that connector's credential only from a permit that names the connector, so once `kei-proxy` enforces that check, a time-bound grant allows the tool call but releases no connector credential. Until time-bound grants can name a connector, add the user to a group with a policy grant that names it (`kei policy create --allow tool:<name> --connector <connector>`). See [Grants and connector credentials](/kei/connectors/grant-a-connector#grants-and-connector-credentials).
+- **A time-bound grant can't name a connector yet.** A grant on a harness tool names only the tool. A harness tool that runs against a connector gets that connector's credential only from a permit that names the connector, so once `kei-proxy` enforces that check, a time-bound grant allows the tool call but releases no connector credential. Until time-bound grants can name a connector, add the user to a group with a policy grant that names it, such as `kei policy create --workspace Main --group db-readers --allow tool:get_users --connector mysql-seed`. See [Grants and connector credentials](/kei/connectors/grant-a-connector#grants-and-connector-credentials).
 
 ## Learn more
 

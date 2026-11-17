@@ -150,7 +150,7 @@ When several policies match, any matching deny wins over every allow. See [How K
 
 ### Grants and connector credentials {#grants-and-connector-credentials}
 
-A grant on `tool:<name>` lets a group call the tool. When a harness tool runs against a connector, such as a query tool that uses a MySQL connector, the tool also needs that connector's credential. `kei-proxy` releases the credential only when the permit that allowed the call names that exact connector. A tool-only grant still allows the call, but the release is denied with reason `connector_not_named` and the tool gets no credential. A grant on a capability alone never allows a harness tool.
+A grant on `tool:<name>` lets a group call the tool. When a harness tool runs against a connector, such as a `get_users` tool that reads the `mysql-seed` MySQL connector, the tool also needs that connector's credential. `kei-proxy` releases the credential only when the permit that allowed the call names that exact connector. A tool-only grant still allows the call, but the release is denied with reason `connector_not_named` and the tool gets no credential. A grant on a capability alone never allows a harness tool.
 
 Name the connector when you grant the tool:
 
@@ -158,24 +158,24 @@ Name the connector when you grant the tool:
 kei policy create \
   --workspace Main \
   --group db-readers \
-  --allow tool:mysql_query \
+  --allow tool:get_users \
   --connector mysql-seed
 ```
 
-`--connector` takes the ID, name, display name, or slug of a connector in the workspace. If it matches none, the command fails and creates nothing. The grant is stored with the selector `{"tool": "mysql_query", "connector_id": "<connector ID>"}`, and the output adds a `Connector: NAME (ID)` line.
+`--connector` takes the ID, name, display name, or slug of a connector in the workspace. If it matches none, the command fails and creates nothing. The grant is stored with the selector `{"tool": "get_users", "connector_id": "<connector ID>"}`, and the output adds a `Connector: NAME (ID)` line.
 
 If you leave out `--connector`:
 
 - When the workspace has exactly one connector, the CLI uses it and says so on stderr.
 - When the workspace has no connectors or several, the CLI creates a tool-only grant and warns on stderr: `Warning: This tool will not receive connector credentials`. With several, it lists them so you can rerun with `--connector`.
 
-For a tool that needs no connector credential, pass `--no-connector`. It skips the lookup and creates a tool-only grant on purpose, with the same warning:
+To create a tool-only grant on purpose, pass `--no-connector`. It skips the connector lookup and prints the same warning. With this grant, `db-readers` can call `get_users`, but `kei-proxy` releases no `mysql-seed` credential for the call:
 
 ```bash
 kei policy create \
   --workspace Main \
   --group db-readers \
-  --allow tool:web_search \
+  --allow tool:get_users \
   --no-connector
 ```
 
