@@ -9,7 +9,7 @@ nav_order: 47
 
 # Connector authentication
 
-A connector's credential decides which account a call runs as. Kei keeps the credential out of your harness: it decides whether a call is allowed, and only on allow does it release the credential for that session. Authentication and authorization are separate questions — the credential model selects the account, while Kei policies decide whether the call is permitted at all. For a harness tool, the permit must also name the connector before its credential is released; see [Grants and connector credentials](/kei/connectors/grant-a-connector#grants-and-connector-credentials).
+A connector's credential decides which account a call runs as. Kei keeps the credential out of your harness: it decides whether a call is allowed, and only on allow does it release the credential for that session. Authentication and authorization are separate questions — the credential model selects the account, while Kei policies decide whether the call is permitted at all.
 
 This page explains the credential models Kei supports or is building. For which connector uses which model, see the [Connector catalog](/kei/connectors/connector-catalog).
 
@@ -76,7 +76,9 @@ The [Connector catalog](/kei/connectors/connector-catalog) carries the full row 
 | Notion | `oauth` or `secret_ref` | Per user; shared |
 | Power BI | `oauth` (Entra on-behalf-of), moving to `kei_token_exchange` | Per user |
 | Gmail | `oauth` (tier 1, hard-coded SSO app) | Per user |
-| Postgres | `secret_ref` (DSN, read-only role) | Shared |
-| Supabase, MySQL, MSSQL, Google Sheets, Airtable, HubSpot, Atlassian, Omni, Sentry | planned, TBD | Planned |
+| Postgres and Supabase | `secret_ref` (DSN, read-only role) | Shared |
+| MySQL | `secret_ref` (DSN, read-only user) | Shared |
+| Microsoft SQL Server | `secret_ref` (DSN, read-only login) | Shared |
+| Google Sheets, Airtable, HubSpot, Atlassian, Omni, Sentry | planned, TBD | Planned |
 
 For which connectors are available today, see the [Connector catalog](/kei/connectors/connector-catalog). For how Kei checks each call, see [Connectors, explained](/kei/connectors/connectors-explained).
