@@ -13,7 +13,7 @@ A database connector lets an agent run read-only SQL against one of your databas
 
 This page covers Postgres, Supabase, MySQL, and Microsoft SQL Server. Snowflake is in preview; see [Snowflake (preview)](#snowflake-preview).
 
-> **Release status.** The Postgres, MySQL, and Microsoft SQL Server connector templates are live in Kei, and the runtime releases their connection strings today. The steps to **create** the connector are available from the next kei CLI release. Until then, the [Connector catalog](/kei/connectors/connector-catalog) lists these connectors as not yet usable. You can do everything else on this page now: create the read-only role, store the DSN, and prepare the runtime.
+> **Release status.** The Postgres, MySQL, and Microsoft SQL Server connector templates are live in Kei, and the runtime releases their connection strings today. You can create, edit, and rotate these connectors in the Kei console. The matching kei CLI commands are available from the next kei CLI release. Until then, the [Connector catalog](/kei/connectors/connector-catalog) lists these connectors as not yet usable. You can do everything else on this page now: create the read-only role, store the DSN, and prepare the runtime.
 
 ## What you get
 
@@ -181,7 +181,29 @@ kei connectors create --workspace my-workspace --provider mssql --name finance-r
 
 ### In the console
 
-Console: available once the console update ships. Until then, use the kei CLI.
+Each console step below has the matching kei CLI command, so you can use either.
+
+1. Open **Connectors** in the left navigation and choose **Add connector**. The **Databases** section lists the database providers the catalog offers. Choose **PostgreSQL** (also for Supabase), **MySQL**, or **Microsoft SQL Server**.
+
+   ![Add a connector page with a Databases section listing PostgreSQL, MySQL, and Microsoft SQL Server](/assets/images/connector-setup/database-gallery.png)
+
+   CLI: pick the provider with `--provider postgres`, `--provider mysql`, or `--provider mssql`. To see which providers your kei release accepts:
+
+   ```bash
+   kei connectors create --help
+   ```
+
+2. Confirm the organization and workspace, then fill in the form. Enter the **Connector name**, for example `analytics-ro`. The account model is fixed to **Shared workspace account**. Paste the DSN into the **Connection string (DSN)** field. It is a password field: the console seals the value for your registered runtimes and never shows it again. Leave **query.run** selected, choose the groups that get access, and create the connector.
+
+   ![PostgreSQL create form with the connector name analytics-ro, the shared account model, an empty DSN password field, the query.run capability, and group access](/assets/images/connector-setup/database-create-postgres.png)
+
+   CLI: the same connector, with the DSN read from a prompt that does not echo:
+
+   ```bash
+   kei connectors create --workspace my-workspace --provider postgres --name analytics-ro
+   ```
+
+   Groups you tick under **Grant to groups** get an allow policy. The CLI allows the `admins` group by default; pass `--no-default-access` to skip it and grant access in step 5.
 
 ### Check it is active
 
@@ -191,10 +213,20 @@ The connector starts as `pending`. On the runtime, run credential sync with the 
 kei-proxy credential sync | jq '.external_refs'
 ```
 
-After the next heartbeat, the connector shows as connected:
+After the next heartbeat, the connector shows as **Connected** on the **Connectors** page. Open it to see **Secret delivery**: whether the `dsn` is set, its generation (it goes up by one each time the DSN is replaced), and when it was last delivered to a runtime. The value itself is never shown.
+
+![Connector details for analytics-ro showing Connected, and Secret delivery with the dsn set at generation 2 and its delivery time](/assets/images/connector-setup/database-connector-list.png)
+
+CLI: list the connectors and their status:
 
 ```sh
 kei connectors list --workspace my-workspace
+```
+
+CLI: show the DSN's secret delivery status:
+
+```sh
+# PLACEHOLDER-CLI-STATUS: kei-cli secret status command pending. Replace before merge.
 ```
 
 If it stays `pending`, see the troubleshooting table on [Read connector secrets from your secret manager](/kei/runtime/secret-manager#troubleshooting).
@@ -227,19 +259,53 @@ kei policy test "connector:analytics-ro" --workspace my-workspace --as group:ana
 
 ### If your harness queries through its own tool
 
-If the harness runs the SQL from its own tool, such as `mysql_query`, rather than a tool bound to the connector, grant that tool and name the connector. The runtime releases the DSN only to an allow that names this connector:
+If the harness runs the SQL from its own tool, such as `sql_query`, rather than a tool bound to the connector, grant that tool and name the connector. The runtime releases the DSN only to an allow that names this connector.
+
+In the console, open **Policies** and choose **New policy**. Set **What** to **Tool call**, **Who** to **Group** and the group, and **Tool call** to the harness tool. A **Connector** picker then lists the workspace's connectors. Choose the database connector. When the workspace has only one connector, it is already selected. If you leave it at **No connector**, the form warns that the tool will not receive connector credentials.
+
+![New policy form granting the sql_query tool call to the analysts group, with analytics-ro chosen in the Connector picker](/assets/images/connector-setup/database-grant-connector-picker.png)
+
+CLI: the same grant:
 
 ```bash
 kei policy create \
   --workspace my-workspace \
   --group analysts \
-  --allow tool:mysql_query \
+  --allow tool:sql_query \
   --connector analytics-ro
 ```
 
-A grant on the tool without `--connector` still allows the call, but the DSN release is denied with `connector_not_named`. When the workspace has only one connector, the CLI names it for you. `--connector` is available from the next kei CLI release. In the console, choose the connector in the **Connector** picker on the tool grant. See [Name the connector when you grant a harness tool](/kei/connectors/grant-a-connector#name-the-connector-when-you-grant-a-harness-tool).
+A grant on the tool without `--connector` still allows the call, but the DSN release is denied with `connector_not_named`. When the workspace has only one connector, the CLI names it for you. `--connector` is available from the next kei CLI release. See [Name the connector when you grant a harness tool](/kei/connectors/grant-a-connector#name-the-connector-when-you-grant-a-harness-tool).
 
 Time-bound access grants cannot name a connector yet, so they release no DSN. For temporary access, add the person to a group whose grant names the connector, and remove them afterwards. See [Grant a connector](/kei/connectors/grant-a-connector) and [How Kei decides](/kei/reference/how-kei-decides).
+
+## Edit or rotate a database connector {#edit-or-rotate}
+
+Replace the DSN when you rotate the database role's password, move the database, or change TLS settings. The slug, and so every policy that names `connector:<slug>`, stays the same.
+
+1. In the database, set the new password on the read-only role, or create a new role with the same grants. Keep the old password working until the runtimes have the new DSN.
+2. Open **Connectors**, open the connector, and check **Secret delivery** for the current `dsn` generation.
+3. Choose **Edit**. The **Connection string (DSN)** field is empty: the current value is never shown. Paste the new DSN and choose **Save changes**. Leave the field blank to keep the current DSN and change only other fields.
+
+   ![Edit connector dialog for analytics-ro with an empty DSN password field and a note that a blank field keeps the current secret](/assets/images/connector-setup/database-connector-edit.png)
+
+   CLI: replace the DSN:
+
+   ```bash
+   # PLACEHOLDER-CLI-ROTATE: kei-cli rotate command pending. Replace before merge.
+   ```
+
+4. Check that the new DSN reached the runtimes. **Secret delivery** shows the next generation, with a new delivery time after the runtime's next credential sync.
+
+   CLI: check the secret status:
+
+   ```bash
+   # PLACEHOLDER-CLI-STATUS: kei-cli secret status command pending. Replace before merge.
+   ```
+
+5. Once the new generation is delivered, revoke the old password or drop the old role in the database.
+
+If you stored the DSN yourself and created the connector with `--credential-ref`, rotate it in your secret manager instead. The runtime reads the new value on its next credential sync; Kei holds only the reference.
 
 ## What the harness does
 
