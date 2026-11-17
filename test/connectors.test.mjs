@@ -232,3 +232,30 @@ test('catalog links the database setup page', async () => {
   const source = await page('connectors/connector-catalog.md');
   assert.match(source, /\/kei\/connectors\/database-connectors/);
 });
+
+test('grant page documents naming a connector on tool grants', async () => {
+  const source = await page('connectors/grant-a-connector.md');
+  assert.match(source, /### Name the connector when you grant a harness tool/);
+  assert.match(source, /connector_not_named/);
+  assert.match(source, /--allow tool:mysql_query --connector/);
+  assert.match(source, /--no-connector/);
+  assert.match(source, /This tool will not receive connector credentials/);
+  assert.match(source, /\*\*Connector\*\* picker/);
+  assert.match(source, /Known limitation: time-bound access grants/);
+  assert.doesNotMatch(source, /HAI-\d+/);
+});
+
+test('database, time-bound, and denial pages explain connector_not_named', async () => {
+  for (const relativePath of [
+    'connectors/database-connectors.md',
+    'policies/time-bound-access.md',
+    'policies/why-was-this-denied.md',
+  ]) {
+    const source = await page(relativePath);
+    assert.match(source, /connector_not_named/, `${relativePath} must explain connector_not_named`);
+    assert.match(source, /grant-a-connector#name-the-connector-when-you-grant-a-harness-tool/, `${relativePath} must link the grant section`);
+  }
+  const database = await page('connectors/database-connectors.md');
+  assert.match(database, /--connector analytics-ro/);
+  assert.doesNotMatch(database, /use an access grant with an expiry instead/);
+});
