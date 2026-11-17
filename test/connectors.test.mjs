@@ -237,7 +237,7 @@ test('grant page documents naming a connector on tool grants', async () => {
   const source = await page('connectors/grant-a-connector.md');
   assert.match(source, /### Name the connector when you grant a harness tool/);
   assert.match(source, /connector_not_named/);
-  assert.match(source, /--allow tool:mysql_query --connector/);
+  assert.match(source, /--allow tool:get_users --connector mysql-seed/);
   assert.match(source, /--no-connector/);
   assert.match(source, /This tool will not receive connector credentials/);
   assert.match(source, /\*\*Connector\*\* picker/);

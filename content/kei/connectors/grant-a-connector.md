@@ -150,7 +150,7 @@ When several policies match, any matching deny wins over every allow. See [How K
 
 ### Name the connector when you grant a harness tool
 
-Some harness tools run their own code and ask the runtime for a connector's credential, for example a `mysql_query` tool that opens a database connection. A grant on such a tool must name the connector whose credential the tool may receive.
+Some harness tools run their own code and ask the runtime for a connector's credential, for example a `get_users` tool that reads users from a MySQL database. A grant on such a tool must name the connector whose credential the tool may receive.
 
 The rule, enforced by the Kei runtime (`kei-proxy`) from its next release:
 
@@ -165,15 +165,15 @@ Tools bound to a single connector when they were registered already carry their 
 `kei policy create --allow tool:NAME` takes `--connector`. It accepts the connector's ID, name, display name, or slug in that workspace:
 
 ```bash
-kei policy create --workspace my-workspace --group db-readers --allow tool:mysql_query --connector orders-ro
+kei policy create --workspace my-workspace --group db-readers --allow tool:get_users --connector mysql-seed
 ```
 
 - **One connector in the workspace:** you can leave out `--connector`. The CLI uses that connector, names it on stderr, and adds a `Connector: NAME (ID)` line to its output.
 - **No connector, or several:** the grant is still created as a tool-only grant, and the CLI warns `This tool will not receive connector credentials`. With several connectors, it lists them so you can pass `--connector`.
-- **A tool that needs no credential:** pass `--no-connector` to skip the lookup. The CLI prints the same warning and creates a tool-only grant.
+- **A tool-only grant on purpose:** pass `--no-connector` to skip the lookup. The CLI prints the same warning and creates a tool-only grant. With the grant below, `db-readers` can call `get_users`, but the runtime releases no `mysql-seed` credential for the call.
 
 ```bash
-kei policy create --workspace my-workspace --group researchers --allow tool:web_search --no-connector
+kei policy create --workspace my-workspace --group db-readers --allow tool:get_users --no-connector
 ```
 
 - If `--connector` matches no connector in the workspace, the command fails and creates nothing.

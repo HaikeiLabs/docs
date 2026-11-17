@@ -1,6 +1,6 @@
 ---
 title: Time-bound access
-description: "Grant a user or group temporary access to a workspace or capability from the Kei console, for incidents or short tasks."
+description: "Grant a user or group temporary access to a workspace or capability from the Kei console or CLI, for incidents or short tasks."
 type: make-and-maintain
 product: kei
 validated: 2026-10-21
@@ -13,7 +13,27 @@ nav_order: 11
 
 Time-bound (just-in-time) access lets you grant a user or group temporary access to a workspace or capability. This is useful for short-term collaboration, incident response, or limited-scope tasks.
 
-> **Note:** Time-bound access is currently available only through the Kei console. There is no CLI command for granting time-bound access.
+> **Warning:** Time-bound access is in beta. We have not tested end to end that a grant stops working when its TTL runs out. Each step has its own automated tests, run against test servers and fixtures:
+>
+> - `kei access grant create` turns `--ttl` into an expiry time and sends it.
+> - Kei rejects a grant with no expiry, an expiry in the past, or a TTL longer than the maximum (7 days by default).
+> - Policy bundles sent to a runtime leave out expired and revoked grants.
+> - `kei-proxy` denies a call that matches only an expired grant, with reason `access_grant_expired`.
+>
+> Before you rely on expiry, check it yourself: after the TTL passes, run the call again and confirm it is denied. If you use time-bound access or it doesn't behave as described here, tell us in the [Haikei Discord community](https://discord.gg/g6QaTYWXDa).
+
+## Grant time-bound access with the CLI
+
+```bash
+kei access grant create \
+  --workspace my-workspace \
+  --principal user:<user-id> \
+  --target shell:git \
+  --ttl 4h \
+  --reason "incident follow-up"
+```
+
+`--principal` takes a typed ID such as `user:<id>` or `agent:<id>`, and `--ttl` sets how long the grant lasts.
 
 ## Grant time-bound access in the console
 
