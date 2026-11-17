@@ -223,10 +223,10 @@ CLI: list the connectors and their status:
 kei connectors list --workspace my-workspace
 ```
 
-CLI: show the DSN's secret delivery status:
+CLI: show the DSN's secret delivery status. `CONNECTOR_ID` is the connector's ID from `kei connectors list`. The status reads `not set` until the DSN has been delivered. This needs the kei CLI release after v0.4.0:
 
 ```sh
-# PLACEHOLDER-CLI-STATUS: kei-cli secret status command pending. Replace before merge.
+kei connectors get CONNECTOR_ID --workspace my-workspace
 ```
 
 If it stays `pending`, see the troubleshooting table on [Read connector secrets from your secret manager](/kei/runtime/secret-manager#troubleshooting).
@@ -289,18 +289,32 @@ Replace the DSN when you rotate the database role's password, move the database,
 
    ![Edit connector dialog for analytics-ro with an empty DSN password field and a note that a blank field keeps the current secret](/assets/images/connector-setup/database-connector-edit.png)
 
-   CLI: replace the DSN:
+   CLI: replace the DSN. Rotating from the CLI needs the kei CLI release after v0.4.0. The CLI reads the new DSN from a prompt that does not echo:
 
    ```bash
-   # PLACEHOLDER-CLI-ROTATE: kei-cli rotate command pending. Replace before merge.
+   kei connectors reconnect CONNECTOR_ID --workspace my-workspace
    ```
+
+   Or read it from a file, for example one your secret manager mounts. For Snowflake, the file is the key-pair JSON file:
+
+   ```bash
+   kei connectors reconnect CONNECTOR_ID --workspace my-workspace --secret-file ./dsn.txt
+   ```
+
+   To reconnect without replacing the secret, pass `--keep-secret`:
+
+   ```bash
+   kei connectors reconnect CONNECTOR_ID --workspace my-workspace --keep-secret
+   ```
+
+   The DSN is never accepted as a flag and never appears in the output. Delete a `--secret-file` once the command succeeds, unless your secret manager owns that file.
 
 4. Check that the new DSN reached the runtimes. **Secret delivery** shows the next generation, with a new delivery time after the runtime's next credential sync.
 
-   CLI: check the secret status:
+   CLI: check the secret status (kei CLI release after v0.4.0). It shows the generation and delivery, or `not set` when the DSN has never been delivered:
 
    ```bash
-   # PLACEHOLDER-CLI-STATUS: kei-cli secret status command pending. Replace before merge.
+   kei connectors get CONNECTOR_ID --workspace my-workspace
    ```
 
 5. Once the new generation is delivered, revoke the old password or drop the old role in the database.
