@@ -9,9 +9,9 @@ nav_order: 45
 
 # Connectors, explained
 
-A connector is a bridge between Kei and an external service — GitHub, Linear, Google Drive, a homegrown CRM API, or a remote MCP server. Connectors let agents read and write data through protected tool calls. Kei authorizes each call; the harness (Claude Code, Codex, the Agentware SDK) performs the actual request.
+A connector is a bridge between Kei and an external service — GitHub, Linear, Google Drive, a homegrown CRM API, or a remote MCP server. Connectors let agents read and write data through protected operations. Kei authorizes each call; the harness (Claude Code, Codex, the Agentware SDK) performs the actual request.
 
-See the [Connector catalog](/kei/connectors/connector-catalog) for the full list of connectors, their kinds, and their status, and [Connector authentication](/kei/connectors/connector-auth) for how each credential model works.
+See [Connector operations](/kei/connectors/connector-operations) for contracts, connections, and policy targets. See the [Connector catalog](/kei/connectors/connector-catalog) for the full list of connectors, their kinds, and their status, and [Connector authentication](/kei/connectors/connector-auth) for how each credential model works.
 
 ## How connectors work
 
@@ -25,7 +25,7 @@ Credentials stay in your environment — your secret manager, an OAuth token iss
 
 ## Operation contracts
 
-Each shipped connector has an **operation contract**: a proto definition of every operation the connector exposes, under `proto/kei/connectors/<connector>/v1/` in [`kei-connector-contracts`](https://github.com/HaikeiLabs/kei-connector-contracts). An operation id is a dotted name such as `github.issues.get` or `database.query.run`, and it is also the policy target (`connector:github.*` matches every GitHub operation).
+A connector with a shipped **operation contract** has a proto definition of every operation the connector exposes, under `proto/kei/connectors/<connector>/v1/` in [`kei-connector-contracts`](https://github.com/HaikeiLabs/kei-connector-contracts). An operation id is a dotted name such as `github.issues.get` or `database.query.run`, and identifies the capability a policy can grant. Catalog policy targets for operation ids are in progress.
 
 Proto is the schema language. buf generates plain Go, Python, TypeScript, and Rust types from the same files — there are no gRPC services, no grpc-gateway, and no generated HTTP clients that relay calls. The generated types describe the request the harness sends and the response it unmarshals; the harness still makes the provider call, and the runtime stays decision-only. Operation contracts carry no provider payloads, results, customer content, or credential values.
 
@@ -51,7 +51,7 @@ Each native connector registers typed capabilities such as `pull_request.read`, 
 
 ### http\_api (generic REST API)
 
-The `http_api` kind is for any homegrown, private, or non-standard HTTP API. It wraps a REST endpoint with guarded access: you configure a base URL, allowed HTTP methods, path patterns, and query parameters, and the harness calls the API through Kei's authorized proxy.
+The `http_api` kind is for any homegrown, private, or non-standard HTTP API. It wraps a REST endpoint with guarded access: you configure a base URL, allowed HTTP methods, path patterns, and query parameters, and the harness calls the API after Kei authorizes the request.
 
 Use `http_api` when:
 
