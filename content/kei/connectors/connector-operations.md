@@ -1,7 +1,7 @@
 ---
 title: Connector operations
 description: "How connector contracts, connections, and operations define access to external services."
-type: concept
+type: read-and-use
 product: kei
 nav_group: Reference
 nav_order: 48
