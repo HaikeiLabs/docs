@@ -16,7 +16,7 @@ export const GA4_MEASUREMENT_ID = 'G-EV3X1G9P73';
 const discordUrl = 'https://discord.gg/g6QaTYWXDa';
 const repoUrl = 'https://github.com/HaikeiLabs/docs';
 const githubUrl = 'https://github.com/HaikeiLabs';
-const allowedTypes = new Set(['read-and-use', 'make-and-maintain', 'reference']);
+const allowedTypes = new Set(['read-and-use', 'make-and-maintain', 'reference', 'concept']);
 const allowedProducts = new Set(['kei', 'agentware']);
 const navGroups = ['Start here', 'Get started', 'Make and maintain', 'Reference'];
 // The sidebar shows Agentware first (its Start here group leads), then Kei.
@@ -59,7 +59,7 @@ function validatePage(relativePath, raw) {
   }
   const descriptionLength = data.description.trim().length;
   if (descriptionLength > maxDescriptionLength) throw new Error(`${relativePath}: description is ${descriptionLength} characters; keep it to ${maxDescriptionLength} or fewer`);
-  if (!allowedTypes.has(data.type)) throw new Error(`${relativePath}: type must be read-and-use, make-and-maintain, or reference`);
+  if (!allowedTypes.has(data.type)) throw new Error(`${relativePath}: type must be read-and-use, make-and-maintain, reference, or concept`);
   if (!allowedProducts.has(data.product)) throw new Error(`${relativePath}: product must be kei or agentware`);
   if (data.nav_group !== undefined && !navGroups.includes(data.nav_group)) throw new Error(`${relativePath}: nav_group must be Start here, Get started, Make and maintain, or Reference`);
   if (data.seo_title !== undefined && (typeof data.seo_title !== 'string' || !data.seo_title.trim())) throw new Error(`${relativePath}: seo_title must be a non-empty string`);
