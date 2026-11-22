@@ -21,7 +21,8 @@ const allowedProducts = new Set(['kei', 'agentware']);
 const navGroups = ['Start here', 'Get started', 'Make and maintain', 'Reference'];
 // The sidebar shows Agentware first (its Start here group leads), then Kei.
 // Start here is always an Agentware group, whatever the page's product.
-const navProducts = [['agentware', 'Agentware'], ['kei', 'Kei']];
+// Research (content/research/) follows Kei.
+const navProducts = [['agentware', 'Agentware'], ['kei', 'Kei'], ['research', 'Research']];
 const maxDescriptionLength = 160;
 // C5 share card. design-system exports it; copy it into assets/social/ (no runtime fetch).
 const shareCardPath = '/assets/social/share-docs-1200x627.png';
@@ -70,7 +71,8 @@ function validatePage(relativePath, raw) {
   if (parts[0] === 'kei' && data.product !== 'kei') throw new Error(`${relativePath}: Kei pages require product: kei`);
   if (parts[0] === 'agentware' && data.product !== 'agentware') throw new Error(`${relativePath}: agentware pages require product: agentware`);
   if (parts[0] === 'tutorials' && parts.length !== 2) throw new Error(`${relativePath}: tutorials must use content/tutorials/<slug>.md`);
-  if (!['kei', 'agentware', 'tutorials'].includes(parts[0]) && relativePath !== 'skills.md') throw new Error(`${relativePath}: use content/kei, content/agentware, content/tutorials, or content/skills.md`);
+  if (parts[0] === 'research' && parts.length !== 2) throw new Error(`${relativePath}: research pages must use content/research/<slug>.md`);
+  if (!['kei', 'agentware', 'tutorials', 'research'].includes(parts[0]) && relativePath !== 'skills.md') throw new Error(`${relativePath}: use content/kei, content/agentware, content/tutorials, content/research, or content/skills.md`);
 
   const validated = isoDate(data.validated);
   const validatedWith = typeof data.validated_with === 'string' ? data.validated_with.trim() : '';
@@ -114,6 +116,7 @@ function pageSlug(page) {
 }
 
 function navProduct(page) {
+  if (page.relativePath.startsWith('research/')) return 'research';
   return page.nav_group === 'Start here' || page.product === 'agentware' ? 'agentware' : 'kei';
 }
 
@@ -176,6 +179,8 @@ function siteLinks(pages) {
       : { href: '/tutorials/', label: 'Browse the tutorials' },
     skills: '/skills/',
     tutorials: '/tutorials/',
+    // The Research tab appears once content/research/index.md exists.
+    research: has('research/index.md') ? '/research/' : '',
   };
 }
 
@@ -194,6 +199,7 @@ function globalNav(links, currentPath, className = 'global-nav') {
     item('kei', links.kei, 'Kei'),
     item('skills', links.skills, 'Skills'),
     item('tutorials', links.tutorials, 'Tutorials'),
+    links.research ? item('research', links.research, 'Research') : '',
     item('', githubUrl, 'GitHub', ' aria-label="Haikei Labs on GitHub"'),
     item('', discordUrl, 'Discord', ' target="_blank" rel="noopener noreferrer" aria-label="Haikei on Discord"'),
   ].join('')}</nav>`;
@@ -451,6 +457,12 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     '/agentware/languages/go /agentware/build/go 301',
     '/tutorials/build-a-protected-agent /tutorials/add-permissions-and-audit 301',
     '/tutorials/build-a-protected-agent/ /tutorials/add-permissions-and-audit 301',
+    '/kei/reference/whitepaper-policy-decision-and-enforcement /research/policy-decision-and-enforcement 301',
+    '/kei/reference/whitepaper-policy-decision-and-enforcement.md /research/policy-decision-and-enforcement.md 301',
+    // The Principal Model v1.1 text is published as written; its banner links repository
+    // paths, which resolve relative to its page.
+    '/research/docs/whitepapers/policy-decision-and-enforcement.md /research/policy-decision-and-enforcement 301',
+    '/research/docs/whitepapers/policy-decision-and-enforcement.pdf https://haikeilabs.com/whitepapers/policy-decision-and-enforcement.pdf 301',
     '',
   ].join('\n'));
   await writeFile(path.join(outputDir, 'index.html'), renderHome(pages));

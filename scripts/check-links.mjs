@@ -1,6 +1,7 @@
 import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import MarkdownIt from 'markdown-it';
+import { verbatimMarker } from './check-language.mjs';
 
 const markdown = new MarkdownIt();
 
@@ -33,7 +34,10 @@ export async function checkLinks(contentDir = new URL('../content/', import.meta
   const available = new Set(files.map((file) => file.relativePath));
   const broken = [];
   for (const file of files) {
-    const tokens = markdown.parse(await readFile(file.absolute, 'utf8'), {});
+    const source = await readFile(file.absolute, 'utf8');
+    // Links in a verbatim historical copy are reproduced as written and are not checked.
+    const start = verbatimMarker(source);
+    const tokens = markdown.parse(start < 0 ? source : source.slice(0, start), {});
     for (const token of tokens) {
       if (token.type !== 'inline') continue;
       for (const child of token.children ?? []) {

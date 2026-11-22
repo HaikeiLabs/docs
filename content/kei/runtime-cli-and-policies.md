@@ -30,4 +30,4 @@ For CLI commands and tool calls that may carry sensitive data, you can encrypt t
 
 - [Add guardrails to your agent](/tutorials/add-permissions-and-audit) — allow, deny, audit
 - [Sign in to Kei](https://app.haikeilabs.com) — get started in the console
-- [Policy decision and enforcement (whitepaper)](/kei/reference/whitepaper-policy-decision-and-enforcement)
+- [Policy decision and enforcement (whitepaper)](/research/policy-decision-and-enforcement)

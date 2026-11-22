@@ -109,3 +109,14 @@ test('exempts the product: enum value but still checks title and description', (
     [2, 7],
   );
 });
+
+test('skips text after a verbatim:begin marker, which reproduces a historical document as written', async () => {
+  await withTempFiles(
+    {
+      'archive.md': '---\ntitle: Old paper\n---\n\nA governed intro.\n\n<!-- verbatim:begin -->\n\nEnabling Sovereign Agent Governance.\n',
+    },
+    async (dir) => {
+      assert.deepEqual(await checkLanguage(dir), ['archive.md:5: "governed"']);
+    },
+  );
+});

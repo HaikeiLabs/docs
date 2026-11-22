@@ -88,6 +88,20 @@ export function findViolations(source) {
   return violations;
 }
 
+// Text after a `<!-- verbatim:begin -->` line reproduces a historical document
+// (for example an archived white paper version) exactly as it was written, so
+// the current wording contract does not apply to it. Text before the marker is
+// checked as usual. Lines are kept, so reported line numbers match the file.
+export function verbatimMarker(source) {
+  const match = source.match(/^\s*<!-- verbatim:begin -->\s*$/m);
+  return match ? match.index : -1;
+}
+
+function withoutVerbatim(source) {
+  const start = verbatimMarker(source);
+  return start < 0 ? source : source.slice(0, start);
+}
+
 async function markdownFiles(dir) {
   const entries = await readdir(dir, { withFileTypes: true });
   const files = [];
@@ -107,7 +121,7 @@ export async function checkLanguage(rootDir) {
     const rel = path.relative(root, file).split(path.sep).join('/');
     if (rel === 'skills.md') continue; // content/skills.md is owned by the doc-skills lane
     const text = await readFile(file, 'utf8');
-    for (const violation of findViolations(text)) {
+    for (const violation of findViolations(withoutVerbatim(text))) {
       const fix = violation.fix ? ` → ${violation.fix}` : '';
       problems.push(`${rel}:${violation.line}: "${violation.word}"${fix}`);
     }
