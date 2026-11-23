@@ -14,6 +14,12 @@ product: kei
 
 Everything below the line is the paper exactly as it is at that commit, unedited. Its own footer says "Document Version: 1.1, Date: August 2026"; the historical-draft banner at its top was added on 2026-10-07. Links inside the paper are as written and may point to locations in the source repository. Every version is listed on the [Research](/research/) page.
 
+> **Note:** Errata. Three references in this version are cited incorrectly. The paper text below is left as written.
+>
+> - Reference 6, arXiv:2606.31498, is by Richard Kang and Yudho Diponegoro, not "Hu, C., et al." The title in the reference is correct but leaves out the subtitle, "What MCP, A2A, and ACP Cannot Express" ([arXiv listing](https://arxiv.org/abs/2606.31498)).
+> - Reference 9 gives arXiv:2403.07918. That identifier belongs to a different paper: [On the Societal Impact of Open Foundation Models](https://arxiv.org/abs/2403.07918), by Sayash Kapoor and 24 other authors.
+> - The paper that reference 9 names, "AgentClops: Bridging the Gap between Agent Frameworks and Native LLMs", could not be found on arXiv or elsewhere. The same title appears in the related research table near the end of the paper.
+
 ---
 
 <!-- verbatim:begin -->
