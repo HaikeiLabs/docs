@@ -376,7 +376,8 @@ function renderHome(pages) {
       ],
     }),
   ].join('');
-  const body = `<h1>Haikei documentation</h1><p class="home-intro">There are two ways to start. Build your own agent with Agentware, or bring the coding agent you already use and add Kei policies to it.</p><div class="path-grid">${cards}</div>`;
+  const research = links.research ? `<p class="home-research">Background reading: <a href="${links.research}">Research</a> has the Haikei Labs white papers on Kei policy architecture, with every published version.</p>` : '';
+  const body = `<h1>Haikei documentation</h1><p class="home-intro">There are two ways to start. Build your own agent with Agentware, or bring the coding agent you already use and add Kei policies to it.</p><div class="path-grid">${cards}</div>${research}`;
   return layout('Haikei documentation', sidebar(pages, '', links), body, { fullTitle: homeTitle, links });
 }
 

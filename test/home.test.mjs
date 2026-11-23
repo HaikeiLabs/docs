@@ -70,6 +70,23 @@ test('docs home: quickstart CTA links to the canonical quickstart', () => withSi
   assert.match(html, /<a class="path-primary button-primary" href="\/agentware\/build\/overview" data-placement="docs-home-quickstart">Start the quickstart<\/a>/);
 }));
 
+test('docs home: one line links the Research section once it exists', () => withSite({
+  'research/index.md': page({ title: 'Research', type: 'reference' }),
+}, async (paths) => {
+  await buildDocs(paths);
+  const html = await read(paths, 'index.html');
+  const main = html.match(/<h1>Haikei documentation<\/h1>[\s\S]*?<\/main>/)[0];
+  const line = main.match(/<p class="home-research">[\s\S]*?<\/p>/);
+  assert.ok(line, 'home page has a Research line');
+  assert.deepEqual(hrefs(line[0]), ['/research/']);
+  assert.equal((html.match(/<section class="path-card"/g) ?? []).length, 2);
+}));
+
+test('docs home: no Research line before content/research/index.md exists', () => withSite({}, async (paths) => {
+  await buildDocs(paths);
+  assert.doesNotMatch(await read(paths, 'index.html'), /home-research/);
+}));
+
 test('docs home: until peer pages land, cards fall back to pages that exist', () => withSite({
   'tutorials/hacker-news-research-agent.md': null,
   'kei/get-started/bring-your-agent.md': null,
