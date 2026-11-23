@@ -460,3 +460,17 @@ test('link check ignores links after a verbatim:begin marker but still checks li
     await rm(paths.root, { recursive: true, force: true });
   }
 });
+
+test('real content: each Principal Model version page and the Research index link its PDF', async () => {
+  const research = new URL('../content/research/', import.meta.url).pathname;
+  const index = await readFile(path.join(research, 'index.md'), 'utf8');
+  const versions = (await readdir(research)).filter((name) => /^principal-model-v\d+-\d+-.+\.md$/.test(name));
+  assert.equal(versions.length, 2);
+  for (const name of versions) {
+    const pdf = `https://haikeilabs.com/whitepapers/${name.replace(/\.md$/, '.pdf')}`;
+    const source = await readFile(path.join(research, name), 'utf8');
+    const intro = source.split('<!-- verbatim:begin -->')[0];
+    assert.ok(intro.includes(`](${pdf})`), `${name} links ${pdf} above the verbatim text`);
+    assert.ok(index.includes(`](${pdf})`), `research/index.md links ${pdf}`);
+  }
+});

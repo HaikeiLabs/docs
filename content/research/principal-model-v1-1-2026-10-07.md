@@ -14,6 +14,8 @@ product: kei
 
 Everything below the line is the paper exactly as it is at that commit, unedited. Its own footer says "Document Version: 1.1, Date: August 2026"; the historical-draft banner at its top was added on 2026-10-07. Links inside the paper are as written and may point to locations in the source repository. Every version is listed on the [Research](/research/) page.
 
+Also available as a [PDF](https://haikeilabs.com/whitepapers/principal-model-v1-1-2026-10-07.pdf). The PDF holds the paper text only; the errata below are not in it.
+
 > **Note:** Errata. Three references in this version are cited incorrectly. The paper text below is left as written.
 >
 > - Reference 6, arXiv:2606.31498, is by Richard Kang and Yudho Diponegoro, not "Hu, C., et al." The title in the reference is correct but leaves out the subtitle, "What MCP, A2A, and ACP Cannot Express" ([arXiv listing](https://arxiv.org/abs/2606.31498)).

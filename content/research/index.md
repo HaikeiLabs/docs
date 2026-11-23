@@ -23,10 +23,10 @@ Policy Decision Points (PDPs), Policy Enforcement Points (PEPs), and how Kei enf
 
 An early design for user-delegated attribute-based access control (ABAC): an AI agent acts with the authority of the person it works for, every tool call is checked against policy, and every decision is attributed to that person. The current policy architecture replaces the components this paper describes, so read it as history, not as a description of Kei today.
 
-| Version | Date | Source commit | What changed |
-|---|---|---|---|
-| [1.0](/research/principal-model-v1-0-2026-07-23) | 2026-07-23 | `81fba36f` | Original draft. |
-| [1.1](/research/principal-model-v1-1-2026-10-07) | 2026-10-07 | `97dca0c1` | Last revision. |
+| Version | Date | Source commit | What changed | PDF |
+|---|---|---|---|---|
+| [1.0](/research/principal-model-v1-0-2026-07-23) | 2026-07-23 | `81fba36f` | Original draft. | [PDF](https://haikeilabs.com/whitepapers/principal-model-v1-0-2026-07-23.pdf) |
+| [1.1](/research/principal-model-v1-1-2026-10-07) | 2026-10-07 | `97dca0c1` | Last revision. | [PDF](https://haikeilabs.com/whitepapers/principal-model-v1-1-2026-10-07.pdf) |
 
 Between the two published versions, the paper was revised several times:
 
