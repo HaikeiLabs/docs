@@ -24,6 +24,9 @@ async function resolvesInternalUrl(url, currentFile, outputDir) {
   const targetUrl = new URL(url, pageUrl);
   if (targetUrl.origin !== pageUrl.origin) return true;
   const pathname = decodeURIComponent(targetUrl.pathname);
+  // A path that _redirects sends somewhere else also resolves.
+  const redirects = await readFile(path.join(outputDir, '_redirects'), 'utf8').catch(() => '');
+  if (redirects.split('\n').some((line) => line.split(/\s+/)[0] === pathname)) return true;
   const target = path.resolve(outputDir, `.${pathname}`);
   if (target !== outputDir && !target.startsWith(`${outputDir}${path.sep}`)) return false;
   const candidates = [target, `${target}.html`, path.join(target, 'index.html')];
@@ -397,4 +400,63 @@ test('404 uses the shared shell and offers both starting paths', async () => {
     assert.match(html, /Build your own agent/);
     assert.match(html, /Bring the agent you use/);
   } finally { await rm(paths.root, { recursive: true, force: true }); }
+});
+
+test('research pages build under /research/ with a Research tab and sidebar section', async () => {
+  const paths = await fixture();
+  try {
+    await mkdir(path.join(paths.contentDir, 'research'), { recursive: true });
+    await writeFile(path.join(paths.contentDir, 'research/index.md'), '---\ntitle: Research\ndescription: Test page.\ntype: reference\nproduct: kei\n---\n\nPapers.\n');
+    await writeFile(path.join(paths.contentDir, 'research/paper.md'), '---\ntitle: A paper\ndescription: Test page.\ntype: reference\nproduct: kei\n---\n\nBody.\n');
+    await buildDocs({ ...paths, assetsDir });
+    const html = await readFile(path.join(paths.outputDir, 'research/paper.html'), 'utf8');
+    const header = html.match(/<header class="site-header">[\s\S]*?<\/header>/)[0];
+    assert.match(header, /<a href="\/research\/" aria-current="true">Research<\/a>/);
+    assert.match(html, /<div class="nav-product">Research<\/div>[\s\S]*?<a href="\/research\/paper" aria-current="page">A paper<\/a>/);
+    assert.equal((await stat(path.join(paths.outputDir, 'research/index.html'))).isFile(), true);
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
+
+test('build rejects research pages nested below content/research/<slug>.md', async () => {
+  const paths = await fixture();
+  try {
+    await mkdir(path.join(paths.contentDir, 'research/deep'), { recursive: true });
+    await writeFile(path.join(paths.contentDir, 'research/deep/paper.md'), '---\ntitle: A paper\ndescription: Test page.\ntype: reference\nproduct: kei\n---\n\nBody.\n');
+    await assert.rejects(buildDocs({ ...paths, assetsDir }), /research pages must use content\/research\/<slug>\.md/);
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
+
+test('the policy decision and enforcement white paper keeps its old Kei reference URLs as 301s to Research', async () => {
+  const paths = await fixture();
+  try {
+    await buildDocs({ ...paths, assetsDir });
+    const rules = (await readFile(path.join(paths.outputDir, '_redirects'), 'utf8')).trim().split('\n').map((line) => line.split(/\s+/));
+    for (const [from, destination] of [
+      ['/kei/reference/whitepaper-policy-decision-and-enforcement', '/research/policy-decision-and-enforcement'],
+      ['/kei/reference/whitepaper-policy-decision-and-enforcement.md', '/research/policy-decision-and-enforcement.md'],
+      // The Principal Model v1.1 banner links repository paths as written; they resolve from its page.
+      ['/research/docs/whitepapers/policy-decision-and-enforcement.md', '/research/policy-decision-and-enforcement'],
+      ['/research/docs/whitepapers/policy-decision-and-enforcement.pdf', 'https://haikeilabs.com/whitepapers/policy-decision-and-enforcement.pdf'],
+    ]) assert.deepEqual(rules.find(([source]) => source === from), [from, destination, '301']);
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
+});
+
+test('link check ignores links after a verbatim:begin marker but still checks links before it', async () => {
+  const paths = await fixture();
+  try {
+    await mkdir(path.join(paths.contentDir, 'research'), { recursive: true });
+    const page = (before) => `---\ntitle: Old\ndescription: Test page.\ntype: reference\nproduct: kei\n---\n\n${before}\n\n<!-- verbatim:begin -->\n\nSee [the old path](docs/whitepapers/x.md).\n`;
+    await writeFile(path.join(paths.contentDir, 'research/old.md'), page('Intro.'));
+    await buildDocs({ ...paths, assetsDir });
+    await writeFile(path.join(paths.contentDir, 'research/old.md'), page('See [missing](/research/missing).'));
+    await assert.rejects(buildDocs({ ...paths, assetsDir }), /research\/old\.md: \/research\/missing/);
+  } finally {
+    await rm(paths.root, { recursive: true, force: true });
+  }
 });
