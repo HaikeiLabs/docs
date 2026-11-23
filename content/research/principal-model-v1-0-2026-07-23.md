@@ -14,6 +14,8 @@ product: kei
 
 Everything below the line is the paper exactly as it is at that commit, unedited. Links inside the paper are as written and may point to locations in the source repository. Every version is listed on the [Research](/research/) page.
 
+Also available as a [PDF](https://haikeilabs.com/whitepapers/principal-model-v1-0-2026-07-23.pdf).
+
 ---
 
 <!-- verbatim:begin -->
