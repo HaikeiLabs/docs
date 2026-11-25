@@ -11,7 +11,9 @@ export function readProgress(storage) {
   try { const value = JSON.parse(storage.getItem('aw-course-done') || '[]'); return new Set(Array.isArray(value) ? value : []); } catch { return new Set(); }
 }
 export function saveProgress(storage, done) { try { storage.setItem('aw-course-done', JSON.stringify([...done])); } catch {} }
+// Once a lesson is complete its quiz is locked: any later answer is a no-op, so the quiz keeps one coherent completed state.
 export function recordAnswer(done, lessonId, answer, correct) {
+  if (done.has(lessonId)) return { correct: true, newlyComplete: false, locked: true };
   if (answer !== correct) return { correct: false, newlyComplete: false };
   const newlyComplete = !done.has(lessonId); done.add(lessonId);
   return { correct: true, newlyComplete };
@@ -35,6 +37,7 @@ if (typeof document !== 'undefined') {
     quiz.querySelectorAll('[data-quiz-answer]').forEach(option => {
       if (option === button) option.dataset.result = correct ? 'right' : 'wrong';
       else if (correct) delete option.dataset.result;
+      if (correct) option.setAttribute('aria-disabled', 'true');
     });
     const feedback = quiz.querySelector('[data-feedback]');
     feedback.textContent = correct ? feedback.dataset.why : 'Not this one. Try again: reread the steps above for the detail the question asks about.';
@@ -88,6 +91,7 @@ if (typeof document !== 'undefined') {
     const button = event.target.closest('[data-quiz-answer]'); if (!button) return;
     const quiz = button.closest('.course-quiz'), lesson = button.closest('.lesson');
     const result = recordAnswer(done, lesson.id, button.dataset.quizAnswer, quiz.dataset.answer);
+    if (result.locked) return;
     markQuiz(quiz, button, result.correct);
     if (!result.correct) return;
     if (result.newlyComplete) { saveProgress(storage, done); track('course_lesson_complete', lesson.id); progress(); }
