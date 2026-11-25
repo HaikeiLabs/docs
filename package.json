@@ -16,12 +16,16 @@
     "test": "node --test",
     "preview": "node scripts/preview.mjs",
     "check:course": "node scripts/course-validate.mjs",
-    "build:fixture": "node scripts/build-fixture.mjs"
+    "build:fixture": "node scripts/build-fixture.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@haikeilabs/brand": "file:vendor/haikeilabs-brand-0.8.0.tgz",
     "ajv": "^8.20.0",
     "markdown-it": "^14.1.0",
     "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
   }
 }
