@@ -34,3 +34,10 @@ test('widget assets contain no raw colors', async () => {
   assert.doesNotMatch(text, /#[0-9a-f]{3,8}\b|rgba?\(/i);
  }
 });
+
+test('runtime code lines reset the site inline-code decoration', async () => {
+ const css = await readFile(new URL('../assets/course/widgets/rtdebugger.css', import.meta.url), 'utf8');
+ const rule = css.match(/\.rt-debugger\s+\.rt-code\s+\.rt-line\s*>\s*code\s*\{([^}]*)\}/)?.[1];
+ assert.ok(rule, 'scoped code reset is present');
+ for (const declaration of [/background:\s*none/, /border:\s*0/, /padding:\s*0/, /font:\s*inherit/]) assert.match(rule, declaration);
+});

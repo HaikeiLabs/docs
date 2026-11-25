@@ -11,6 +11,7 @@
 .rt-code { overflow-x: auto; }
 .rt-label, .rt-lap { font: 500 .75rem var(--font-mono); color: var(--color-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: .5rem; }
 .rt-line { display: flex; align-items: baseline; min-width: max-content; font: 500 .8rem/1.65 var(--font-mono); white-space: pre; }
+.rt-debugger .rt-code .rt-line > code { background: none; border: 0; padding: 0; font: inherit; overflow-wrap: normal; }
 .rt-line.rt-current { background: var(--color-accent-soft); }
 .rt-bp, .rt-bp-space { width: 1.5rem; flex: none; }
 .rt-bp { border: 0; padding: 0; color: var(--color-accent-text); background: transparent; cursor: pointer; }
