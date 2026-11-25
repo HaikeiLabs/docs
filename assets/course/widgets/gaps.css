@@ -1,0 +1,18 @@
+.gaps-widget { min-width: 0; color: var(--color-content); font-family: Inter, sans-serif; }
+.gaps-widget * { box-sizing: border-box; }
+.gaps-list { display: grid; gap: .75rem; }
+.gaps-card { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: .5rem 1.25rem; min-width: 0; padding: 1rem; border: 1px solid var(--color-line); border-radius: .5rem; background: var(--color-surface); }
+.gaps-title { display: flex; flex-direction: column; align-items: flex-start; gap: .5rem; }
+.gaps-severity { padding: 0 .5rem; border: 1px solid var(--color-line-strong); border-radius: 999px; color: var(--color-muted); font: 500 .6875rem/1.6 'JetBrains Mono', monospace; letter-spacing: .06em; }
+.gaps-severity.is-high { background: var(--kei-deny-bg); border-color: var(--kei-deny-line); color: var(--kei-deny-ink); }
+.gaps-card dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .25rem .875rem; min-width: 0; margin: 0; font-size: .875rem; line-height: 1.6; }
+.gaps-card dt { color: var(--color-muted); font: 500 .6875rem/2 'JetBrains Mono', monospace; text-transform: uppercase; }
+.gaps-card dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+.gaps-mono { font: 500 .78rem/1.75 'JetBrains Mono', monospace; }
+.gaps-repro { margin-top: 1rem; }
+.gaps-repro summary { cursor: pointer; font-weight: 600; }
+.gaps-repro summary:focus-visible, .gaps-code pre:focus-visible { outline: 2px solid var(--color-accent-text); outline-offset: 2px; }
+.gaps-code { min-width: 0; margin-top: .75rem; overflow: hidden; border: 1px solid var(--color-line); border-radius: .5rem; background: var(--color-surface); }
+.gaps-file { padding: .6rem .8rem; border-bottom: 1px solid var(--color-line); color: var(--color-muted); font: 500 .75rem 'JetBrains Mono', monospace; }
+.gaps-code pre { max-width: 100%; margin: 0; padding: .8rem; overflow: auto; white-space: pre; font: 500 .8rem/1.6 'JetBrains Mono', monospace; }
+@media (max-width: 700px) { .gaps-card { grid-template-columns: minmax(0, 1fr); } .gaps-card dl { grid-template-columns: minmax(0, 1fr); gap: .1rem; } .gaps-card dd { margin-bottom: .5rem; } }
