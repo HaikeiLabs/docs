@@ -7,3 +7,4 @@
 .lesson[hidden] { display: none; }
 .widget { min-width: 0; }
 @media (max-width: 860px) { .layout.course-layout { grid-template-columns: minmax(0, 1fr); } }
+.course-rail nav > p, .lesson > p:first-child { font: 500 .875rem/1.5 var(--font-mono); }
