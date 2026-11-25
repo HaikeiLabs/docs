@@ -4,7 +4,7 @@
       "id": "gptoss",
       "name": "GPT-OSS",
       "sub": "",
-      "note": "Tools are a TypeScript-style namespace functions. A call goes on the commentary channel, addressed to=functions.NAME, and ends with &lt;|call|&gt;. There are no call ids.",
+      "note": "Tools are a TypeScript-style `namespace functions`. A call goes on the `commentary` channel, addressed `to=functions.NAME`, and ends with `<|call|>`. There are no call ids.",
       "panes": [
         {
           "label": "Declare",
