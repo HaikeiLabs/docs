@@ -24,7 +24,11 @@ function checkSchema(name, value, file) {
 }
 // Only contract fields marked as inline Markdown are checked here. Verbatim
 // source fields can legitimately contain HTML-like tokens and entities.
-function checkInlineMarkdown(value, field) {
+// Inline code spans are skipped: the compare widget and the lede renderer escape
+// them, so `<think>` or `&amp;` inside backticks shows as literal text. The span
+// pattern matches the compare widget's inlineMarkdown (single backticks, one line).
+function checkInlineMarkdown(raw, field) {
+  const value = raw.replace(/`[^`\n]+`/g, '');
   if (/<\/?[a-z][a-z0-9:-]*(?:\s[^<>]*?)?\s*\/?>/i.test(value) || /&(?:#[xX][0-9a-f]+|#\d+|[a-z][a-z0-9]+);/i.test(value)) {
     throw new Error(`${field}: use inline Markdown instead of HTML tags or entities`);
   }
