@@ -1,0 +1,736 @@
+{
+  "anthropic": [
+    {
+      "iteration": 1,
+      "request": {
+        "model": "claude-model-id",
+        "max_tokens": 1024,
+        "system": "You are a concise weather assistant.",
+        "thinking": {
+          "type": "enabled",
+          "budget_tokens": 2048
+        },
+        "tools": [
+          {
+            "name": "get_weather",
+            "description": "Get the current weather for a city.",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "City name, e.g. Tokyo"
+                },
+                "unit": {
+                  "type": "string",
+                  "enum": [
+                    "celsius",
+                    "fahrenheit"
+                  ]
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        ],
+        "messages": [
+          {
+            "role": "user",
+            "content": "Is it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?"
+          }
+        ]
+      },
+      "response": {
+        "id": "msg_01",
+        "type": "message",
+        "role": "assistant",
+        "stop_reason": "tool_use",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "Need current weather for both cities. I can call get_weather twice in parallel.",
+            "signature": "EuYBCkQYAiJA...opaque..."
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_01A",
+            "name": "get_weather",
+            "input": {
+              "city": "Tokyo"
+            }
+          },
+          {
+            "type": "tool_use",
+            "id": "toolu_01B",
+            "name": "get_weather",
+            "input": {
+              "city": "Seoul"
+            }
+          }
+        ]
+      },
+      "tools_run": [
+        {
+          "name": "get_weather",
+          "args": {
+            "city": "Tokyo"
+          },
+          "result": "{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}"
+        },
+        {
+          "name": "get_weather",
+          "args": {
+            "city": "Seoul"
+          },
+          "result": "{\"city\": \"Seoul\", \"temp\": 17, \"unit\": \"celsius\", \"sky\": \"clear\"}"
+        }
+      ],
+      "done": false,
+      "appended": [
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "thinking",
+              "thinking": "Need current weather for both cities. I can call get_weather twice in parallel.",
+              "signature": "EuYBCkQYAiJA...opaque..."
+            },
+            {
+              "type": "tool_use",
+              "id": "toolu_01A",
+              "name": "get_weather",
+              "input": {
+                "city": "Tokyo"
+              }
+            },
+            {
+              "type": "tool_use",
+              "id": "toolu_01B",
+              "name": "get_weather",
+              "input": {
+                "city": "Seoul"
+              }
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "tool_result",
+              "tool_use_id": "toolu_01A",
+              "content": "{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}"
+            },
+            {
+              "type": "tool_result",
+              "tool_use_id": "toolu_01B",
+              "content": "{\"city\": \"Seoul\", \"temp\": 17, \"unit\": \"celsius\", \"sky\": \"clear\"}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "request": {
+        "model": "claude-model-id",
+        "max_tokens": 1024,
+        "system": "You are a concise weather assistant.",
+        "thinking": {
+          "type": "enabled",
+          "budget_tokens": 2048
+        },
+        "tools": [
+          {
+            "name": "get_weather",
+            "description": "Get the current weather for a city.",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string",
+                  "description": "City name, e.g. Tokyo"
+                },
+                "unit": {
+                  "type": "string",
+                  "enum": [
+                    "celsius",
+                    "fahrenheit"
+                  ]
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        ],
+        "messages": [
+          {
+            "role": "user",
+            "content": "Is it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "Need current weather for both cities. I can call get_weather twice in parallel.",
+                "signature": "EuYBCkQYAiJA...opaque..."
+              },
+              {
+                "type": "tool_use",
+                "id": "toolu_01A",
+                "name": "get_weather",
+                "input": {
+                  "city": "Tokyo"
+                }
+              },
+              {
+                "type": "tool_use",
+                "id": "toolu_01B",
+                "name": "get_weather",
+                "input": {
+                  "city": "Seoul"
+                }
+              }
+            ]
+          },
+          {
+            "role": "user",
+            "content": [
+              {
+                "type": "tool_result",
+                "tool_use_id": "toolu_01A",
+                "content": "{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}"
+              },
+              {
+                "type": "tool_result",
+                "tool_use_id": "toolu_01B",
+                "content": "{\"city\": \"Seoul\", \"temp\": 17, \"unit\": \"celsius\", \"sky\": \"clear\"}"
+              }
+            ]
+          }
+        ]
+      },
+      "response": {
+        "id": "msg_02",
+        "type": "message",
+        "role": "assistant",
+        "stop_reason": "end_turn",
+        "content": [
+          {
+            "type": "text",
+            "text": "Tokyo is warmer (22°C vs 17°C in Seoul). Bring an umbrella in Tokyo—it's raining. Seoul is clear."
+          }
+        ]
+      },
+      "tools_run": null,
+      "done": true,
+      "appended": [
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "Tokyo is warmer (22°C vs 17°C in Seoul). Bring an umbrella in Tokyo—it's raining. Seoul is clear."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "gpt-oss": [
+    {
+      "iteration": 1,
+      "request": {
+        "model": "openai/gpt-oss-20b",
+        "prompt": "<|start|>system<|message|>You are ChatGPT, a large language model trained by OpenAI.\nKnowledge cutoff: 2024-06\nCurrent date: 2026-11-20\n\nReasoning: medium\n\n# Valid channels: analysis, commentary, final. Channel must be included for every message.\nCalls to these tools must go to the commentary channel: 'functions'.<|end|><|start|>developer<|message|># Instructions\n\nYou are a concise weather assistant.\n\n# Tools\n\n## functions\n\nnamespace functions {\n\n// Get the current weather for a city.\ntype get_weather = (_: {\n// City name, e.g. Tokyo\ncity: string,\nunit?: \"celsius\" | \"fahrenheit\",\n}) => any;\n\n} // namespace functions<|end|><|start|>user<|message|>Is it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?<|end|><|start|>assistant",
+        "max_tokens": 1024,
+        "skip_special_tokens": false
+      },
+      "chat_request": {
+        "model": "openai/gpt-oss-20b",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a concise weather assistant."
+          },
+          {
+            "role": "user",
+            "content": "Is it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?"
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "description": "Get the current weather for a city.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "city": {
+                    "type": "string",
+                    "description": "City name, e.g. Tokyo"
+                  },
+                  "unit": {
+                    "type": "string",
+                    "enum": [
+                      "celsius",
+                      "fahrenheit"
+                    ]
+                  }
+                },
+                "required": [
+                  "city"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "response": "<|channel|>analysis<|message|>Need weather for Tokyo and Seoul. Start with Tokyo.<|end|><|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{\"city\":\"Tokyo\"}<|call|>",
+      "tools_run": [
+        {
+          "name": "get_weather",
+          "args": {
+            "city": "Tokyo"
+          },
+          "result": "{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}"
+        }
+      ],
+      "done": false,
+      "final": null,
+      "appended": [
+        {
+          "role": "assistant",
+          "content": null,
+          "reasoning_content": "Need weather for Tokyo and Seoul. Start with Tokyo.",
+          "tool_calls": [
+            {
+              "id": "call_1a",
+              "type": "function",
+              "function": {
+                "name": "get_weather",
+                "arguments": "{\"city\": \"Tokyo\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_1a",
+          "content": "{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "request": {
+        "model": "openai/gpt-oss-20b",
+        "prompt": "<|start|>system<|message|>You are ChatGPT, a large language model trained by OpenAI.\nKnowledge cutoff: 2024-06\nCurrent date: 2026-11-20\n\nReasoning: medium\n\n# Valid channels: analysis, commentary, final. Channel must be included for every message.\nCalls to these tools must go to the commentary channel: 'functions'.<|end|><|start|>developer<|message|># Instructions\n\nYou are a concise weather assistant.\n\n# Tools\n\n## functions\n\nnamespace functions {\n\n// Get the current weather for a city.\ntype get_weather = (_: {\n// City name, e.g. Tokyo\ncity: string,\nunit?: \"celsius\" | \"fahrenheit\",\n}) => any;\n\n} // namespace functions<|end|><|start|>user<|message|>Is it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?<|end|><|start|>assistant<|channel|>analysis<|message|>Need weather for Tokyo and Seoul. Start with Tokyo.<|end|><|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{\"city\":\"Tokyo\"}<|call|><|start|>functions.get_weather to=assistant<|channel|>commentary<|message|>{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}<|end|><|start|>assistant",
+        "max_tokens": 1024,
+        "skip_special_tokens": false
+      },
+      "chat_request": {
+        "model": "openai/gpt-oss-20b",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a concise weather assistant."
+          },
+          {
+            "role": "user",
+            "content": "Is it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?"
+          },
+          {
+            "role": "assistant",
+            "content": null,
+            "reasoning_content": "Need weather for Tokyo and Seoul. Start with Tokyo.",
+            "tool_calls": [
+              {
+                "id": "call_1a",
+                "type": "function",
+                "function": {
+                  "name": "get_weather",
+                  "arguments": "{\"city\": \"Tokyo\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_1a",
+            "content": "{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}"
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "description": "Get the current weather for a city.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "city": {
+                    "type": "string",
+                    "description": "City name, e.g. Tokyo"
+                  },
+                  "unit": {
+                    "type": "string",
+                    "enum": [
+                      "celsius",
+                      "fahrenheit"
+                    ]
+                  }
+                },
+                "required": [
+                  "city"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "response": "<|channel|>analysis<|message|>Tokyo 22C rain. Now Seoul.<|end|><|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{\"city\":\"Seoul\"}<|call|>",
+      "tools_run": [
+        {
+          "name": "get_weather",
+          "args": {
+            "city": "Seoul"
+          },
+          "result": "{\"city\": \"Seoul\", \"temp\": 17, \"unit\": \"celsius\", \"sky\": \"clear\"}"
+        }
+      ],
+      "done": false,
+      "final": null,
+      "appended": [
+        {
+          "role": "assistant",
+          "content": null,
+          "reasoning_content": "Tokyo 22C rain. Now Seoul.",
+          "tool_calls": [
+            {
+              "id": "call_2a",
+              "type": "function",
+              "function": {
+                "name": "get_weather",
+                "arguments": "{\"city\": \"Seoul\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_2a",
+          "content": "{\"city\": \"Seoul\", \"temp\": 17, \"unit\": \"celsius\", \"sky\": \"clear\"}"
+        }
+      ]
+    },
+    {
+      "iteration": 3,
+      "request": {
+        "model": "openai/gpt-oss-20b",
+        "prompt": "<|start|>system<|message|>You are ChatGPT, a large language model trained by OpenAI.\nKnowledge cutoff: 2024-06\nCurrent date: 2026-11-20\n\nReasoning: medium\n\n# Valid channels: analysis, commentary, final. Channel must be included for every message.\nCalls to these tools must go to the commentary channel: 'functions'.<|end|><|start|>developer<|message|># Instructions\n\nYou are a concise weather assistant.\n\n# Tools\n\n## functions\n\nnamespace functions {\n\n// Get the current weather for a city.\ntype get_weather = (_: {\n// City name, e.g. Tokyo\ncity: string,\nunit?: \"celsius\" | \"fahrenheit\",\n}) => any;\n\n} // namespace functions<|end|><|start|>user<|message|>Is it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?<|end|><|start|>assistant<|channel|>analysis<|message|>Need weather for Tokyo and Seoul. Start with Tokyo.<|end|><|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{\"city\":\"Tokyo\"}<|call|><|start|>functions.get_weather to=assistant<|channel|>commentary<|message|>{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}<|end|><|start|>assistant<|channel|>analysis<|message|>Tokyo 22C rain. Now Seoul.<|end|><|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{\"city\":\"Seoul\"}<|call|><|start|>functions.get_weather to=assistant<|channel|>commentary<|message|>{\"city\": \"Seoul\", \"temp\": 17, \"unit\": \"celsius\", \"sky\": \"clear\"}<|end|><|start|>assistant",
+        "max_tokens": 1024,
+        "skip_special_tokens": false
+      },
+      "chat_request": {
+        "model": "openai/gpt-oss-20b",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a concise weather assistant."
+          },
+          {
+            "role": "user",
+            "content": "Is it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?"
+          },
+          {
+            "role": "assistant",
+            "content": null,
+            "reasoning_content": "Need weather for Tokyo and Seoul. Start with Tokyo.",
+            "tool_calls": [
+              {
+                "id": "call_1a",
+                "type": "function",
+                "function": {
+                  "name": "get_weather",
+                  "arguments": "{\"city\": \"Tokyo\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_1a",
+            "content": "{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}"
+          },
+          {
+            "role": "assistant",
+            "content": null,
+            "reasoning_content": "Tokyo 22C rain. Now Seoul.",
+            "tool_calls": [
+              {
+                "id": "call_2a",
+                "type": "function",
+                "function": {
+                  "name": "get_weather",
+                  "arguments": "{\"city\": \"Seoul\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_2a",
+            "content": "{\"city\": \"Seoul\", \"temp\": 17, \"unit\": \"celsius\", \"sky\": \"clear\"}"
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "description": "Get the current weather for a city.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "city": {
+                    "type": "string",
+                    "description": "City name, e.g. Tokyo"
+                  },
+                  "unit": {
+                    "type": "string",
+                    "enum": [
+                      "celsius",
+                      "fahrenheit"
+                    ]
+                  }
+                },
+                "required": [
+                  "city"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "response": "<|channel|>analysis<|message|>Seoul 17C clear. Tokyo warmer, umbrella for Tokyo.<|end|><|start|>assistant<|channel|>final<|message|>Tokyo is warmer (22°C vs 17°C). Take an umbrella in Tokyo—it's raining. Seoul is clear.<|return|>",
+      "tools_run": null,
+      "done": true,
+      "final": "Tokyo is warmer (22°C vs 17°C). Take an umbrella in Tokyo—it's raining. Seoul is clear.",
+      "appended": [
+        {
+          "role": "assistant",
+          "content": "Tokyo is warmer (22°C vs 17°C). Take an umbrella in Tokyo—it's raining. Seoul is clear.",
+          "reasoning_content": "Seoul 17C clear. Tokyo warmer, umbrella for Tokyo."
+        }
+      ]
+    }
+  ],
+  "qwen": [
+    {
+      "iteration": 1,
+      "request": {
+        "model": "Qwen/Qwen3-8B",
+        "prompt": "<|im_start|>system\nYou are a concise weather assistant.\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"get_weather\", \"description\": \"Get the current weather for a city.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"city\": {\"type\": \"string\", \"description\": \"City name, e.g. Tokyo\"}, \"unit\": {\"type\": \"string\", \"enum\": [\"celsius\", \"fahrenheit\"]}}, \"required\": [\"city\"]}}}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\nIs it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?<|im_end|>\n<|im_start|>assistant\n",
+        "max_tokens": 1024,
+        "skip_special_tokens": false
+      },
+      "chat_request": {
+        "model": "Qwen/Qwen3-8B",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a concise weather assistant."
+          },
+          {
+            "role": "user",
+            "content": "Is it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?"
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "description": "Get the current weather for a city.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "city": {
+                    "type": "string",
+                    "description": "City name, e.g. Tokyo"
+                  },
+                  "unit": {
+                    "type": "string",
+                    "enum": [
+                      "celsius",
+                      "fahrenheit"
+                    ]
+                  }
+                },
+                "required": [
+                  "city"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "response": "<think>\nI need the weather in both cities. I can call get_weather for each.\n</think>\n\n<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Tokyo\"}}\n</tool_call>\n<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Seoul\"}}\n</tool_call><|im_end|>",
+      "tools_run": [
+        {
+          "name": "get_weather",
+          "args": {
+            "city": "Tokyo"
+          },
+          "result": "{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}"
+        },
+        {
+          "name": "get_weather",
+          "args": {
+            "city": "Seoul"
+          },
+          "result": "{\"city\": \"Seoul\", \"temp\": 17, \"unit\": \"celsius\", \"sky\": \"clear\"}"
+        }
+      ],
+      "done": false,
+      "final": null,
+      "appended": [
+        {
+          "role": "assistant",
+          "content": null,
+          "reasoning_content": "I need the weather in both cities. I can call get_weather for each.",
+          "tool_calls": [
+            {
+              "id": "call_1a",
+              "type": "function",
+              "function": {
+                "name": "get_weather",
+                "arguments": "{\"city\": \"Tokyo\"}"
+              }
+            },
+            {
+              "id": "call_1b",
+              "type": "function",
+              "function": {
+                "name": "get_weather",
+                "arguments": "{\"city\": \"Seoul\"}"
+              }
+            }
+          ]
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_1a",
+          "content": "{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}"
+        },
+        {
+          "role": "tool",
+          "tool_call_id": "call_1b",
+          "content": "{\"city\": \"Seoul\", \"temp\": 17, \"unit\": \"celsius\", \"sky\": \"clear\"}"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "request": {
+        "model": "Qwen/Qwen3-8B",
+        "prompt": "<|im_start|>system\nYou are a concise weather assistant.\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"get_weather\", \"description\": \"Get the current weather for a city.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"city\": {\"type\": \"string\", \"description\": \"City name, e.g. Tokyo\"}, \"unit\": {\"type\": \"string\", \"enum\": [\"celsius\", \"fahrenheit\"]}}, \"required\": [\"city\"]}}}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\nIs it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?<|im_end|>\n<|im_start|>assistant\n<think>\nI need the weather in both cities. I can call get_weather for each.\n</think>\n\n<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Tokyo\"}}\n</tool_call>\n<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Seoul\"}}\n</tool_call><|im_end|>\n<|im_start|>user\n<tool_response>\n{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}\n</tool_response>\n<tool_response>\n{\"city\": \"Seoul\", \"temp\": 17, \"unit\": \"celsius\", \"sky\": \"clear\"}\n</tool_response><|im_end|>\n<|im_start|>assistant\n",
+        "max_tokens": 1024,
+        "skip_special_tokens": false
+      },
+      "chat_request": {
+        "model": "Qwen/Qwen3-8B",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are a concise weather assistant."
+          },
+          {
+            "role": "user",
+            "content": "Is it warmer in Tokyo or Seoul right now? Do I need an umbrella in either?"
+          },
+          {
+            "role": "assistant",
+            "content": null,
+            "reasoning_content": "I need the weather in both cities. I can call get_weather for each.",
+            "tool_calls": [
+              {
+                "id": "call_1a",
+                "type": "function",
+                "function": {
+                  "name": "get_weather",
+                  "arguments": "{\"city\": \"Tokyo\"}"
+                }
+              },
+              {
+                "id": "call_1b",
+                "type": "function",
+                "function": {
+                  "name": "get_weather",
+                  "arguments": "{\"city\": \"Seoul\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_1a",
+            "content": "{\"city\": \"Tokyo\", \"temp\": 22, \"unit\": \"celsius\", \"sky\": \"rain\"}"
+          },
+          {
+            "role": "tool",
+            "tool_call_id": "call_1b",
+            "content": "{\"city\": \"Seoul\", \"temp\": 17, \"unit\": \"celsius\", \"sky\": \"clear\"}"
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "get_weather",
+              "description": "Get the current weather for a city.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "city": {
+                    "type": "string",
+                    "description": "City name, e.g. Tokyo"
+                  },
+                  "unit": {
+                    "type": "string",
+                    "enum": [
+                      "celsius",
+                      "fahrenheit"
+                    ]
+                  }
+                },
+                "required": [
+                  "city"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "response": "<think>\nTokyo 22 rain, Seoul 17 clear.\n</think>\n\nTokyo is warmer (22°C vs 17°C). Bring an umbrella in Tokyo—it's raining. Seoul is clear.<|im_end|>",
+      "tools_run": null,
+      "done": true,
+      "final": "Tokyo is warmer (22°C vs 17°C). Bring an umbrella in Tokyo—it's raining. Seoul is clear.",
+      "appended": [
+        {
+          "role": "assistant",
+          "content": "Tokyo is warmer (22°C vs 17°C). Bring an umbrella in Tokyo—it's raining. Seoul is clear.",
+          "reasoning_content": "Tokyo 22 rain, Seoul 17 clear."
+        }
+      ]
+    }
+  ]
+}

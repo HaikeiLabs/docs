@@ -1,0 +1,51 @@
+[
+  {
+    "area": "Qwen3 tool calls",
+    "sev": "high",
+    "wire": "<tool_call>{\"name\": …, \"arguments\": {…}}</tool_call>",
+    "aw": "QwenFormatter expects <tool_call><tool name=\"…\">{args}</tool></tool_call>",
+    "effect": "parse_tool_calls() returns [] on real Qwen3 output."
+  },
+  {
+    "area": "Thinking tags",
+    "sev": "high",
+    "wire": "<think> (Qwen3, MiniMax M2, DeepSeek), <mm:think> (M3), Harmony analysis",
+    "aw": "ReasoningAdapter recognizes <thinking> and [THINK] only",
+    "effect": "<think> reasoning stays in the visible content."
+  },
+  {
+    "area": "GPT-OSS",
+    "sev": "medium",
+    "wire": "Harmony channels",
+    "aw": "Mapped to the OpenAI JSON formatter",
+    "effect": "Works through chat completions. Raw mode isn't supported."
+  },
+  {
+    "area": "MiniMax",
+    "sev": "medium",
+    "wire": "<minimax:tool_call><invoke name=…>",
+    "aw": "Python and TypeScript use GenericFormatter. Go matches <tool_call><tool_name>.",
+    "effect": "Text-mode parsing misses real calls."
+  },
+  {
+    "area": "Prompt generator",
+    "sev": "low",
+    "wire": "n/a",
+    "aw": "generate_tool_schemas() reads input_schema as an attribute",
+    "effect": "A tool whose input_schema is a method raises a TypeError."
+  },
+  {
+    "area": "Tool result text",
+    "sev": "low",
+    "wire": "Raw result, matched by id",
+    "aw": "InferenceExecutor sends \"Tool {name} result: …\"",
+    "effect": "Adds a prefix the model wasn't trained on."
+  },
+  {
+    "area": "Retry history order",
+    "sev": "low",
+    "wire": "The failed assistant turn, then the correction",
+    "aw": "run_inference appends the nudge before the failed assistant turn, and the failed turn keeps no tool_calls",
+    "effect": "The model reads a correction before the answer it corrects. Seen in the lesson 9 trace."
+  }
+]

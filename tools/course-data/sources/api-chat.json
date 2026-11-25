@@ -1,0 +1,491 @@
+[
+  {
+    "id": "chat",
+    "vendor": "OpenAI-compatible",
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "servers": "OpenAI, vLLM, SGLang, Ollama, OpenRouter, LM Studio",
+    "summary": "Send the conversation and the tools. The server applies the model's chat template and parses tool calls back into JSON.",
+    "headers": [
+      {
+        "n": "Authorization",
+        "t": "string",
+        "d": "Bearer <API key>",
+        "r": true,
+        "k": [],
+        "tag": null
+      }
+    ],
+    "req": [
+      {
+        "n": "model",
+        "t": "string",
+        "d": "Model id.",
+        "r": true,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "messages",
+        "t": "array<Message>",
+        "d": "The full conversation so far. The API is stateless, so send everything every time.",
+        "r": true,
+        "k": [
+          {
+            "n": "role",
+            "t": "\"system\" | \"user\" | \"assistant\" | \"tool\"",
+            "d": "",
+            "r": true,
+            "k": [],
+            "tag": null
+          },
+          {
+            "n": "content",
+            "t": "string | null",
+            "d": "null on an assistant turn that only calls tools.",
+            "r": false,
+            "k": [],
+            "tag": null
+          },
+          {
+            "n": "tool_calls",
+            "t": "array<ToolCall>",
+            "d": "Assistant turns only. Echo back exactly what the model returned.",
+            "r": false,
+            "k": [],
+            "tag": "tools"
+          },
+          {
+            "n": "tool_call_id",
+            "t": "string",
+            "d": "Tool turns only. Which call this result answers.",
+            "r": false,
+            "k": [],
+            "tag": "tools"
+          }
+        ],
+        "tag": null
+      },
+      {
+        "n": "tools",
+        "t": "array<Tool>",
+        "d": "Every tool the model may call. Send them on every request.",
+        "r": false,
+        "k": [
+          {
+            "n": "type",
+            "t": "\"function\"",
+            "d": "",
+            "r": true,
+            "k": [],
+            "tag": null
+          },
+          {
+            "n": "function",
+            "t": "object",
+            "d": "",
+            "r": true,
+            "k": [
+              {
+                "n": "name",
+                "t": "string",
+                "d": "What the model writes to call it.",
+                "r": true,
+                "k": [],
+                "tag": null
+              },
+              {
+                "n": "description",
+                "t": "string",
+                "d": "When to use it. This is a prompt.",
+                "r": false,
+                "k": [],
+                "tag": null
+              },
+              {
+                "n": "parameters",
+                "t": "JSON Schema",
+                "d": "The arguments.",
+                "r": false,
+                "k": [],
+                "tag": null
+              }
+            ],
+            "tag": null
+          }
+        ],
+        "tag": "tools"
+      },
+      {
+        "n": "tool_choice",
+        "t": "\"auto\" | \"none\" | \"required\" | object",
+        "d": "Default auto. An object forces one named tool.",
+        "r": false,
+        "k": [],
+        "tag": "tools"
+      },
+      {
+        "n": "parallel_tool_calls",
+        "t": "boolean",
+        "d": "Allow several calls in one turn.",
+        "r": false,
+        "k": [],
+        "tag": "tools"
+      }
+    ],
+    "res": [
+      {
+        "n": "choices[]",
+        "t": "array",
+        "d": "",
+        "r": true,
+        "k": [
+          {
+            "n": "message",
+            "t": "object",
+            "d": "",
+            "r": true,
+            "k": [
+              {
+                "n": "role",
+                "t": "\"assistant\"",
+                "d": "",
+                "r": true,
+                "k": [],
+                "tag": null
+              },
+              {
+                "n": "content",
+                "t": "string | null",
+                "d": "Text answer, or null when calling tools.",
+                "r": false,
+                "k": [],
+                "tag": null
+              },
+              {
+                "n": "tool_calls[]",
+                "t": "array",
+                "d": "Present when the model wants tools.",
+                "r": false,
+                "k": [
+                  {
+                    "n": "id",
+                    "t": "string",
+                    "d": "Send this back as tool_call_id.",
+                    "r": true,
+                    "k": [],
+                    "tag": null
+                  },
+                  {
+                    "n": "type",
+                    "t": "\"function\"",
+                    "d": "",
+                    "r": true,
+                    "k": [],
+                    "tag": null
+                  },
+                  {
+                    "n": "function.name",
+                    "t": "string",
+                    "d": "",
+                    "r": true,
+                    "k": [],
+                    "tag": null
+                  },
+                  {
+                    "n": "function.arguments",
+                    "t": "string",
+                    "d": "A JSON-encoded string. You must json.loads() it.",
+                    "r": true,
+                    "k": [],
+                    "tag": null
+                  }
+                ],
+                "tag": "tools"
+              },
+              {
+                "n": "reasoning_content",
+                "t": "string",
+                "d": "Server extension (vLLM, DeepSeek, Qwen). Some servers call it reasoning.",
+                "r": false,
+                "k": [],
+                "tag": "reasoning"
+              }
+            ],
+            "tag": null
+          },
+          {
+            "n": "finish_reason",
+            "t": "\"stop\" | \"length\" | \"tool_calls\"",
+            "d": "tool_calls means run tools, then call again.",
+            "r": true,
+            "k": [],
+            "tag": "tools"
+          }
+        ],
+        "tag": null
+      }
+    ],
+    "ex_req": "{\n  \"model\": \"Qwen/Qwen3-8B\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a concise weather assistant.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Do I need an umbrella in Tokyo?\"\n    }\n  ],\n  \"tools\": [\n    {\n      \"type\": \"function\",\n      \"function\": {\n        \"name\": \"get_weather\",\n        \"description\": \"Get the current weather for a city.\",\n        \"parameters\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"city\": {\n              \"type\": \"string\",\n              \"description\": \"City name, e.g. Tokyo\"\n            },\n            \"unit\": {\n              \"type\": \"string\",\n              \"enum\": [\n                \"celsius\",\n                \"fahrenheit\"\n              ]\n            }\n          },\n          \"required\": [\n            \"city\"\n          ]\n        }\n      }\n    }\n  ]\n}",
+    "ex_res": "{\n  \"choices\": [\n    {\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": null,\n        \"tool_calls\": [\n          {\n            \"id\": \"call_1\",\n            \"type\": \"function\",\n            \"function\": {\n              \"name\": \"get_weather\",\n              \"arguments\": \"{\\\"city\\\": \\\"Tokyo\\\"}\"\n            }\n          }\n        ]\n      },\n      \"finish_reason\": \"tool_calls\"\n    }\n  ]\n}"
+  },
+  {
+    "id": "messages",
+    "vendor": "Anthropic",
+    "method": "POST",
+    "path": "/v1/messages",
+    "servers": "api.anthropic.com, Amazon Bedrock, Google Vertex AI",
+    "summary": "Same idea as chat completions, with content blocks. Tool calls and results are blocks inside messages.",
+    "headers": [
+      {
+        "n": "x-api-key",
+        "t": "string",
+        "d": "",
+        "r": true,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "anthropic-version",
+        "t": "string",
+        "d": "2023-06-01",
+        "r": true,
+        "k": [],
+        "tag": null
+      }
+    ],
+    "req": [
+      {
+        "n": "model",
+        "t": "string",
+        "d": "",
+        "r": true,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "max_tokens",
+        "t": "integer",
+        "d": "Required here, unlike OpenAI.",
+        "r": true,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "system",
+        "t": "string",
+        "d": "Top-level, not a message.",
+        "r": false,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "messages",
+        "t": "array<Message>",
+        "d": "",
+        "r": true,
+        "k": [
+          {
+            "n": "role",
+            "t": "\"user\" | \"assistant\"",
+            "d": "No tool role. Results go in a user message.",
+            "r": true,
+            "k": [],
+            "tag": null
+          },
+          {
+            "n": "content",
+            "t": "string | array<Block>",
+            "d": "",
+            "r": true,
+            "k": [
+              {
+                "n": "{type: \"tool_use\"}",
+                "t": "Block",
+                "d": "Assistant: id, name, input (object).",
+                "r": false,
+                "k": [],
+                "tag": "tools"
+              },
+              {
+                "n": "{type: \"tool_result\"}",
+                "t": "Block",
+                "d": "User: tool_use_id, content, is_error.",
+                "r": false,
+                "k": [],
+                "tag": "tools"
+              },
+              {
+                "n": "{type: \"thinking\"}",
+                "t": "Block",
+                "d": "Assistant: thinking, signature. Replay unchanged.",
+                "r": false,
+                "k": [],
+                "tag": "reasoning"
+              }
+            ],
+            "tag": null
+          }
+        ],
+        "tag": null
+      },
+      {
+        "n": "tools",
+        "t": "array<Tool>",
+        "d": "",
+        "r": false,
+        "k": [
+          {
+            "n": "name",
+            "t": "string",
+            "d": "",
+            "r": true,
+            "k": [],
+            "tag": null
+          },
+          {
+            "n": "description",
+            "t": "string",
+            "d": "",
+            "r": false,
+            "k": [],
+            "tag": null
+          },
+          {
+            "n": "input_schema",
+            "t": "JSON Schema",
+            "d": "Same schema, different key.",
+            "r": true,
+            "k": [],
+            "tag": null
+          }
+        ],
+        "tag": "tools"
+      },
+      {
+        "n": "tool_choice",
+        "t": "{type: \"auto\" | \"any\" | \"tool\" | \"none\"}",
+        "d": "",
+        "r": false,
+        "k": [],
+        "tag": "tools"
+      },
+      {
+        "n": "thinking",
+        "t": "{type: \"enabled\", budget_tokens}",
+        "d": "Turns on extended thinking.",
+        "r": false,
+        "k": [],
+        "tag": "reasoning"
+      }
+    ],
+    "res": [
+      {
+        "n": "content[]",
+        "t": "array<Block>",
+        "d": "",
+        "r": true,
+        "k": [
+          {
+            "n": "{type: \"thinking\"}",
+            "t": "Block",
+            "d": "thinking, signature",
+            "r": false,
+            "k": [],
+            "tag": "reasoning"
+          },
+          {
+            "n": "{type: \"text\"}",
+            "t": "Block",
+            "d": "text",
+            "r": false,
+            "k": [],
+            "tag": null
+          },
+          {
+            "n": "{type: \"tool_use\"}",
+            "t": "Block",
+            "d": "id, name, input. input is already an object.",
+            "r": false,
+            "k": [],
+            "tag": "tools"
+          }
+        ],
+        "tag": null
+      },
+      {
+        "n": "stop_reason",
+        "t": "\"end_turn\" | \"tool_use\" | \"max_tokens\" | \"stop_sequence\"",
+        "d": "tool_use means run tools, then call again.",
+        "r": true,
+        "k": [],
+        "tag": "tools"
+      }
+    ],
+    "ex_req": "{\n  \"model\": \"claude-model-id\",\n  \"max_tokens\": 1024,\n  \"system\": \"You are a concise weather assistant.\",\n  \"tools\": [\n    {\n      \"name\": \"get_weather\",\n      \"description\": \"Get the current weather for a city.\",\n      \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"city\": {\n            \"type\": \"string\",\n            \"description\": \"City name, e.g. Tokyo\"\n          },\n          \"unit\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"celsius\",\n              \"fahrenheit\"\n            ]\n          }\n        },\n        \"required\": [\n          \"city\"\n        ]\n      }\n    }\n  ],\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Do I need an umbrella in Tokyo?\"\n    }\n  ]\n}",
+    "ex_res": "{\n  \"stop_reason\": \"tool_use\",\n  \"content\": [\n    {\n      \"type\": \"tool_use\",\n      \"id\": \"toolu_01A\",\n      \"name\": \"get_weather\",\n      \"input\": {\n        \"city\": \"Tokyo\"\n      }\n    }\n  ]\n}"
+  },
+  {
+    "id": "completions",
+    "vendor": "Open-weight, raw",
+    "method": "POST",
+    "path": "/v1/completions",
+    "servers": "vLLM, SGLang, llama.cpp",
+    "summary": "No messages, no tools field. You render the chat template yourself and parse the tags out of the text. That's what Lessons 4 and 7 do by hand.",
+    "headers": [],
+    "req": [
+      {
+        "n": "model",
+        "t": "string",
+        "d": "",
+        "r": true,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "prompt",
+        "t": "string",
+        "d": "The fully rendered chat template, tools included, ending with the assistant header.",
+        "r": true,
+        "k": [],
+        "tag": "tools"
+      },
+      {
+        "n": "max_tokens",
+        "t": "integer",
+        "d": "",
+        "r": false,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "stop",
+        "t": "array<string>",
+        "d": "e.g. <|im_end|>, <|call|>, <|return|>",
+        "r": false,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "skip_special_tokens",
+        "t": "boolean",
+        "d": "vLLM. Set false or the tags you need to parse get stripped.",
+        "r": false,
+        "k": [],
+        "tag": "tools"
+      }
+    ],
+    "res": [
+      {
+        "n": "choices[].text",
+        "t": "string",
+        "d": "Raw tokens, tags included. Parse tool calls and reasoning yourself.",
+        "r": true,
+        "k": [],
+        "tag": "tools"
+      }
+    ],
+    "ex_req": "{\n  \"model\": \"Qwen/Qwen3-8B\",\n  \"prompt\": \"<|im_start|>system\\nYou are a concise weather assistant.\\n\\n# Tools\\n…<tools>…</tools>…<|im_end|>\\n<|im_start|>user\\nDo I need an umbrella in Tokyo?<|im_end|>\\n<|im_start|>assistant\\n\",\n  \"max_tokens\": 1024,\n  \"skip_special_tokens\": false\n}",
+    "ex_res": "{\n  \"choices\": [\n    {\n      \"text\": \"<think>\\nNeed Tokyo weather.\\n</think>\\n\\n<tool_call>\\n{\\\"name\\\": \\\"get_weather\\\", \\\"arguments\\\": {\\\"city\\\": \\\"Tokyo\\\"}}\\n</tool_call>\"\n    }\n  ]\n}"
+  }
+]

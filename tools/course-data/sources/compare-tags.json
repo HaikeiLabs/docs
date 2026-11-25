@@ -1,0 +1,85 @@
+{
+  "tabs": [
+    {
+      "id": "gptoss",
+      "name": "GPT-OSS",
+      "sub": "",
+      "note": "Tools are a TypeScript-style `namespace functions`. A call goes on the `commentary` channel, addressed `to=functions.NAME`, and ends with `<|call|>`. There are no call ids.",
+      "src": "openai/harmony docs/format.md and test-data",
+      "panes": [
+        {
+          "label": "Declare",
+          "file": "developer message",
+          "lang": "tokens",
+          "src": "<|start|>developer<|message|># Instructions\n\nYou are a concise weather assistant.\n\n# Tools\n\n## functions\n\nnamespace functions {\n\n// Get the current weather for a city.\ntype get_weather = (_: {\n// City name, e.g. Tokyo\ncity: string,\nunit?: \"celsius\" | \"fahrenheit\",\n}) => any;\n\n} // namespace functions<|end|>"
+        },
+        {
+          "label": "Model calls it",
+          "file": "model output",
+          "lang": "tokens",
+          "src": "<|channel|>analysis<|message|>Need weather for Tokyo.<|end|>\n<|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{\"city\":\"Tokyo\"}<|call|>"
+        },
+        {
+          "label": "You send the result",
+          "file": "next prompt",
+          "lang": "tokens",
+          "src": "<|start|>functions.get_weather to=assistant<|channel|>commentary<|message|>{\"temp\": 22, \"sky\": \"rain\"}<|end|>"
+        }
+      ]
+    },
+    {
+      "id": "claude",
+      "name": "Claude",
+      "sub": "",
+      "note": "Anthropic doesn't publish Claude's raw prompt format. You only work with JSON blocks, so there's no template to render and nothing to parse.",
+      "src": "Anthropic Messages API",
+      "panes": [
+        {
+          "label": "Declare",
+          "file": "tools[0]",
+          "lang": "json",
+          "src": "{\n  \"name\": \"get_weather\",\n  \"description\": \"Get the current weather for a city.\",\n  \"input_schema\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"city\": {\n        \"type\": \"string\"\n      }\n    },\n    \"required\": [\n      \"city\"\n    ]\n  }\n}"
+        },
+        {
+          "label": "Model calls it",
+          "file": "content[0]",
+          "lang": "json",
+          "src": "{\n  \"type\": \"tool_use\",\n  \"id\": \"toolu_01A\",\n  \"name\": \"get_weather\",\n  \"input\": {\n    \"city\": \"Tokyo\"\n  }\n}"
+        },
+        {
+          "label": "You send the result",
+          "file": "user message",
+          "lang": "json",
+          "src": "{\n  \"role\": \"user\",\n  \"content\": [\n    {\n      \"type\": \"tool_result\",\n      \"tool_use_id\": \"toolu_01A\",\n      \"content\": \"{\\\"temp\\\": 22, \\\"sky\\\": \\\"rain\\\"}\"\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "id": "qwen3",
+      "name": "Qwen3",
+      "sub": "",
+      "note": "Tools are JSON lines inside a `tools` tag. A call is a JSON object inside `<tool_call>`. Results come back in a **user** turn inside `<tool_response>`. This also covers Qwen2.5.",
+      "src": "Qwen3 chat template, vLLM hermes parser",
+      "panes": [
+        {
+          "label": "Declare",
+          "file": "system turn",
+          "lang": "tokens",
+          "src": "<|im_start|>system\nYou are a concise weather assistant.\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"get_weather\", …}}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>"
+        },
+        {
+          "label": "Model calls it",
+          "file": "model output",
+          "lang": "tokens",
+          "src": "<think>\nI need Tokyo's weather.\n</think>\n\n<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Tokyo\"}}\n</tool_call><|im_end|>"
+        },
+        {
+          "label": "You send the result",
+          "file": "next prompt",
+          "lang": "tokens",
+          "src": "<|im_start|>user\n<tool_response>\n{\"temp\": 22, \"sky\": \"rain\"}\n</tool_response><|im_end|>"
+        }
+      ]
+    }
+  ]
+}

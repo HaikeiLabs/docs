@@ -1,0 +1,129 @@
+[
+  {
+    "id": "list",
+    "vendor": "MCP",
+    "method": "RPC",
+    "path": "tools/list",
+    "servers": "Any MCP server, over stdio or HTTP",
+    "summary": "Ask the server which tools it has. Each one has the same three parts as Lesson 2.",
+    "headers": [],
+    "req": [
+      {
+        "n": "jsonrpc",
+        "t": "\"2.0\"",
+        "d": "",
+        "r": true,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "id",
+        "t": "number | string",
+        "d": "",
+        "r": true,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "method",
+        "t": "\"tools/list\"",
+        "d": "",
+        "r": true,
+        "k": [],
+        "tag": null
+      }
+    ],
+    "res": [
+      {
+        "n": "result.tools[]",
+        "t": "array",
+        "d": "",
+        "r": true,
+        "k": [
+          {
+            "n": "name",
+            "t": "string",
+            "d": "",
+            "r": true,
+            "k": [],
+            "tag": null
+          },
+          {
+            "n": "description",
+            "t": "string",
+            "d": "",
+            "r": false,
+            "k": [],
+            "tag": null
+          },
+          {
+            "n": "inputSchema",
+            "t": "JSON Schema",
+            "d": "Rename to parameters or input_schema for your model.",
+            "r": true,
+            "k": [],
+            "tag": "tools"
+          }
+        ],
+        "tag": null
+      }
+    ],
+    "ex_req": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"method\": \"tools/list\"\n}",
+    "ex_res": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 2,\n  \"result\": {\n    \"tools\": [\n      {\n        \"name\": \"get_weather\",\n        \"description\": \"Get the current weather for a city.\",\n        \"inputSchema\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"city\": {\n              \"type\": \"string\"\n            }\n          },\n          \"required\": [\n            \"city\"\n          ]\n        }\n      }\n    ]\n  }\n}"
+  },
+  {
+    "id": "call",
+    "vendor": "MCP",
+    "method": "RPC",
+    "path": "tools/call",
+    "servers": "Any MCP server, over stdio or HTTP",
+    "summary": "Your harness forwards the model's call. Join the text content and send it to the model as a normal tool result.",
+    "headers": [],
+    "req": [
+      {
+        "n": "method",
+        "t": "\"tools/call\"",
+        "d": "",
+        "r": true,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "params.name",
+        "t": "string",
+        "d": "",
+        "r": true,
+        "k": [],
+        "tag": null
+      },
+      {
+        "n": "params.arguments",
+        "t": "object",
+        "d": "Already parsed, from the model's call.",
+        "r": true,
+        "k": [],
+        "tag": "tools"
+      }
+    ],
+    "res": [
+      {
+        "n": "result.content[]",
+        "t": "array<{type, text}>",
+        "d": "Usually text blocks.",
+        "r": true,
+        "k": [],
+        "tag": "tools"
+      },
+      {
+        "n": "result.isError",
+        "t": "boolean",
+        "d": "Send errors back too, so the model can recover.",
+        "r": false,
+        "k": [],
+        "tag": null
+      }
+    ],
+    "ex_req": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 3,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"get_weather\",\n    \"arguments\": {\n      \"city\": \"Tokyo\"\n    }\n  }\n}",
+    "ex_res": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 3,\n  \"result\": {\n    \"content\": [\n      {\n        \"type\": \"text\",\n        \"text\": \"{\\\"temp\\\": 22, \\\"sky\\\": \\\"rain\\\"}\"\n      }\n    ],\n    \"isError\": false\n  }\n}"
+  }
+]

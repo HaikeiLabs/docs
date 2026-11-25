@@ -1,0 +1,651 @@
+{
+  "code": "while lap < max_laps:\n    resp = backend.complete(messages)\n    clean = reasoning.strip(resp)\n    check = validator.validate(resp.tool_calls or clean)\n    if check.needs_retry:\n        messages += [user(check.nudge), assistant(clean)]\n        continue\n    messages.append(assistant(resp))\n    for call in resp.tool_calls:\n        # inside AuditedToolClient.Execute()\n        decision = policy.evaluate(call.name, call.args, caller)\n        auditor.record(AuditRecord(call, decision, caller))\n        if decision.action == \"deny\":\n            out = {\"error\": f\"denied by policy: {decision.reason}\"}\n        else:\n            out = tool(**call.args)\n        messages.append(tool_message(call.id, out))\n    if final_answer_called:\n        return answer",
+  "trace": [
+    {
+      "kind": "lap",
+      "lap": 1
+    },
+    {
+      "kind": "complete",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a weather assistant. Always finish with final_answer.",
+          "meta": "user_input"
+        },
+        {
+          "role": "user",
+          "content": "Is it warmer in Tokyo or Seoul? Tell #travel if it's raining.",
+          "meta": "user_input"
+        }
+      ],
+      "response": {
+        "content": "",
+        "reasoning_content": "I need the weather for both cities.",
+        "tool_calls": [
+          {
+            "id": "call_1",
+            "name": "weather_lookup",
+            "arguments": {
+              "city": "Tokyo"
+            }
+          }
+        ],
+        "finish_reason": "tool_calls"
+      }
+    },
+    {
+      "kind": "reasoning",
+      "raw_content": "",
+      "reasoning": "I need the weather for both cities.",
+      "clean": ""
+    },
+    {
+      "kind": "validate",
+      "mode": "tool_calls",
+      "input": [
+        {
+          "tool": "weather_lookup",
+          "args": {
+            "city": "Tokyo"
+          }
+        }
+      ],
+      "ok": false,
+      "nudge": "Tool 'weather_lookup' does not exist. Available tools: post_to_slack, final_answer, and get_weather. Call one of them."
+    },
+    {
+      "kind": "complete",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a weather assistant. Always finish with final_answer.",
+          "meta": "user_input"
+        },
+        {
+          "role": "user",
+          "content": "Is it warmer in Tokyo or Seoul? Tell #travel if it's raining.",
+          "meta": "user_input"
+        },
+        {
+          "role": "user",
+          "content": "Tool 'weather_lookup' does not exist. Available tools: post_to_slack, final_answer, and get_weather. Call one of them.",
+          "meta": "retry_nudge"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "meta": "text_response"
+        }
+      ],
+      "response": {
+        "content": "",
+        "reasoning_content": "The tool is called get_weather. Check both cities.",
+        "tool_calls": [
+          {
+            "id": "call_2",
+            "name": "get_weather",
+            "arguments": {
+              "city": "Tokyo"
+            }
+          },
+          {
+            "id": "call_3",
+            "name": "get_weather",
+            "arguments": {
+              "city": "Seoul"
+            }
+          }
+        ],
+        "finish_reason": "tool_calls"
+      }
+    },
+    {
+      "kind": "reasoning",
+      "raw_content": "",
+      "reasoning": "The tool is called get_weather. Check both cities.",
+      "clean": ""
+    },
+    {
+      "kind": "validate",
+      "mode": "tool_calls",
+      "input": [
+        {
+          "tool": "get_weather",
+          "args": {
+            "city": "Tokyo"
+          }
+        },
+        {
+          "tool": "get_weather",
+          "args": {
+            "city": "Seoul"
+          }
+        }
+      ],
+      "ok": true,
+      "nudge": null
+    },
+    {
+      "kind": "inference_done",
+      "attempts": 2,
+      "retries_added": [
+        {
+          "role": "user",
+          "content": "Tool 'weather_lookup' does not exist. Available tools: post_to_slack, final_answer, and get_weather. Call one of them.",
+          "meta": "retry_nudge"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "meta": "text_response"
+        }
+      ]
+    },
+    {
+      "kind": "policy",
+      "tool": "get_weather",
+      "args": {
+        "city": "Tokyo"
+      },
+      "action": "allow",
+      "rule": "read-weather",
+      "reason": "Reading weather is allowed",
+      "subject": "alex"
+    },
+    {
+      "kind": "execute",
+      "tool": "get_weather",
+      "args": {
+        "city": "Tokyo"
+      },
+      "status": "ok",
+      "output": "{\"temp\": 22, \"sky\": \"rain\"}",
+      "audit": {
+        "session_id": "sess-1",
+        "invoking_subject": "alex",
+        "framework": "weather-agent",
+        "tool_name": "get_weather",
+        "decision": "allow",
+        "rule": "read-weather",
+        "delegation_depth": 0
+      }
+    },
+    {
+      "kind": "append",
+      "message": {
+        "role": "tool",
+        "content": "{\"temp\": 22, \"sky\": \"rain\"}",
+        "tool_call_id": "call_2",
+        "meta": "user_input"
+      }
+    },
+    {
+      "kind": "policy",
+      "tool": "get_weather",
+      "args": {
+        "city": "Seoul"
+      },
+      "action": "allow",
+      "rule": "read-weather",
+      "reason": "Reading weather is allowed",
+      "subject": "alex"
+    },
+    {
+      "kind": "execute",
+      "tool": "get_weather",
+      "args": {
+        "city": "Seoul"
+      },
+      "status": "ok",
+      "output": "{\"temp\": 17, \"sky\": \"clear\"}",
+      "audit": {
+        "session_id": "sess-1",
+        "invoking_subject": "alex",
+        "framework": "weather-agent",
+        "tool_name": "get_weather",
+        "decision": "allow",
+        "rule": "read-weather",
+        "delegation_depth": 0
+      }
+    },
+    {
+      "kind": "append",
+      "message": {
+        "role": "tool",
+        "content": "{\"temp\": 17, \"sky\": \"clear\"}",
+        "tool_call_id": "call_3",
+        "meta": "user_input"
+      }
+    },
+    {
+      "kind": "lap",
+      "lap": 2
+    },
+    {
+      "kind": "complete",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a weather assistant. Always finish with final_answer.",
+          "meta": "user_input"
+        },
+        {
+          "role": "user",
+          "content": "Is it warmer in Tokyo or Seoul? Tell #travel if it's raining.",
+          "meta": "user_input"
+        },
+        {
+          "role": "user",
+          "content": "Tool 'weather_lookup' does not exist. Available tools: post_to_slack, final_answer, and get_weather. Call one of them.",
+          "meta": "retry_nudge"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "meta": "text_response"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_2",
+              "name": "get_weather",
+              "arguments": {
+                "city": "Tokyo"
+              }
+            },
+            {
+              "id": "call_3",
+              "name": "get_weather",
+              "arguments": {
+                "city": "Seoul"
+              }
+            }
+          ],
+          "meta": "user_input"
+        },
+        {
+          "role": "tool",
+          "content": "{\"temp\": 22, \"sky\": \"rain\"}",
+          "tool_call_id": "call_2",
+          "meta": "user_input"
+        },
+        {
+          "role": "tool",
+          "content": "{\"temp\": 17, \"sky\": \"clear\"}",
+          "tool_call_id": "call_3",
+          "meta": "user_input"
+        }
+      ],
+      "response": {
+        "content": "",
+        "reasoning_content": "Tokyo is rainy. I'll tell the travel channel.",
+        "tool_calls": [
+          {
+            "id": "call_4",
+            "name": "post_to_slack",
+            "arguments": {
+              "channel": "#travel",
+              "text": "Rain in Tokyo today"
+            }
+          }
+        ],
+        "finish_reason": "tool_calls"
+      }
+    },
+    {
+      "kind": "reasoning",
+      "raw_content": "",
+      "reasoning": "Tokyo is rainy. I'll tell the travel channel.",
+      "clean": ""
+    },
+    {
+      "kind": "validate",
+      "mode": "tool_calls",
+      "input": [
+        {
+          "tool": "post_to_slack",
+          "args": {
+            "channel": "#travel",
+            "text": "Rain in Tokyo today"
+          }
+        }
+      ],
+      "ok": true,
+      "nudge": null
+    },
+    {
+      "kind": "inference_done",
+      "attempts": 1,
+      "retries_added": []
+    },
+    {
+      "kind": "policy",
+      "tool": "post_to_slack",
+      "args": {
+        "channel": "#travel",
+        "text": "Rain in Tokyo today"
+      },
+      "action": "deny",
+      "rule": "no-posting",
+      "reason": "Posting to Slack needs a person to approve it",
+      "subject": "alex"
+    },
+    {
+      "kind": "execute",
+      "tool": "post_to_slack",
+      "args": {
+        "channel": "#travel",
+        "text": "Rain in Tokyo today"
+      },
+      "status": "denied",
+      "output": "{\"error\": \"denied by policy: Posting to Slack needs a person to approve it\"}",
+      "audit": {
+        "session_id": "sess-1",
+        "invoking_subject": "alex",
+        "framework": "weather-agent",
+        "tool_name": "post_to_slack",
+        "decision": "deny",
+        "rule": "no-posting",
+        "delegation_depth": 0
+      }
+    },
+    {
+      "kind": "append",
+      "message": {
+        "role": "tool",
+        "content": "{\"error\": \"denied by policy: Posting to Slack needs a person to approve it\"}",
+        "tool_call_id": "call_4",
+        "meta": "user_input"
+      }
+    },
+    {
+      "kind": "lap",
+      "lap": 3
+    },
+    {
+      "kind": "complete",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a weather assistant. Always finish with final_answer.",
+          "meta": "user_input"
+        },
+        {
+          "role": "user",
+          "content": "Is it warmer in Tokyo or Seoul? Tell #travel if it's raining.",
+          "meta": "user_input"
+        },
+        {
+          "role": "user",
+          "content": "Tool 'weather_lookup' does not exist. Available tools: post_to_slack, final_answer, and get_weather. Call one of them.",
+          "meta": "retry_nudge"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "meta": "text_response"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_2",
+              "name": "get_weather",
+              "arguments": {
+                "city": "Tokyo"
+              }
+            },
+            {
+              "id": "call_3",
+              "name": "get_weather",
+              "arguments": {
+                "city": "Seoul"
+              }
+            }
+          ],
+          "meta": "user_input"
+        },
+        {
+          "role": "tool",
+          "content": "{\"temp\": 22, \"sky\": \"rain\"}",
+          "tool_call_id": "call_2",
+          "meta": "user_input"
+        },
+        {
+          "role": "tool",
+          "content": "{\"temp\": 17, \"sky\": \"clear\"}",
+          "tool_call_id": "call_3",
+          "meta": "user_input"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_4",
+              "name": "post_to_slack",
+              "arguments": {
+                "channel": "#travel",
+                "text": "Rain in Tokyo today"
+              }
+            }
+          ],
+          "meta": "user_input"
+        },
+        {
+          "role": "tool",
+          "content": "{\"error\": \"denied by policy: Posting to Slack needs a person to approve it\"}",
+          "tool_call_id": "call_4",
+          "meta": "user_input"
+        }
+      ],
+      "response": {
+        "content": "Tokyo is warmer at 22°C, but it's raining. Bring an umbrella.",
+        "reasoning_content": "Posting was denied. Just answer.",
+        "tool_calls": [],
+        "finish_reason": "stop"
+      }
+    },
+    {
+      "kind": "reasoning",
+      "raw_content": "Tokyo is warmer at 22°C, but it's raining. Bring an umbrella.",
+      "reasoning": "Posting was denied. Just answer.",
+      "clean": "Tokyo is warmer at 22°C, but it's raining. Bring an umbrella."
+    },
+    {
+      "kind": "validate",
+      "mode": "text",
+      "input": "Tokyo is warmer at 22°C, but it's raining. Bring an umbrella.",
+      "ok": false,
+      "rescued": [],
+      "nudge": "Your previous response was not a valid tool call. You must respond with a tool call, not free text. Available tools: post_to_slack, final_answer, and get_weather. Please try again with a valid tool call."
+    },
+    {
+      "kind": "complete",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a weather assistant. Always finish with final_answer.",
+          "meta": "user_input"
+        },
+        {
+          "role": "user",
+          "content": "Is it warmer in Tokyo or Seoul? Tell #travel if it's raining.",
+          "meta": "user_input"
+        },
+        {
+          "role": "user",
+          "content": "Tool 'weather_lookup' does not exist. Available tools: post_to_slack, final_answer, and get_weather. Call one of them.",
+          "meta": "retry_nudge"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "meta": "text_response"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_2",
+              "name": "get_weather",
+              "arguments": {
+                "city": "Tokyo"
+              }
+            },
+            {
+              "id": "call_3",
+              "name": "get_weather",
+              "arguments": {
+                "city": "Seoul"
+              }
+            }
+          ],
+          "meta": "user_input"
+        },
+        {
+          "role": "tool",
+          "content": "{\"temp\": 22, \"sky\": \"rain\"}",
+          "tool_call_id": "call_2",
+          "meta": "user_input"
+        },
+        {
+          "role": "tool",
+          "content": "{\"temp\": 17, \"sky\": \"clear\"}",
+          "tool_call_id": "call_3",
+          "meta": "user_input"
+        },
+        {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "call_4",
+              "name": "post_to_slack",
+              "arguments": {
+                "channel": "#travel",
+                "text": "Rain in Tokyo today"
+              }
+            }
+          ],
+          "meta": "user_input"
+        },
+        {
+          "role": "tool",
+          "content": "{\"error\": \"denied by policy: Posting to Slack needs a person to approve it\"}",
+          "tool_call_id": "call_4",
+          "meta": "user_input"
+        },
+        {
+          "role": "user",
+          "content": "Your previous response was not a valid tool call. You must respond with a tool call, not free text. Available tools: post_to_slack, final_answer, and get_weather. Please try again with a valid tool call.",
+          "meta": "retry_nudge"
+        },
+        {
+          "role": "assistant",
+          "content": "Tokyo is warmer at 22°C, but it's raining. Bring an umbrella.",
+          "meta": "text_response"
+        }
+      ],
+      "response": {
+        "content": "",
+        "reasoning_content": "Plain text isn't allowed here. Use final_answer.",
+        "tool_calls": [
+          {
+            "id": "call_5",
+            "name": "final_answer",
+            "arguments": {
+              "text": "Tokyo is warmer (22°C vs 17°C), but it's raining there, so bring an umbrella. I couldn't post to #travel: that needs approval."
+            }
+          }
+        ],
+        "finish_reason": "tool_calls"
+      }
+    },
+    {
+      "kind": "reasoning",
+      "raw_content": "",
+      "reasoning": "Plain text isn't allowed here. Use final_answer.",
+      "clean": ""
+    },
+    {
+      "kind": "validate",
+      "mode": "tool_calls",
+      "input": [
+        {
+          "tool": "final_answer",
+          "args": {
+            "text": "Tokyo is warmer (22°C vs 17°C), but it's raining there, so bring an umbrella. I couldn't post to #travel: that needs approval."
+          }
+        }
+      ],
+      "ok": true,
+      "nudge": null
+    },
+    {
+      "kind": "inference_done",
+      "attempts": 2,
+      "retries_added": [
+        {
+          "role": "user",
+          "content": "Your previous response was not a valid tool call. You must respond with a tool call, not free text. Available tools: post_to_slack, final_answer, and get_weather. Please try again with a valid tool call.",
+          "meta": "retry_nudge"
+        },
+        {
+          "role": "assistant",
+          "content": "Tokyo is warmer at 22°C, but it's raining. Bring an umbrella.",
+          "meta": "text_response"
+        }
+      ]
+    },
+    {
+      "kind": "policy",
+      "tool": "final_answer",
+      "args": {
+        "text": "Tokyo is warmer (22°C vs 17°C), but it's raining there, so bring an umbrella. I couldn't post to #travel: that needs approval."
+      },
+      "action": "allow",
+      "rule": "answer-user",
+      "reason": "Answering the user is allowed",
+      "subject": "alex"
+    },
+    {
+      "kind": "execute",
+      "tool": "final_answer",
+      "args": {
+        "text": "Tokyo is warmer (22°C vs 17°C), but it's raining there, so bring an umbrella. I couldn't post to #travel: that needs approval."
+      },
+      "status": "ok",
+      "output": "{\"delivered\": true}",
+      "audit": {
+        "session_id": "sess-1",
+        "invoking_subject": "alex",
+        "framework": "weather-agent",
+        "tool_name": "final_answer",
+        "decision": "allow",
+        "rule": "answer-user",
+        "delegation_depth": 0
+      }
+    },
+    {
+      "kind": "append",
+      "message": {
+        "role": "tool",
+        "content": "{\"delivered\": true}",
+        "tool_call_id": "call_5",
+        "meta": "user_input"
+      }
+    },
+    {
+      "kind": "done",
+      "text": "Tokyo is warmer (22°C vs 17°C), but it's raining there, so bring an umbrella. I couldn't post to #travel: that needs approval.",
+      "laps": 3,
+      "audit_count": 4
+    }
+  ]
+}

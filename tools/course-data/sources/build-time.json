@@ -1,0 +1,8 @@
+{
+  "models": [
+    {"id": "claude", "model": "claude-x", "name": "claude-…"},
+    {"id": "qwen3-8b", "model": "Qwen/Qwen3-8B", "name": "Qwen/Qwen3-8B"},
+    {"id": "gpt-oss-20b", "model": "openai/gpt-oss-20b", "name": "openai/gpt-oss-20b"},
+    {"id": "minimax-m2", "model": "MiniMax-M2", "name": "MiniMax-M2"}
+  ]
+}

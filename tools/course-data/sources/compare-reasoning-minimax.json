@@ -1,0 +1,64 @@
+{
+  "tabs": [
+    {
+      "id": "minimax2",
+      "name": "MiniMax M2",
+      "sub": "",
+      "note": "The chat template opens the `think` tag for the model, so the output starts mid-thought and only the closing tag appears. Everything before the closing tag is reasoning. vLLM's `minimax_m2_append_think` parser keeps it in content so you can send it back.",
+      "src": "vLLM reasoning/minimax_m2_reasoning_parser.py",
+      "panes": [
+        {
+          "label": "Turn it on",
+          "file": "serve flag",
+          "lang": "bash",
+          "src": "--reasoning-parser minimax_m2\n# or minimax_m2_append_think to keep it in content"
+        },
+        {
+          "label": "Where it shows up",
+          "file": "model output",
+          "lang": "tokens",
+          "src": "Need the weather for Tokyo.</think>\n\n<minimax:tool_call>\n<invoke name=\"get_weather\">\n<parameter name=\"city\">Tokyo</parameter>\n</invoke>\n</minimax:tool_call>",
+          "hl": [
+            1
+          ]
+        },
+        {
+          "label": "Send it back",
+          "file": "assistant content",
+          "lang": "tokens",
+          "src": "<think>Need the weather for Tokyo.</think>\n\n<minimax:tool_call>…</minimax:tool_call>"
+        }
+      ]
+    },
+    {
+      "id": "minimax3",
+      "name": "MiniMax M3",
+      "sub": "",
+      "note": "Explicit `mm:think` blocks. With `thinking_mode` enabled the template may pre-open the block, so output can start inside it.",
+      "src": "vLLM reasoning/minimax_m3_reasoning_parser.py",
+      "panes": [
+        {
+          "label": "Turn it on",
+          "file": "request",
+          "lang": "json",
+          "src": "{\n  \"chat_template_kwargs\": {\n    \"thinking_mode\": \"enabled\"\n  }\n}"
+        },
+        {
+          "label": "Where it shows up",
+          "file": "model output",
+          "lang": "tokens",
+          "src": "<mm:think>Need the weather for Tokyo.</mm:think>\n]<]minimax[>[<tool_call>…",
+          "hl": [
+            1
+          ]
+        },
+        {
+          "label": "Send it back",
+          "file": "next prompt",
+          "lang": "tokens",
+          "src": "(the M3 template renders earlier reasoning itself)"
+        }
+      ]
+    }
+  ]
+}
