@@ -22,6 +22,13 @@ function frontmatter(file) {
 function checkSchema(name, value, file) {
   if (!validators[name](value)) throw new Error(`${file}: ${ajv.errorsText(validators[name].errors)}`);
 }
+// Only contract fields marked as inline Markdown are checked here. Verbatim
+// source fields can legitimately contain HTML-like tokens and entities.
+function checkInlineMarkdown(value, field) {
+  if (/<\/?[a-z][a-z0-9:-]*(?:\s[^<>]*?)?\s*\/?>/i.test(value) || /&(?:#[xX][0-9a-f]+|#\d+|[a-z][a-z0-9]+);/i.test(value)) {
+    throw new Error(`${field}: use inline Markdown instead of HTML tags or entities`);
+  }
+}
 export function validateCourse(dir) {
   const [hub] = frontmatter(path.join(dir, 'index.md')); checkSchema('hub', hub, 'index.md');
   const files = fs.readdirSync(path.join(dir, 'lessons')).filter(f => f.endsWith('.md')).map(f => f.slice(0, -3));
@@ -32,12 +39,19 @@ export function validateCourse(dir) {
     const file = path.join(dir, 'data', `${stem}.json`); const key = `${stem}:${schema}`;
     if (checked.has(key)) return;
     const value = JSON.parse(fs.readFileSync(file, 'utf8')); checkSchema(schema, value, file);
-    if (schema === 'compare' && new Set(value.tabs.map(t => t.id)).size !== value.tabs.length) throw new Error(`${file}: duplicate tab id`);
+    if (schema === 'compare') {
+      if (new Set(value.tabs.map(t => t.id)).size !== value.tabs.length) throw new Error(`${file}: duplicate tab id`);
+      value.tabs.forEach((tab, i) => checkInlineMarkdown(tab.note, `${file}: tabs[${i}].note`));
+    }
     for (const anchor of anchors[schema] ?? []) if (value.code.split('\n').filter(line => line.includes(anchor)).length !== 1) throw new Error(`${file}: anchor ${anchor} must appear exactly once`);
     checked.add(key);
   }
+  for (const file of fs.readdirSync(path.join(dir, 'data'))) {
+    if (/^compare-[a-z0-9-]+\.json$/.test(file)) data(file.slice(0, -5), 'compare');
+  }
   hub.lessons.forEach((id, index) => {
     const file = path.join(dir, 'lessons', `${id}.md`); const [lesson, body] = frontmatter(file); checkSchema('lesson-front-matter', lesson, file);
+    checkInlineMarkdown(lesson.lede, `${file}: lede`);
     if (lesson.id !== id || lesson.num !== index + 1) throw new Error(`${file}: id or number differs`);
     if (lesson.quiz.a >= lesson.quiz.opts.length) throw new Error(`${file}: quiz answer out of range`);
     if (lesson.finish && index !== hub.lessons.length - 1) throw new Error(`${file}: finish must be last`);
