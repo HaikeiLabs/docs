@@ -143,7 +143,7 @@ def build_time_and_gaps(version: str) -> None:
                 "src": f"Captured by running haikeilabs-agentware {version}",
                 "panes": [
                     {
-                        "label": "Build time: tool definitions (text mode)",
+                        "label": "Build time: tool definitions",
                         "file": "format_tool_definitions()",
                         "lang": lang,
                         "src": defs,

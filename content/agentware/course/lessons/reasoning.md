@@ -17,13 +17,13 @@ quiz:
 
 ## On, out, and back
 
-You turn reasoning on in the request, find it in the reply, and send it back the way the model family expects. Pick a family to see all three.
+You turn reasoning on in the request, find it in the reply, and send it back the way the model family expects. Claude's thinking blocks are signed, so in a tool-use turn you send them back unchanged. Pick a family to see all three.
 
 [widget:compare data=compare-reasoning]
 
 ## Strip it before you parse tool calls
 
-Models often draft a tool call inside their thinking. If you search the whole output for `<tool_call>`, you'll run the draft. Pull the reasoning out first [[1]], then parse what's left [[2]].
+Models often draft a tool call inside their thinking. In a text format like Qwen3's, where reasoning sits in `<think>` tags and calls in `<tool_call>` tags, searching the whole output runs the draft. Pull the reasoning out first [[1]], then look for tool calls only in what's left [[2]].
 
 ```python title="parse.py" marks="4=1;6=2"
 THINK = re.compile(r"<think>(.*?)</think>", re.S)

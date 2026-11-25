@@ -14,7 +14,7 @@ reg=ToolRegistry(); reg.register(Weather())
 out={}
 out["schemas"]=json.dumps(DefaultPromptGenerator().generate_tool_schemas(reg),indent=2)
 out["section"]=DefaultPromptGenerator().generate_tool_section(reg)
-for m in ["claude-x","Qwen/Qwen3-8B","openai/gpt-oss-20b","MiniMax-M2"]:
+for m in ["claude-sonnet-4-5","Qwen/Qwen3-8B","openai/gpt-oss-20b","MiniMax-M2"]:
     f=get_formatter(m)
     out["fmt_"+m]={"family":f.model_family(),"defs":f.format_tool_definitions([Weather()]),
       "result":f.format_tool_result("get_weather",Result(success=True,data='{"temp": 22}'),call_id="toolu_01A")}

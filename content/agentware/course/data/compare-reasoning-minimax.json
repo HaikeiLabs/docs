@@ -4,7 +4,7 @@
       "id": "minimax2",
       "name": "MiniMax M2",
       "sub": "",
-      "note": "The chat template opens the `think` tag for the model, so the output starts mid-thought and only the closing tag appears. Everything before the closing tag is reasoning. vLLM's `minimax_m2_append_think` parser keeps it in content so you can send it back.",
+      "note": "The chat template opens the `think` tag for the model, so the output starts mid-thought and only the closing tag appears. Everything before the closing tag is reasoning. vLLM's `minimax_m2_append_think` parser keeps it in content and adds the opening tag back, so you send the whole block back.",
       "src": "vLLM reasoning/minimax_m2_reasoning_parser.py",
       "panes": [
         {

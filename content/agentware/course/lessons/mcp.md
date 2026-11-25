@@ -17,7 +17,7 @@ quiz:
 
 ## Two methods matter
 
-An MCP server lists its tools and runs them when your harness asks. It uses JSON-RPC 2.0: every request is a JSON object with a method name and parameters. After the `initialize` handshake, you only need these two methods.
+An MCP server lists its tools and runs them when your harness asks. It uses JSON-RPC 2.0: every request is a JSON object with a method name and parameters. After `initialize`, where client and server agree on the protocol version and what each supports, you only need these two methods.
 
 [widget:api data=api-mcp]
 
@@ -25,7 +25,7 @@ An MCP server lists its tools and runs them when your harness asks. It uses JSON
 
 An MCP tool isn't tied to any model, so converting it is just a rename: [[1]] for OpenAI-compatible APIs, [[2]] for Anthropic.
 
-Agentware, the SDK in Lessons 8 to 10, does this in its Go MCP server (`go/mcp`). It runs one process per user, so every call still goes through policy (allow or deny) and audit (a record of each call).
+Agentware, the SDK in Lessons 8 to 10, does this in its Go MCP server (`go/mcp`). It runs one process per user, and each process sends calls through that user's Agentware client, which checks policy (allow or deny) and writes an audit record (a log of each call) before the tool runs.
 
 ```python title="mcp_bridge.py" marks="4=1;8=2"
 def mcp_to_openai(t):

@@ -36,7 +36,7 @@ Do I need an umbrella in Tokyo?<|im_end|>
 
 ## Same call, three formats
 
-Each family has a **prompt format**: the text layout its chat template produces. Qwen uses **ChatML**, which wraps every message in `<|im_start|>` and `<|im_end|>`. GPT-OSS uses **Harmony**, which splits each assistant turn into channels: `analysis` for reasoning, `commentary` for tool calls, and `final` for the answer. Here is the same call in each.
+Each family has a **prompt format**: the text layout its chat template produces. Qwen uses **ChatML**, which wraps every message in `<|im_start|>` and `<|im_end|>`. GPT-OSS uses **Harmony**, which splits each assistant turn into channels: `analysis` for reasoning, `commentary` for tool calls, and `final` for the answer. Here is the same call in each; the `final` channel shows up in Lesson 5.
 
 [widget:compare data=compare-tags]
 
@@ -50,7 +50,7 @@ Other model families you'll meet when self-hosting.
 
 ## Server flags for self-hosting
 
-vLLM, a popular open-source model server, needs to know which format to parse. If the flag doesn't match the model, tool calls come back as plain text and `tool_calls` stays empty. The Qwen3 parser is called `hermes` because Qwen uses the tool-call format first published with the Hermes models.
+vLLM, a popular open-source model server, needs to know which format to parse. If the flag doesn't match the model, tool calls come back as plain text and `tool_calls` stays empty. The labels in the margin mark each model's command. The Qwen3 parser is called `hermes` because Qwen uses the tool-call format first published with the Hermes models; `openai` is vLLM's Harmony parser for GPT-OSS, and `--reasoning-parser` does the same job for reasoning (Lesson 5).
 
 ```bash title="serve.sh" marks="2=Qwen3;5=GPT-OSS;8=MiniMax M2"
 vllm serve Qwen/Qwen3-8B --enable-auto-tool-choice \

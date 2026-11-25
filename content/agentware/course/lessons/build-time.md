@@ -17,7 +17,7 @@ quiz:
 
 ## In code
 
-Register the tool [[1]] and pick a formatter, the class that writes and reads one model family's tool format, from the model name [[2]]. Then render the tools: as JSON for the `tools` field [[3]], or as text for the system prompt when the server has no tool parser [[4]].
+Register the tool [[1]] and pick a formatter, the class that writes and reads one model family's tool format, from the model name [[2]]. Then render the tools: `DefaultPromptGenerator` writes the OpenAI-style list for the request's `tools` field [[3]], and the formatter writes them as text for the system prompt when the server has no tool parser [[4]].
 
 ```python title="build.py" marks="2=1;4=2;6=3;7=4"
 registry = ToolRegistry()
@@ -31,6 +31,6 @@ text = fmt.format_tool_definitions(registry.all())
 
 ## The templates it renders
 
-Real output from the Python SDK for the same `get_weather` tool. Pick a model name to see which formatter it gets.
+Real output from the Python SDK for the same `get_weather` tool. Pick a model name to see which formatter it gets. Qwen gets its own text block; the Anthropic and OpenAI formatters write JSON in their API's shape, and MiniMax falls back to the generic JSON formatter (Lesson 10).
 
 [widget:compare data=compare-build-time]
