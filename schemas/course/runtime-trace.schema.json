@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string"
+    },
+    "trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "oneOf": [
+          {
+            "properties": {
+              "kind": {
+                "const": "lap"
+              },
+              "lap": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "kind",
+              "lap"
+            ]
+          },
+          {
+            "properties": {
+              "kind": {
+                "const": "complete"
+              },
+              "messages": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "response": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "kind",
+              "messages",
+              "response"
+            ]
+          },
+          {
+            "properties": {
+              "kind": {
+                "const": "reasoning"
+              },
+              "raw_content": {
+                "type": "string"
+              },
+              "reasoning": {
+                "type": "string"
+              },
+              "clean": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "raw_content",
+              "reasoning",
+              "clean"
+            ]
+          },
+          {
+            "properties": {
+              "kind": {
+                "const": "validate"
+              },
+              "mode": {
+                "enum": [
+                  "text",
+                  "tool_calls"
+                ]
+              },
+              "input": {
+                "type": [
+                  "string",
+                  "array"
+                ]
+              },
+              "ok": {
+                "type": "boolean"
+              },
+              "nudge": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "mode",
+              "input",
+              "ok",
+              "nudge"
+            ]
+          },
+          {
+            "properties": {
+              "kind": {
+                "const": "inference_done"
+              },
+              "attempts": {
+                "type": "integer"
+              },
+              "retries_added": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            },
+            "required": [
+              "kind",
+              "attempts",
+              "retries_added"
+            ]
+          },
+          {
+            "properties": {
+              "kind": {
+                "const": "policy"
+              },
+              "tool": {
+                "type": "string"
+              },
+              "args": {
+                "type": "object"
+              },
+              "action": {
+                "enum": [
+                  "allow",
+                  "deny"
+                ]
+              },
+              "rule": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "tool",
+              "args",
+              "action",
+              "rule",
+              "reason",
+              "subject"
+            ]
+          },
+          {
+            "properties": {
+              "kind": {
+                "const": "execute"
+              },
+              "tool": {
+                "type": "string"
+              },
+              "args": {
+                "type": "object"
+              },
+              "status": {
+                "type": "string"
+              },
+              "output": {
+                "type": "string"
+              },
+              "audit": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "kind",
+              "tool",
+              "args",
+              "status",
+              "output",
+              "audit"
+            ]
+          },
+          {
+            "properties": {
+              "kind": {
+                "const": "append"
+              },
+              "message": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "kind",
+              "message"
+            ]
+          },
+          {
+            "properties": {
+              "kind": {
+                "const": "done"
+              },
+              "text": {
+                "type": "string"
+              },
+              "laps": {
+                "type": "integer"
+              },
+              "audit_count": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "kind",
+              "text",
+              "laps",
+              "audit_count"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "code",
+    "trace"
+  ],
+  "additionalProperties": false
+}

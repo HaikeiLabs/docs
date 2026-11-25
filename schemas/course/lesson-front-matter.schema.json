@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "num": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mins": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "lede": {
+      "type": "string",
+      "minLength": 1
+    },
+    "quiz": {
+      "type": "object",
+      "properties": {
+        "q": {
+          "type": "string",
+          "minLength": 1
+        },
+        "opts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 2,
+          "maxItems": 4
+        },
+        "a": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "why": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "q",
+        "opts",
+        "a",
+        "why"
+      ],
+      "additionalProperties": false
+    },
+    "finish": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "id",
+    "num",
+    "title",
+    "mins",
+    "lede",
+    "quiz"
+  ],
+  "additionalProperties": false
+}
