@@ -1,0 +1,26 @@
+.cycle-widget { min-width: 0; font-family: Inter, sans-serif; color: var(--color-content); }
+.cycle-styles, .cycle-controls, .cycle-laps { display: flex; flex-wrap: wrap; gap: .5rem; }
+.cycle-widget button { font: inherit; font-weight: 500; color: var(--color-content); background: var(--color-surface); border: 1px solid var(--color-line); border-radius: .4rem; padding: .5rem .75rem; cursor: pointer; }
+.cycle-widget button:hover, .cycle-widget button[aria-pressed="true"] { color: var(--color-accent-text); border-color: var(--color-accent-text); }
+.cycle-widget button:focus-visible { outline: 2px solid var(--color-accent-text); outline-offset: 2px; }
+.cycle-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 1.25rem; align-items: center; margin-top: 1rem; }
+.cycle-layout svg { display: block; width: 100%; min-width: 0; }
+.cycle-edge, .cycle-ring { stroke: var(--color-line); stroke-width: 2; fill: none; }
+.cycle-edge.active, .cycle-ring-on { stroke: var(--color-accent-text); }
+.cycle-ring-on { fill: none; stroke-width: 3; }
+.cycle-node circle { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 2; }
+.cycle-node.active circle { stroke: var(--color-accent-text); }
+.cycle-node text { fill: var(--color-content); text-anchor: middle; font-size: 13px; font-weight: 600; }
+.cycle-node .cycle-sub { fill: var(--color-muted); font: 500 18px 'JetBrains Mono', monospace; }
+.cycle-packet { fill: var(--color-accent-text); }
+.cycle-side { display: grid; gap: 1rem; min-width: 0; }
+.cycle-label, .cycle-count { font: 500 .75rem 'JetBrains Mono', monospace; color: var(--color-muted); }
+.cycle-label { margin-bottom: .5rem; text-transform: uppercase; }
+.cycle-lap { display: grid; place-items: center; width: 2rem; height: 2rem; border: 1px solid var(--color-line); border-radius: 50%; font: 500 .75rem 'JetBrains Mono', monospace; }
+.cycle-lap.current { border-color: var(--color-accent-text); color: var(--color-accent-text); }
+.cycle-lap.done { background: var(--color-accent-text); color: var(--color-on-accent); border-color: var(--color-accent-text); }
+.cycle-message { min-width: 0; padding: 1rem; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: .5rem; overflow-wrap: anywhere; }
+.cycle-message strong { display: block; margin-bottom: .4rem; }
+.cycle-message div { font: 500 .8rem 'JetBrains Mono', monospace; }
+.cycle-count { margin: 0; }
+@media (max-width: 700px) { .cycle-layout { grid-template-columns: minmax(0, 1fr); } }
