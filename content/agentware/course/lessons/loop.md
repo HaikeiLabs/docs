@@ -3,7 +3,7 @@ id: loop
 num: 7
 title: Debug one agent loop
 mins: 12
-lede: Run a real loop under a debugger. It pauses each time it sends to the model, gets a reply, runs a tool, or appends results. Same task, three wire formats.
+lede: "Run a real loop under a debugger. It pauses each time it sends to the model, gets a reply, runs a tool, or appends results. Same task in three formats: Claude's Messages API, GPT-OSS Harmony and Qwen3 ChatML."
 quiz:
   q: Two parallel tool results. What does each format append?
   opts:

@@ -25,7 +25,7 @@ and rewrites every JSON file in `content/agentware/course/data/`. Then run
 | `debugger.json` | 7 | `sources/debugger.json` (loop code and help text) plus the render and parse functions from `agent_loop_mock.py` |
 | `runtime-trace.json` | 9 | `runtime_trace.py`: a real Agentware run with a scripted model, plus the loop in `sources/runtime_loop.py` |
 | `compare-build-time.json` | 8 | `aw_templates.py`: real Agentware formatter output, for the models in `sources/build-time.json` |
-| `gaps.json` | 10 | `sources/gaps.json` plus the reproduction output from `aw_templates.py`; `repro.sdk_version` is the installed Agentware version |
+| `gaps.json` | 10 | `sources/gaps.json` plus output from `aw_templates.py`: fields written as `{"capture": "<key>"}` in the source (such as what `run_inference` sends the backend) and the reproduction block; `repro.sdk_version` is the installed Agentware version |
 | `compare-*.json`, `api-*.json` (others) | 3 to 6 | copied from `sources/` |
 
 The file shapes are defined by `schemas/course/*.schema.json`.

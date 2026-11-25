@@ -50,7 +50,7 @@ Other model families you'll meet when self-hosting.
 
 ## Server flags for self-hosting
 
-vLLM needs to know which format to parse. If the flag doesn't match the model, tool calls come back as plain text and `tool_calls` stays empty.
+vLLM, a popular open-source model server, needs to know which format to parse. If the flag doesn't match the model, tool calls come back as plain text and `tool_calls` stays empty. The Qwen3 parser is called `hermes` because Qwen uses the tool-call format first published with the Hermes models.
 
 ```bash title="serve.sh" marks="2=Qwen3;5=GPT-OSS;8=MiniMax M2"
 vllm serve Qwen/Qwen3-8B --enable-auto-tool-choice \

@@ -5,7 +5,7 @@
       "name": "Qwen3-Coder",
       "sub": "",
       "note": "Same wrapper as Qwen3, but every parameter is its own block, which suits long code values. Values arrive as strings, so convert types yourself.",
-      "src": "vLLM examples/tool_chat_template_qwen3coder.jinja",
+      "src": "vLLM example chat template for Qwen3-Coder",
       "panes": [
         {
           "label": "Declare",
@@ -58,7 +58,7 @@
       "id": "minimax3",
       "name": "MiniMax M3",
       "sub": "",
-      "note": "Every structural tag carries the marker `]<]minimax[>[`. Parameters become elements named after the parameter.",
+      "note": "Every structural tag contains the string `]<]minimax[>[`. Parameters become elements named after the parameter.",
       "src": "vLLM vllm/parser/minimax_m3.py",
       "panes": [
         {

@@ -12,7 +12,7 @@ quiz:
     - Denied it by policy
     - Ended the run with an error
   a: 1
-  why: With a validator configured, every turn must be a tool call. Plain text gets a retry nudge, so the agent finishes by calling final_answer.
+  why: With a response validator configured, every turn must be a tool call. Plain text gets a retry nudge, a short message telling the model what to fix, so the agent finishes by calling final_answer.
 ---
 
 [widget:rtdebugger data=runtime-trace]

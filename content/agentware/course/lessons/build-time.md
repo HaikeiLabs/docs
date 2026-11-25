@@ -17,7 +17,7 @@ quiz:
 
 ## In code
 
-Register the tool [[1]] and pick a formatter from the model name [[2]]. Then render the tools: as JSON for the `tools` field [[3]], or as text for the system prompt when the server has no tool parser [[4]].
+Register the tool [[1]] and pick a formatter, the class that writes and reads one model family's tool format, from the model name [[2]]. Then render the tools: as JSON for the `tools` field [[3]], or as text for the system prompt when the server has no tool parser [[4]].
 
 ```python title="build.py" marks="2=1;4=2;6=3;7=4"
 registry = ToolRegistry()

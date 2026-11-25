@@ -3,7 +3,7 @@ id: api
 num: 3
 title: "The API: where tools go"
 mins: 4
-lede: Two APIs cover most models. They do the same three things with different field names.
+lede: "Two APIs cover most models: the OpenAI-compatible Chat Completions API, which most model servers copy, and Anthropic's Messages API. They do the same three things with different field names."
 quiz:
   q: In an OpenAI-compatible response, what type is function.arguments?
   opts:
@@ -23,7 +23,7 @@ Pick a moment. Highlighted lines are where the two APIs differ.
 
 ## Close the loop
 
-Keep the assistant message exactly as returned [[1]]. Decode the arguments string [[2]], run the tool, and answer each call by its id [[3]]. If there were calls, go again [[4]].
+`MODEL` is the model id, `URL` the server's `/v1/chat/completions` endpoint, and `TOOLS` your Lesson 2 tool in the OpenAI shape. Keep the assistant message exactly as returned [[1]]: the API keeps no state, so the model only sees its own tool calls if you send them back. Decode the arguments string [[2]], run the tool, and answer each call by its id [[3]]. If there were calls, go again [[4]].
 
 ```python title="openai_step.py" marks="4=1;6=2;8=3;9=4"
 def step(messages):

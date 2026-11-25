@@ -100,6 +100,28 @@ def runtime_trace() -> None:
     write_json("runtime-trace.json", {"code": code, "trace": trace})
 
 
+def captures(captured: dict) -> dict:
+    """Gap fields that come from running the SDK, referenced in sources/gaps.json as {"capture": "<key>"}."""
+    # The tools field an OpenAI-compatible request should carry, as the SDK itself
+    # serializes it, with the JSON Schema shortened to keep the line readable.
+    tools = json.loads(captured["schemas"])
+    for tool in tools:
+        tool["function"]["parameters"] = "…"
+    sent = captured["tools_sent"]
+    received = sent["backend_received"]
+    return {
+        "tools_wire": '"tools": ' + json.dumps(tools, ensure_ascii=False).replace('"…"', "…"),
+        "tools_aw": (
+            f"run_inference gets tool_specs {sent['tool_specs']} but calls "
+            f"client.complete(messages); the backend receives tools={received!r}"
+        ),
+    }
+
+
+def fill_captures(gap: dict, values: dict) -> dict:
+    return {key: values[value["capture"]] if isinstance(value, dict) else value for key, value in gap.items()}
+
+
 def build_time_and_gaps(version: str) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         captured = json.loads(run_script("aw_templates.py", Path(tmp)))
@@ -140,7 +162,7 @@ def build_time_and_gaps(version: str) -> None:
     write_json(
         "gaps.json",
         {
-            "gaps": read_json(SOURCES / "gaps.json"),
+            "gaps": [fill_captures(gap, captures(captured)) for gap in read_json(SOURCES / "gaps.json")],
             "repro": {
                 "qwen_parse_official": captured["qwen_parse_official"],
                 "reason_thinking_tag": captured["reason_thinking_tag"],
