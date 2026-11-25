@@ -3,8 +3,8 @@ import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../dist');
-const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.md': 'text/markdown; charset=utf-8' };
+const root = process.env.PREVIEW_DIR ? path.resolve(process.env.PREVIEW_DIR) : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../dist');
+const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.md': 'text/markdown; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml' };
 
 createServer(async (request, response) => {
   try {
@@ -20,4 +20,4 @@ createServer(async (request, response) => {
     response.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' });
     response.end('Not found');
   }
-}).listen(4173, '127.0.0.1', () => console.log('Previewing docs at http://localhost:4173'));
+}).listen(Number(process.env.PORT ?? 4173), '127.0.0.1', () => console.log(`Previewing docs at http://localhost:${process.env.PORT ?? 4173}`));

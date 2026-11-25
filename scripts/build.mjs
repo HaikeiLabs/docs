@@ -3,6 +3,7 @@ import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import YAML from 'yaml';
+import { loadCourse, renderCourse } from './course.mjs';
 import { createMarkdown, escapeHtml, neighbours, renderToc, stripHtmlComments, stripLeadingTitle } from './render.mjs';
 import { checkBuiltRoutes, checkLinks } from './check-links.mjs';
 
@@ -90,7 +91,7 @@ async function markdownFiles(directory, root = directory) {
   const files = [];
   for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
     const absolute = path.join(directory, entry.name);
-    if (entry.isDirectory()) files.push(...await markdownFiles(absolute, root));
+    if (entry.isDirectory() && path.relative(root, absolute).split(path.sep).join('/') !== 'agentware/course/lessons') files.push(...await markdownFiles(absolute, root));
     else if (entry.isFile() && entry.name.endsWith('.md')) files.push({ absolute, relativePath: path.relative(root, absolute).split(path.sep).join('/') });
   }
   return files;
@@ -157,7 +158,7 @@ function sidebar(pages, currentPath = '', links = siteLinks(pages)) {
   const groups = navSections(pages).map((section) => {
     const heading = section.product === product ? '' : `<div class="nav-product">${section.label}</div>`;
     product = section.product;
-    const entries = section.pages.map((page) => `<li><a href="${pageHref(page)}"${page.relativePath === currentPath ? ' aria-current="page"' : ''}>${escapeHtml(page.title)}</a></li>`).join('');
+    const entries = section.pages.map((page) => `<li><a href="${pageHref(page)}"${page.relativePath === currentPath ? ' aria-current="page"' : ''}>${escapeHtml(page.course === 'agentware' ? 'Course: tool calling from scratch' : page.title)}</a></li>`).join('');
     return `${heading}<div class="nav-section">${section.group}</div><ul>${entries}</ul>`;
   }).join('');
   return `<aside class="sidebar" id="site-nav"><div class="menu-hint">Press <kbd>Esc</kbd> to close <span>Focus returns to Menu</span></div>${globalNav(links, currentPath, 'sidebar-global')}<nav aria-label="Documentation">${groups}</nav></aside>`;
@@ -269,7 +270,7 @@ function seoHead({ title, description, canonical, ogType }) {
   ].join('\n  ');
 }
 
-function layout(title, nav, content, { toc = '', mermaid = false, description = homeDescription, canonical = '/', ogType = 'website', fullTitle = `${title} · ${siteName}`, links, currentPath = '', tutorial = '', notFound = false } = {}) {
+function layout(title, nav, content, { toc = '', mermaid = false, description = homeDescription, canonical = '/', ogType = 'website', fullTitle = `${title} · ${siteName}`, links, currentPath = '', tutorial = '', notFound = false, variant = '' } = {}) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -286,6 +287,7 @@ function layout(title, nav, content, { toc = '', mermaid = false, description = 
   <link rel="stylesheet" href="/assets/brand.css">
   <link rel="stylesheet" href="/assets/tokens.css">
   <link rel="stylesheet" href="/assets/site.css">
+  ${variant === 'course' ? '<link rel="stylesheet" href="/assets/course/course.css"><script type="module" src="/assets/course/course.js"></script>' : ''}
   ${mermaid ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js" defer></script>' : ''}
   <script src="/assets/site.js" defer></script>
 </head>
@@ -300,7 +302,7 @@ function layout(title, nav, content, { toc = '', mermaid = false, description = 
     <a class="header-link" href="${escapeHtml(appLink(`${consoleUrl}/`, 'docs-header-console'))}">Console</a>
     <button class="theme-toggle" type="button" aria-label="Switch color theme"></button>
   </header>
-  <div class="layout">${nav}<main id="main" class="content"${tutorial ? ` data-tutorial="${escapeHtml(tutorial)}"` : ''}>${content}<footer class="footer">${notFound ? '' : '<p>Public guidance for people building and using agents with Kei.</p>'}<p>Questions? Join the developer community on <a href="${discordUrl}" target="_blank" rel="noopener noreferrer">Discord</a>.</p></footer></main>${toc}</div>
+  <div class="layout${variant === 'course' ? ' course-layout' : ''}">${nav}<main id="main" class="content"${tutorial ? ` data-tutorial="${escapeHtml(tutorial)}"` : ''}>${content}<footer class="footer">${notFound ? '' : '<p>Public guidance for people building and using agents with Kei.</p>'}<p>Questions? Join the developer community on <a href="${discordUrl}" target="_blank" rel="noopener noreferrer">Discord</a>.</p></footer></main>${toc}</div>
 </body>
 </html>
 `;
@@ -406,7 +408,7 @@ export async function loadDocs(contentDir = path.join(repoRoot, 'content')) {
   return pages;
 }
 
-export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), outputDir = path.join(repoRoot, 'dist'), assetsDir = path.join(repoRoot, 'assets') } = {}) {
+export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), outputDir = path.join(repoRoot, 'dist'), assetsDir = path.join(repoRoot, 'assets'), courseDir = process.env.COURSE_DIR ?? path.join(contentDir, 'agentware/course') } = {}) {
   markdown.renderer.rules.link_open = (tokens, index, options, env, self) => {
     const token = tokens[index];
     const href = token.attrGet('href');
@@ -415,6 +417,9 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     return self.renderToken(tokens, index, options);
   };
   const pages = await loadDocs(contentDir);
+  const course = existsSync(path.join(courseDir, 'index.md')) ? loadCourse(courseDir) : null;
+  if (course && !pages.some(page => page.relativePath === 'agentware/course/index.md')) pages.push(validatePage('agentware/course/index.md', await readFile(path.join(courseDir, 'index.md'), 'utf8')));
+  checkNavOrder(pages);
   await checkLinks(contentDir);
   await rm(outputDir, { recursive: true, force: true });
   await mkdir(path.join(outputDir, 'assets'), { recursive: true });
@@ -426,14 +431,17 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   // The share card arrives from design-system; until then og:image points at the C5 path.
   if (existsSync(path.join(assetsDir, 'social'))) await cp(path.join(assetsDir, 'social'), path.join(outputDir, 'assets/social'), { recursive: true });
   const links = siteLinks(pages);
+  if (course) { await cp(path.join(assetsDir, 'course'), path.join(outputDir, 'assets/course'), { recursive: true }); await cp(path.join(courseDir, 'data'), path.join(outputDir, 'agentware/course/data'), { recursive: true }); }
   for (const page of pages) {
-    const { outputPath, html } = renderPage(page, pages, links);
+    let result = renderPage(page, pages, links);
+    if (page.course === 'agentware' && course) { const rendered = renderCourse(course); result = { outputPath: pageOutputPath(page), html: layout(page.title, rendered.rail, rendered.content, { variant: 'course', description: page.description, canonical: pageHref(page), links, currentPath: page.relativePath }) }; }
+    const { outputPath, html } = result;
     const htmlFile = path.join(outputDir, outputPath);
     const markdownFile = path.join(outputDir, page.relativePath);
     await mkdir(path.dirname(htmlFile), { recursive: true });
     await writeFile(htmlFile, html);
     await mkdir(path.dirname(markdownFile), { recursive: true });
-    await cp(path.join(contentDir, page.relativePath), markdownFile);
+    await cp(page.course === 'agentware' && course ? path.join(courseDir, 'index.md') : path.join(contentDir, page.relativePath), markdownFile);
   }
   const overview = pages.find((page) => page.relativePath === 'agentware/build/overview.md');
   if (!overview) throw new Error('Missing content/agentware/build/overview.md required by Agentware section routes');

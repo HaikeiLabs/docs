@@ -15,7 +15,8 @@
     "build": "node scripts/build.mjs",
     "test": "node --test",
     "preview": "node scripts/preview.mjs",
-    "check:course": "node scripts/course-validate.mjs"
+    "check:course": "node scripts/course-validate.mjs",
+    "build:fixture": "node scripts/build-fixture.mjs"
   },
   "dependencies": {
     "@haikeilabs/brand": "file:vendor/haikeilabs-brand-0.8.0.tgz",
