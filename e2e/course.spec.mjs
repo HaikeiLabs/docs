@@ -321,3 +321,27 @@ test.describe('390px debuggers', () => {
     });
   }
 });
+
+for (const [name, url] of [['a hashless load', '/agentware/course/'], ['an unknown hash', '/agentware/course/#no-such-lesson']]) {
+  test(`${name} shows the first lesson, marks it current and sets its hash`, async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.goto(url);
+    await expect(page.locator('.lesson:visible')).toHaveCount(1);
+    await expect(page.locator('.lesson:visible h1')).toHaveText('Basics');
+    await expect(page.locator('[data-lesson-link="basics"]')).toHaveAttribute('aria-current', 'page');
+    await expect.poll(() => page.evaluate(() => location.hash)).toBe('#basics');
+    expect(errors).toEqual([]);
+  });
+}
+
+test('wide gaps code shows a scroll affordance at 390px', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/agentware/course/#gaps');
+  await mounted(page, 'gaps', 'gaps');
+  const details = page.locator('#gaps .gaps-repro');
+  if (await details.count()) await details.first().locator('summary').click();
+  const style = await page.locator('#gaps .gaps-code pre').first().evaluate(el => ({ image: getComputedStyle(el).backgroundImage, attachment: getComputedStyle(el).backgroundAttachment }));
+  expect(style.image).toContain('gradient');
+  expect(style.attachment).toContain('local');
+});

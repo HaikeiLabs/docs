@@ -3,8 +3,9 @@ export function lessonForHash(hash, lessons, documentRoot) {
   try { id = decodeURIComponent(hash.replace(/^#/, '')); } catch { id = ''; }
   const direct = lessons.find(lesson => lesson.id === id);
   if (direct) return direct;
-  const anchor = id && documentRoot?.getElementById(id);
-  return anchor?.closest('.lesson') ?? lessons[0];
+  // An empty or unknown hash falls back to the first lesson (the docs nav links to the bare URL).
+  const anchor = id ? documentRoot?.getElementById(id) : null;
+  return anchor?.closest?.('.lesson') ?? lessons[0];
 }
 export function readProgress(storage) {
   try { const value = JSON.parse(storage.getItem('aw-course-done') || '[]'); return new Set(Array.isArray(value) ? value : []); } catch { return new Set(); }
@@ -46,6 +47,10 @@ if (typeof document !== 'undefined') {
   const show = async () => {
     const current = lessonForHash(location.hash, lessons, document);
     if (!current) return;
+    // Give a bare or unknown URL the lesson's hash, so the address matches what is shown and can be shared.
+    let target = null;
+    try { target = document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch {}
+    if (!target || !current.contains(target)) history.replaceState(null, '', `${location.pathname}${location.search}#${current.id}`);
     if (current !== currentLesson) {
       cleanups.forEach(fn => fn()); cleanups = []; currentLesson = current; generation++;
       track('course_lesson_view', current.id);
