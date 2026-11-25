@@ -14,6 +14,18 @@
       "type": "string",
       "minLength": 1
     },
+    "seo_title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 70,
+      "description": "Optional search title for <title> and og:title. Defaults to \"<title> \u00b7 Agentware course\"."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "description": "Optional meta description. Defaults to the lede as plain text, cut to 160 characters."
+    },
     "mins": {
       "type": "integer",
       "minimum": 1

@@ -1,11 +1,12 @@
-export function lessonForHash(hash, lessons, documentRoot) {
+// Old one-page URLs (/agentware/course/#<id>, or #<id>-<step> for a step) map to the
+// lesson's own page. The longest matching id wins, so #tool-call-x is tool-call, not tool.
+export function lessonUrlForHash(hash, ids, base = '/agentware/course/') {
   let id;
-  try { id = decodeURIComponent(hash.replace(/^#/, '')); } catch { id = ''; }
-  const direct = lessons.find(lesson => lesson.id === id);
-  if (direct) return direct;
-  // An empty or unknown hash falls back to the first lesson (the docs nav links to the bare URL).
-  const anchor = id ? documentRoot?.getElementById(id) : null;
-  return anchor?.closest?.('.lesson') ?? lessons[0];
+  try { id = decodeURIComponent(hash.replace(/^#/, '')); } catch { return null; }
+  if (!id) return null;
+  if (ids.includes(id)) return `${base}${id}/`;
+  const owner = ids.filter(lessonId => id.startsWith(`${lessonId}-`)).sort((a, b) => b.length - a.length)[0];
+  return owner ? `${base}${owner}/#${encodeURIComponent(id)}` : null;
 }
 export function readProgress(storage) {
   try { const value = JSON.parse(storage.getItem('aw-course-done') || '[]'); return new Set(Array.isArray(value) ? value : []); } catch { return new Set(); }
@@ -17,19 +18,27 @@ export function recordAnswer(done, lessonId, answer, correct) {
   return { correct: true, newlyComplete };
 }
 if (typeof document !== 'undefined') {
-  const lessons = [...document.querySelectorAll('.lesson')];
+  const ids = (document.querySelector('[data-course-lessons]')?.dataset.courseLessons ?? '').split(' ').filter(Boolean);
+  const hubTarget = document.querySelector('[data-course-hub]') ? lessonUrlForHash(location.hash, ids) : null;
+  if (hubTarget) location.replace(hubTarget);
+  else initCourse(ids);
+}
+
+function initCourse(ids) {
+  // A lesson page holds exactly one lesson; the hub holds none.
+  const current = document.querySelector('.lesson');
   let storage;
   try { storage = window.localStorage; } catch { storage = null; }
   const done = readProgress(storage);
-  let cleanups = [], currentLesson = null, generation = 0;
+  const cleanups = [];
   const track = (event, id) => window.haikeiAnalytics?.track(event, { lesson_id: id });
   const progress = () => {
     document.querySelectorAll('[data-lesson-link]').forEach(link => {
       link.querySelector('[data-check]').textContent = done.has(link.dataset.lessonLink) ? '✓ ' : '';
     });
-    const count = lessons.filter(l => done.has(l.id)).length;
-    document.querySelectorAll('[data-progress]').forEach(el => { el.textContent = `${count} of ${lessons.length}`; });
-    document.querySelectorAll('[data-course-complete]').forEach(el => { el.hidden = count < lessons.length; });
+    const count = ids.filter(id => done.has(id)).length;
+    document.querySelectorAll('[data-progress]').forEach(el => { el.textContent = `${count} of ${ids.length}`; });
+    document.querySelectorAll('[data-course-complete]').forEach(el => { el.hidden = count < ids.length; });
   };
   const markQuiz = (quiz, button, correct) => {
     quiz.querySelectorAll('[data-quiz-answer]').forEach(option => {
@@ -40,28 +49,10 @@ if (typeof document !== 'undefined') {
     feedback.textContent = correct ? feedback.dataset.why : 'Not this one. Try again: reread the steps above for the detail the question asks about.';
   };
   // A completed lesson shows its answered quiz again after a reload.
-  for (const lesson of lessons) {
-    const quiz = lesson.querySelector('.course-quiz');
-    if (quiz && done.has(lesson.id)) markQuiz(quiz, quiz.querySelector(`[data-quiz-answer="${quiz.dataset.answer}"]`), true);
-  }
-  const show = async () => {
-    const current = lessonForHash(location.hash, lessons, document);
-    if (!current) return;
-    // Give a bare or unknown URL the lesson's hash, so the address matches what is shown and can be shared.
-    let target = null;
-    try { target = document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch {}
-    if (!target || !current.contains(target)) history.replaceState(null, '', `${location.pathname}${location.search}#${current.id}`);
-    if (current !== currentLesson) {
-      cleanups.forEach(fn => fn()); cleanups = []; currentLesson = current; generation++;
-      track('course_lesson_view', current.id);
-    } else return;
-    const thisGeneration = generation;
-    for (const lesson of lessons) lesson.hidden = lesson !== current;
-    document.querySelectorAll('[data-lesson-link]').forEach(link => {
-      if (link.dataset.lessonLink === current.id) link.setAttribute('aria-current', 'page');
-      else link.removeAttribute('aria-current');
-    });
-    for (const el of current.querySelectorAll('[data-widget]')) {
+  const quiz = current?.querySelector('.course-quiz');
+  if (quiz && done.has(current.id)) markQuiz(quiz, quiz.querySelector(`[data-quiz-answer="${quiz.dataset.answer}"]`), true);
+  const mountWidgets = async lesson => {
+    for (const el of lesson.querySelectorAll('[data-widget]')) {
       try {
         const module = await import(`/assets/course/widgets/${el.dataset.widget}.js`);
         const fetchData = async name => { const res = await fetch(`/agentware/course/data/${name}.json`); if (!res.ok) throw new Error(`Cannot load ${name}`); return res.json(); };
@@ -69,7 +60,6 @@ if (typeof document !== 'undefined') {
         if (el.dataset.src) { const res = await fetch(el.dataset.src); if (!res.ok) throw new Error('Cannot load widget data'); data = await res.json(); }
         else if (el.dataset.widget === 'debugger') data = { logs: await fetchData('logs'), debugger: await fetchData('debugger') };
         else data = await fetchData(el.dataset.widget === 'cycle' ? 'logs' : el.dataset.widget);
-        if (generation !== thisGeneration) continue;
         module.mount(el, data, { reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches, onCleanup: fn => cleanups.push(fn) });
       } catch (error) { console.warn('Course widget unavailable', error); }
     }
@@ -92,5 +82,6 @@ if (typeof document !== 'undefined') {
     if (!result.correct) return;
     if (result.newlyComplete) { saveProgress(storage, done); track('course_lesson_complete', lesson.id); progress(); }
   });
-  progress(); addEventListener('hashchange', show); show();
+  progress();
+  if (current) { track('course_lesson_view', current.id); mountWidgets(current); }
 }

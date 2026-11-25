@@ -7,14 +7,17 @@ for (const theme of ['light', 'dark']) {
   test.describe(`${theme} theme`, () => {
     test.beforeEach(async ({ page }) => { await page.addInitScript(value => { if (!localStorage.getItem('haikei-theme')) localStorage.setItem('haikei-theme', value); }, theme); });
 
-    test('routes every lesson and keeps the mobile page within its viewport', async ({ page }) => {
+    test('every lesson page shows one lesson with its own title and keeps the mobile page within its viewport', async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       for (const [id, title] of lessons) {
-        await page.goto(`/agentware/course/#${id}`);
-        await expect(page.locator('.lesson:visible')).toHaveCount(1);
+        await page.goto(`/agentware/course/${id}/`);
+        await expect(page).toHaveURL(new RegExp(`/agentware/course/${id}/$`));
+        await expect(page).toHaveTitle(`${title} · Agentware course`);
+        await expect(page.locator('.lesson')).toHaveCount(1);
         await expect(page.locator('.lesson:visible h1')).toHaveText(title);
+        await expect(page.locator(`[data-lesson-link="${id}"]`)).toHaveAttribute('aria-current', 'page');
         await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
         await page.getByRole('button', { name: 'Menu' }).click();
         await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -24,7 +27,7 @@ for (const theme of ['light', 'dark']) {
     });
 
     test('theme toggle persists across reload', async ({ page }) => {
-      await page.goto('/agentware/course/#basics');
+      await page.goto('/agentware/course/basics/');
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
       await page.locator('.theme-toggle').click();
       const next = theme === 'light' ? 'dark' : 'light';
@@ -34,7 +37,7 @@ for (const theme of ['light', 'dark']) {
     });
 
     test('quiz marks only a correct answer complete and persists it', async ({ page }) => {
-      await page.goto('/agentware/course/#basics');
+      await page.goto('/agentware/course/basics/');
       await page.locator('#basics [data-quiz-answer="1"]').click();
       await expect(page.locator('[data-progress]')).toHaveText('0 of 6');
       await page.locator('#basics [data-quiz-answer="0"]').click();
@@ -48,14 +51,14 @@ for (const theme of ['light', 'dark']) {
       const context = await browser.newContext();
       await context.addInitScript(() => { Object.defineProperty(window, 'localStorage', { get() { throw new Error('storage blocked'); } }); });
       const page = await context.newPage();
-      await page.goto('/agentware/course/#basics');
+      await page.goto('/agentware/course/basics/');
       await page.locator('#basics [data-quiz-answer="0"]').click();
       await expect(page.locator('[data-progress]')).toHaveText('1 of 6');
       await context.close();
     });
 
     test('markers, quiz, body and rail text meet contrast requirements', async ({ page }) => {
-      await page.goto('/agentware/course/#basics');
+      await page.goto('/agentware/course/basics/');
       const ratios = await page.evaluate(() => {
         const parse = value => value.match(/[\d.]+/g).map(Number);
         const blend = (fg, bg) => { const a = fg[3] ?? 1; return [0, 1, 2].map(i => fg[i] * a + bg[i] * (1 - a)); };
@@ -75,7 +78,7 @@ for (const theme of ['light', 'dark']) {
 }
 
 test('rail links and quiz controls have visible keyboard focus', async ({ page }) => {
-  await page.goto('/agentware/course/#basics');
+  await page.goto('/agentware/course/basics/');
   const link = page.locator('[data-lesson-link="basics"]');
   await link.focus();
   await expect(link).toBeFocused();
@@ -91,7 +94,7 @@ for (const [name, lesson] of [['cycle', 'basics'], ['compare', 'api'], ['api', '
     test.skip(!existsSync(`assets/course/widgets/${name}.js`), `${name} widget is being developed separately`);
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
-    await page.goto(`/agentware/course/#${lesson}`);
+    await page.goto(`/agentware/course/${lesson}/`);
     if (name === 'api') await page.locator('#api .course-reference summary').click();
     const widget = page.locator(`#${lesson} [data-widget="${name}"]`);
     await expect(widget).not.toHaveText(`Interactive ${name} widget`);
@@ -113,7 +116,7 @@ test('cycle respects reduced motion and advances only on request', async ({ brow
   test.skip(!existsSync('assets/course/widgets/cycle.js'), 'cycle widget is being developed separately');
   const context = await browser.newContext({ reducedMotion: 'reduce' });
   const page = await context.newPage();
-  await page.goto('/agentware/course/#basics');
+  await page.goto('/agentware/course/basics/');
   const widget = page.locator('[data-widget="cycle"]');
   await expect(widget).not.toHaveText('Interactive cycle widget');
   const before = await widget.innerHTML();
@@ -127,7 +130,7 @@ test('cycle respects reduced motion and advances only on request', async ({ brow
 test('compare tabs support keyboard and do not overflow mobile', async ({ page }) => {
   test.skip(!existsSync('assets/course/widgets/compare.js'), 'compare widget is being developed separately');
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/agentware/course/#api');
+  await page.goto('/agentware/course/api/');
   const widget = page.locator('[data-widget="compare"]');
   const tabs = widget.getByRole('tab');
   await expect(tabs.first()).toBeVisible();
@@ -143,7 +146,7 @@ test('compare tabs support keyboard and do not overflow mobile', async ({ page }
 
 test('debugger controls have visible keyboard focus', async ({ page }) => {
   test.skip(!existsSync('assets/course/widgets/debugger.js'), 'debugger widget is being developed separately');
-  await page.goto('/agentware/course/#loop');
+  await page.goto('/agentware/course/loop/');
   const button = page.locator('[data-widget="debugger"]').getByRole('button', { name: 'Step', exact: true });
   await expect(button).toBeVisible();
   await button.focus();
@@ -173,7 +176,7 @@ test('code and token text render without font ligatures', async ({ page }) => {
     ['loop', 'debugger', ['.debugger-line code', '.debugger-inspector pre']],
     ['runtime', 'rtdebugger', ['.rt-line code', '.rt-block pre']],
   ]) {
-    await page.goto(`/agentware/course/#${lesson}`);
+    await page.goto(`/agentware/course/${lesson}/`);
     await mounted(page, lesson, widget);
     for (const selector of selectors) {
       expect(await page.locator(`#${lesson} ${selector}`).first().evaluate(el => getComputedStyle(el).fontVariantLigatures), selector).toBe('none');
@@ -185,7 +188,7 @@ for (const theme of ['light', 'dark']) {
   test(`debugger status banners meet contrast in ${theme} mode`, async ({ page }) => {
     await setTheme(page, theme);
     for (const [lesson, widget, selector] of [['loop', 'debugger', '.debugger-status'], ['runtime', 'rtdebugger', '.rt-status']]) {
-      await page.goto(`/agentware/course/#${lesson}`);
+      await page.goto(`/agentware/course/${lesson}/`);
       await mounted(page, lesson, widget);
       for (const [name, ratio] of await contrastOf(page, [`#${lesson} ${selector}`])) expect(ratio, `${name}: ${ratio}`).toBeGreaterThanOrEqual(4.5);
     }
@@ -194,7 +197,7 @@ for (const theme of ['light', 'dark']) {
 
 test('debugger Step and Continue are disabled at the last stop', async ({ page }) => {
   for (const [lesson, widget, stop] of [['loop', 'debugger', '[data-stop]'], ['runtime', 'rtdebugger', '[data-go]']]) {
-    await page.goto(`/agentware/course/#${lesson}`);
+    await page.goto(`/agentware/course/${lesson}/`);
     await mounted(page, lesson, widget);
     const root = page.locator(`#${lesson} [data-widget="${widget}"]`);
     await expect(root.getByRole('button', { name: 'Step', exact: true })).not.toHaveAttribute('aria-disabled', 'true');
@@ -206,7 +209,7 @@ test('debugger Step and Continue are disabled at the last stop', async ({ page }
 });
 
 test('debugger defaults to Claude and pluralizes the history count', async ({ page }) => {
-  await page.goto('/agentware/course/#loop');
+  await page.goto('/agentware/course/loop/');
   await mounted(page, 'loop', 'debugger');
   const root = page.locator('#loop [data-widget="debugger"]');
   await expect(root.locator('[data-style]')).toHaveText(['Claude', 'GPT-OSS', 'Qwen3']);
@@ -216,7 +219,7 @@ test('debugger defaults to Claude and pluralizes the history count', async ({ pa
 
 test('debugger final answer wraps inside its panel', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto('/agentware/course/#loop');
+  await page.goto('/agentware/course/loop/');
   await mounted(page, 'loop', 'debugger');
   await page.locator('#loop [data-stop]').last().click();
   const pre = page.locator('#loop .debugger-inspector pre').last();
@@ -226,7 +229,7 @@ test('debugger final answer wraps inside its panel', async ({ page }) => {
 
 test('cycle: Next disables at the end, Restart resets Replay, controls stay on one row', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto('/agentware/course/#basics');
+  await page.goto('/agentware/course/basics/');
   await mounted(page, 'basics', 'cycle');
   const root = page.locator('#basics [data-widget="cycle"]');
   await root.getByRole('button', { name: 'GPT-OSS' }).click();
@@ -245,7 +248,7 @@ test('cycle: Next disables at the end, Restart resets Replay, controls stay on o
 });
 
 test('a wrong quiz pick gets the neutral treatment and a hint, not the correct style', async ({ page }) => {
-  await page.goto('/agentware/course/#basics');
+  await page.goto('/agentware/course/basics/');
   const quiz = page.locator('#basics .course-quiz');
   const wrong = quiz.locator('[data-quiz-answer="1"]'), right = quiz.locator('[data-quiz-answer="0"]');
   await wrong.click();
@@ -267,13 +270,13 @@ test('completed quizzes are restored after reload and the course reports complet
   await page.goto('/agentware/course/');
   await expect(page.locator('[data-course-complete]:visible')).toHaveCount(0);
   for (const [id] of lessons) {
-    await page.goto(`/agentware/course/#${id}`);
+    await page.goto(`/agentware/course/${id}/`);
     const answer = await page.locator(`#${id} .course-quiz`).getAttribute('data-answer');
     await page.locator(`#${id} [data-quiz-answer="${answer}"]`).click();
   }
   await expect(page.locator('[data-progress]')).toHaveText('6 of 6');
   await expect(page.locator('#gaps [data-course-complete]')).toBeVisible();
-  await page.goto('/agentware/course/#basics');
+  await page.goto('/agentware/course/basics/');
   await page.reload();
   await expect(page.locator('#basics [data-quiz-answer="0"]')).toHaveAttribute('data-result', 'right');
   await expect(page.locator('#basics [data-feedback]')).toHaveText('The first answer is correct.');
@@ -282,14 +285,14 @@ test('completed quizzes are restored after reload and the course reports complet
 
 test('lesson lede stays within the content column', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto('/agentware/course/#basics');
+  await page.goto('/agentware/course/basics/');
   const [lede, prose] = await Promise.all(['#basics > p:nth-of-type(2)', '#basics .prose'].map(s => page.locator(s).evaluate(el => el.getBoundingClientRect().right)));
   expect(lede).toBeLessThanOrEqual(prose + 1);
 });
 
 test('every course button has an accessible name', async ({ page }) => {
   for (const [id] of lessons) {
-    await page.goto(`/agentware/course/#${id}`);
+    await page.goto(`/agentware/course/${id}/`);
     await page.waitForLoadState('networkidle');
     for (const summary of await page.locator(`#${id} details > summary`).all()) await summary.click();
     const unnamed = await page.locator(`#${id} button`).evaluateAll(buttons => buttons.filter(b => !(b.getAttribute('aria-label') || b.textContent).trim()).map(b => b.outerHTML.slice(0, 80)));
@@ -302,7 +305,7 @@ test.describe('390px debuggers', () => {
   for (const [lesson, widget, inspector, gutter] of [['loop', 'debugger', '.debugger-inspector', '[data-bp]'], ['runtime', 'rtdebugger', '.rt-inspector', '.rt-bp']]) {
     test(`${widget}: Step sits next to the panel it changes and gutter targets are 44px`, async ({ page }) => {
       await setTheme(page, 'dark');
-      await page.goto(`/agentware/course/#${lesson}`);
+      await page.goto(`/agentware/course/${lesson}/`);
       await mounted(page, lesson, widget);
       const root = page.locator(`#${lesson} [data-widget="${widget}"]`);
       const step = root.getByRole('button', { name: 'Step', exact: true });
@@ -322,22 +325,66 @@ test.describe('390px debuggers', () => {
   }
 });
 
-for (const [name, url] of [['a hashless load', '/agentware/course/'], ['an unknown hash', '/agentware/course/#no-such-lesson']]) {
-  test(`${name} shows the first lesson, marks it current and sets its hash`, async ({ page }) => {
-    const errors = [];
-    page.on('pageerror', error => errors.push(error.message));
-    await page.goto(url);
-    await expect(page.locator('.lesson:visible')).toHaveCount(1);
-    await expect(page.locator('.lesson:visible h1')).toHaveText('Basics');
-    await expect(page.locator('[data-lesson-link="basics"]')).toHaveAttribute('aria-current', 'page');
-    await expect.poll(() => page.evaluate(() => location.hash)).toBe('#basics');
-    expect(errors).toEqual([]);
+test('the hub introduces the course and links every lesson page without rendering lessons', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/agentware/course/');
+  await expect(page.locator('.lesson')).toHaveCount(0);
+  await expect(page.locator('main h1')).toHaveText('Agentware course');
+  await expect(page.locator('main .tutorial-list a')).toHaveCount(lessons.length);
+  await page.getByRole('link', { name: 'Start the course' }).click();
+  await expect(page).toHaveURL(/\/agentware\/course\/basics\/$/);
+  await expect(page.locator('.lesson h1')).toHaveText('Basics');
+  expect(errors).toEqual([]);
+});
+
+for (const [hash, target] of [['#api', '/agentware/course/api/'], ['#basics-define-a-tool', '/agentware/course/basics/#basics-define-a-tool']]) {
+  test(`the old one-page URL ${hash} redirects to its lesson page`, async ({ page }) => {
+    await page.goto(`/agentware/course/${hash}`);
+    await expect(page).toHaveURL(target);
+    await expect(page.locator('.lesson')).toHaveCount(1);
+    await page.goBack();
+    expect(page.url(), 'the redirect replaces the history entry').not.toContain(hash);
   });
 }
 
+test('an unknown hash on the hub stays on the hub', async ({ page }) => {
+  await page.goto('/agentware/course/#no-such-lesson');
+  await expect(page.locator('main h1')).toHaveText('Agentware course');
+  await expect(page).toHaveURL(/\/agentware\/course\/#no-such-lesson$/);
+});
+
+test('progress survives moving between lesson pages and shows on the hub', async ({ page }) => {
+  await page.goto('/agentware/course/basics/');
+  await page.locator('#basics [data-quiz-answer="0"]').click();
+  await expect(page.locator('[data-progress]')).toHaveText('1 of 6');
+  await page.getByRole('link', { name: /^Next: Steps/ }).click();
+  await expect(page).toHaveURL(/\/agentware\/course\/steps\/$/);
+  await expect(page.locator('[data-progress]')).toHaveText('1 of 6');
+  await expect(page.locator('[data-lesson-link="basics"] [data-check]')).toContainText('✓');
+  await page.locator('#steps [data-quiz-answer="0"]').click();
+  await page.getByRole('link', { name: /^Previous: Basics/ }).click();
+  await expect(page.locator('#basics [data-quiz-answer="0"]')).toHaveAttribute('data-result', 'right');
+  await expect(page.locator('[data-progress]')).toHaveText('2 of 6');
+  await page.goto('/agentware/course/');
+  await expect(page.locator('main [data-lesson-link="steps"] [data-check]')).toContainText('✓');
+  await expect(page.locator('[data-progress]')).toHaveText('2 of 6');
+});
+
+test('a lesson page reports one lesson view to GA4', async ({ page }) => {
+  // site.js assigns window.haikeiAnalytics; record what course.js passes to its track().
+  await page.addInitScript(() => {
+    window.__events = [];
+    let analytics;
+    Object.defineProperty(window, 'haikeiAnalytics', { configurable: true, get: () => analytics, set: value => { analytics = { ...value, track: (name, params) => window.__events.push([name, params]) }; } });
+  });
+  await page.goto('/agentware/course/api/');
+  await expect.poll(() => page.evaluate(() => window.__events)).toEqual([['course_lesson_view', { lesson_id: 'api' }]]);
+});
+
 test('wide gaps code shows a scroll affordance at 390px', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/agentware/course/#gaps');
+  await page.goto('/agentware/course/gaps/');
   await mounted(page, 'gaps', 'gaps');
   const details = page.locator('#gaps .gaps-repro');
   if (await details.count()) await details.first().locator('summary').click();

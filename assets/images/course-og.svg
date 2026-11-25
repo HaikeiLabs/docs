@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Agentware course: How do LLM tool calls work? Haikei Labs">
+  <!-- Course share card. Layout, mark and colors from @haikeilabs/brand assets/social/card-template.svg
+       (ink ground, emerald accent only, Inter 400/600, JetBrains Mono 500). Rendered to course-og.png
+       by scripts/course-og.mjs; re-run it after editing this file. -->
+  <rect x="0" y="0" width="1200" height="630" fill="#07110d"/>
+  <rect x="80" y="80" width="43" height="43" rx="5" fill="#6ee7b7"/>
+  <rect x="52" y="52" width="71" height="71" rx="7" fill="none" stroke="#6ee7b7" stroke-width="7"/>
+  <rect x="80" y="80" width="71" height="71" rx="7" fill="none" stroke="#ffffff" stroke-width="7"/>
+  <circle cx="93" cy="93" r="5.5" fill="#07110d"/>
+  <circle cx="111" cy="93" r="5.5" fill="#07110d"/>
+  <circle cx="93" cy="111" r="5.5" fill="#07110d"/>
+  <circle cx="111" cy="111" r="5.5" fill="#07110d"/>
+  <text x="188" y="119" fill="#f6f8f6" font-family="Inter" font-weight="600" font-size="46">Haikei Labs</text>
+  <text x="52" y="282" fill="#6ee7b7" font-family="JetBrains Mono" font-weight="500" font-size="26" letter-spacing="2">AGENTWARE COURSE</text>
+  <text x="52" y="370" fill="#f6f8f6" font-family="Inter" font-weight="600" font-size="72" letter-spacing="-1.5">How do LLM tool calls work?</text>
+  <text x="52" y="438" fill="#a3b1aa" font-family="Inter" font-weight="400" font-size="34">Tool calling from scratch, in ten short lessons.</text>
+  <rect x="52" y="500" width="76" height="5" fill="#6ee7b7"/>
+  <text x="52" y="566" fill="#a3b1aa" font-family="JetBrains Mono" font-weight="500" font-size="24">docs.haikeilabs.com/agentware/course</text>
+</svg>

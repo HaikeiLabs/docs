@@ -6,9 +6,16 @@
       "type": "string",
       "minLength": 1
     },
+    "seo_title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 70,
+      "description": "Optional search title for <title> and og:title. Defaults to \"<title> \u00b7 Haikei docs\"."
+    },
     "description": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "maxLength": 160
     },
     "type": {
       "const": "read-and-use"
