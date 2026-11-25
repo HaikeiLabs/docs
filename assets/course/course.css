@@ -9,18 +9,19 @@
 @media (max-width: 860px) { .layout.course-layout { grid-template-columns: minmax(0, 1fr); } }
 .course-step { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: 1.5rem; align-items: start; padding: 1.5rem 0; border-top: 1px solid var(--color-line); }
 .course-step > * { min-width: 0; }
-.course-step h2 { margin-top: 0; }
+.prose .course-step h2 { margin-top: 0; padding-top: 0; border-top: 0; }
 .course-step.has-widget { grid-template-columns: minmax(0, 1fr); }
 .course-step .code-block { margin: 0; }
 .course-code-line { display: grid; grid-template-columns: 4.5rem max-content; gap: .5rem; min-width: max-content; }
-.course-mark, .mk { font: 500 .75rem var(--font-mono); color: var(--color-accent-text); background: var(--color-accent-soft); border-radius: var(--course-radius); padding: .12rem .35rem; }
+.course-mark, .mk { font: 500 .75rem var(--font-mono); color: var(--kei-permit-ink); background: var(--kei-permit-bg); border-radius: var(--course-radius); padding: .12rem .35rem; }
 .course-mark { justify-self: start; }
 .course-reference { border-top: 1px solid var(--color-line); padding: 1rem 0; }
 .course-reference summary { cursor: pointer; font-weight: 600; }
 .course-quiz { border: 1px solid var(--color-line); border-radius: var(--course-radius); padding: 1rem; display: grid; gap: .5rem; }
 .course-quiz legend { font-weight: 600; }
-.course-quiz button { text-align: left; color: var(--color-content); background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--course-radius); padding: .75rem; cursor: pointer; }
+.course-quiz button { font: inherit; text-align: left; color: var(--color-content); background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--course-radius); padding: .75rem; cursor: pointer; }
 .course-quiz button:hover { border-color: var(--color-accent); }
 .course-pager, .course-finish { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
 @media (max-width: 860px) { .course-step { grid-template-columns: minmax(0, 1fr); } }
 .course-code-line.is-highlighted { background: var(--course-hl-line); }
+.course-rail nav > p, .lesson > p:first-child { font: 500 .875rem/1.5 var(--font-mono); }

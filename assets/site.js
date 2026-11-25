@@ -88,8 +88,9 @@
     if (!button) return;
     var block = button.closest('.code-block');
     var codeNode = block.querySelector('code').cloneNode(true);
+    var courseLines = codeNode.querySelectorAll('.course-code-line');
     codeNode.querySelectorAll('.course-mark, .course-mark-empty').forEach(function (mark) { mark.remove(); });
-    var code = codeNode.textContent;
+    var code = courseLines.length ? Array.from(courseLines, function (line) { return line.textContent; }).join('\n') : codeNode.textContent;
     var copied = classifyCopy(code, block.getAttribute('data-assistant') || '', location.pathname);
     if (copied) track(copied.name, copied.params);
     var done = function () {

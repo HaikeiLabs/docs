@@ -22,3 +22,8 @@ test('hash routes to a lesson or its owning inner anchor', async () => {
   assert.equal(lessonForHash('#missing', lessons, root), lessons[0]);
   assert.equal(lessonForHash('#api-example', lessons, root), lessons[1]);
 });
+
+test('course progress and lesson eyebrow use the mono role at weight 500', async () => {
+  const css = await readFile('assets/course/course.css', 'utf8');
+  assert.match(css, /\.course-rail nav > p\s*,\s*\.lesson > p:first-child\s*\{[^}]*font(?:-weight)?:\s*500[^}]*var\(--font-mono\)/s);
+});

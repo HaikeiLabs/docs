@@ -29,7 +29,7 @@ function renderItems(text, lesson) {
       const lang = fence[1].trim().split(/\s+/)[0];
       const title = fence[1].match(/\btitle="([^"]*)"/)?.[1] ?? lang;
       const marks = Object.fromEntries((fence[1].match(/\bmarks="([^"]*)"/)?.[1] ?? '').split(';').filter(Boolean).map(entry => { const at = entry.indexOf('='); return [entry.slice(0, at), entry.slice(at + 1)]; }));
-      const lines = fence[2].replace(/\n$/, '').split('\n').map((line, i) => `<span class="course-code-line">${marks[i + 1] ? `<span class="course-mark" data-mark="${escapeHtml(marks[i + 1])}">${escapeHtml(marks[i + 1])}</span>` : '<span class="course-mark-empty"></span>'}<span>${highlight(line, lang)}</span></span>`).join('\n');
+      const lines = fence[2].replace(/\n$/, '').split('\n').map((line, i) => `<span class="course-code-line">${marks[i + 1] ? `<span class="course-mark" data-mark="${escapeHtml(marks[i + 1])}">${escapeHtml(marks[i + 1])}</span>` : '<span class="course-mark-empty"></span>'}<span>${highlight(line, lang)}</span></span>`).join('');
       visual = `<div class="code-block"><div class="code-head"><span class="code-label is-file">${escapeHtml(title)}</span><button class="copy" type="button" aria-label="Copy ${escapeHtml(title)} code">Copy</button></div><pre tabindex="0"><code class="language-${escapeHtml(lang)}">${lines}</code></pre></div>`;
     } else if (widget) {
       const [, name, data] = widget; visual = `<div class="widget" data-widget="${name}" data-src="${data ? `/agentware/course/data/${data}.json` : ''}">Interactive ${name} widget</div>`;
