@@ -11,7 +11,7 @@
 .cycle-node circle { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 2; }
 .cycle-node.active circle { stroke: var(--color-accent-text); }
 .cycle-node text { fill: var(--color-content); text-anchor: middle; font-size: 13px; font-weight: 600; }
-.cycle-node .cycle-sub { fill: var(--color-muted); font: 500 8px 'JetBrains Mono', monospace; }
+.cycle-node .cycle-sub { fill: var(--color-muted); font: 500 18px 'JetBrains Mono', monospace; }
 .cycle-packet { fill: var(--color-accent-text); }
 .cycle-side { display: grid; gap: 1rem; min-width: 0; }
 .cycle-label, .cycle-count { font: 500 .75rem 'JetBrains Mono', monospace; color: var(--color-muted); }
