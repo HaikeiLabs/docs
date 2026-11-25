@@ -1,0 +1,58 @@
+---
+id: schema
+num: 2
+title: Describe the tool
+mins: 4
+lede: "The model reads a name, a description, and a JSON Schema. That's all it knows about your function."
+quiz:
+  q: What does the model receive about your tool?
+  opts:
+    - The Python source
+    - The name, description and JSON Schema
+    - Every possible return value
+    - Your docstring, read automatically
+  a: 1
+  why: Only the declaration crosses the wire, which is why the description matters.
+---
+
+## Name, description, parameters
+
+[[1]] **name** is what the model writes to call it.
+
+[[2]] **description** is a prompt. It's how the model decides *when* to use the tool.
+
+[[3]] **parameters** is standard JSON Schema.
+
+[[4]] `enum` keeps values valid, and [[5]] `required` marks what can't be left out.
+
+```python title="tools.py" marks="2=1;3=2;4=3;8=4;10=5"
+TOOL = {
+    "name": "get_weather",
+    "description": "Get the current weather for a city.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "city": {"type": "string", "description": "City name, e.g. Tokyo"},
+            "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+        },
+        "required": ["city"],
+    },
+}
+```
+
+## Map names to functions
+
+When a call comes back, look up the name [[1]] and run it [[2]]. Return errors as data [[3]]: the model can read the error and fix its arguments on the next lap, but a crash ends the run.
+
+```python title="tools.py" marks="4=1;8=2;10=3"
+REGISTRY = {"get_weather": get_weather}
+
+def run_tool(name, args):
+    fn = REGISTRY.get(name)
+    if fn is None:
+        return json.dumps({"error": f"unknown tool {name}"})
+    try:
+        return json.dumps(fn(**args))
+    except TypeError as e:
+        return json.dumps({"error": str(e)})
+```
