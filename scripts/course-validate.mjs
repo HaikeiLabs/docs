@@ -83,5 +83,7 @@ export function validateCourse(dir) {
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const dir = process.argv[2] ?? process.env.COURSE_DIR ?? 'content/agentware/course';
-  if (fs.existsSync(dir)) { validateCourse(dir); console.log(`Course valid: ${dir}`); } else if (process.argv[2]) { throw new Error(`Course directory not found: ${dir}`); }
+  // Same rule as the build: without a hub page the course is skipped, so there is nothing to validate.
+  if (fs.existsSync(dir) && !fs.existsSync(path.join(dir, 'index.md'))) console.log(`No hub page at ${path.join(dir, 'index.md')}; course not built, nothing to validate.`);
+  else if (fs.existsSync(dir)) { validateCourse(dir); console.log(`Course valid: ${dir}`); } else if (process.argv[2]) { throw new Error(`Course directory not found: ${dir}`); }
 }

@@ -49,3 +49,12 @@ test('allows raw token syntax in Markdown code and preserves verbatim source fie
     assert.doesNotThrow(() => validateCourse(dir));
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
+
+test('check:course explains a lessons folder without a hub page and exits 0', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'course-nohub-'));
+  try {
+    fs.cpSync(fixture, dir, { recursive: true }); fs.rmSync(path.join(dir, 'index.md'));
+    const out = execFileSync(process.execPath, ['scripts/course-validate.mjs', dir], { encoding: 'utf8' });
+    assert.match(out, /no hub page.*course not built/i);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});

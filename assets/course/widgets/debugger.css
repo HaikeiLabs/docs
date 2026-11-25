@@ -1,8 +1,11 @@
 .debugger-widget { color: var(--color-content); font-family: Inter, sans-serif; min-width: 0; }
 .debugger-widget * { box-sizing: border-box; }
 .prose .debugger-widget code { background: none; border: 0; padding: 0; font: inherit; }
-.debugger-toolbar, .debugger-controls { display: flex; flex-wrap: wrap; gap: .5rem; }
-.debugger-toolbar { justify-content: space-between; gap: 1rem; }
+.debugger-controls { display: flex; flex-wrap: wrap; gap: .5rem; }
+/* Step controls and the status travel together; on narrow screens they stick under the site header. */
+.debugger-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin: 1rem 0; }
+.debugger-bar .debugger-status { flex: 1 1 16rem; margin: 0; }
+.debugger-widget button[aria-disabled="true"], .debugger-widget button[aria-disabled="true"]:hover { color: var(--color-muted); background: var(--color-ground); border-color: var(--color-line); cursor: not-allowed; }
 .debugger-widget button { font: inherit; color: inherit; background: var(--color-surface); border: 1px solid var(--color-line-strong); border-radius: .35rem; padding: .45rem .7rem; cursor: pointer; }
 .debugger-widget button:hover { background: var(--color-surface-hover); }
 .debugger-widget button:focus-visible, .debugger-widget summary:focus-visible { outline: 2px solid var(--color-accent-text); outline-offset: 2px; }
@@ -17,7 +20,7 @@
 .debugger-line { display: grid; grid-template-columns: 2rem 2rem max-content; align-items: center; min-width: max-content; font: 500 .8rem/1.7 'JetBrains Mono', monospace; }
 .debugger-line code { white-space: pre; }
 .debugger-line.current { background: var(--kei-permit-bg); }
-.debugger-line button { padding: 0; border: 0; color: var(--color-accent-text); background: transparent; }
+.debugger-line button { padding: 0; border: 0; min-height: 1.5rem; min-width: 1.5rem; color: var(--color-accent-text); background: transparent; }
 .debugger-number { color: var(--color-muted); text-align: right; padding-right: .7rem; }
 .debugger-widget pre { margin: 0; padding: .8rem; white-space: pre; font: 500 .8rem/1.6 'JetBrains Mono', monospace; }
 .debugger-vars { margin-top: 1rem; }
@@ -35,4 +38,11 @@
 .debugger-timeline { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0; }
 .debugger-timeline button { font-size: .8rem; }
 .debugger-real .debugger-block { margin-top: .75rem; }
-@media (max-width: 800px) { .debugger-grid { grid-template-columns: minmax(0, 1fr); } }
+.debugger-inspector pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 800px) {
+  .debugger-grid { grid-template-columns: minmax(0, 1fr); }
+  .debugger-inspector { order: -1; }
+  .debugger-bar { position: sticky; top: 3.5rem; z-index: 1; margin: 1rem 0 .5rem; padding: .5rem 0; background: var(--color-ground); border-bottom: 1px solid var(--color-line); }
+  .debugger-line { grid-template-columns: 2.75rem 2rem max-content; }
+  .debugger-line button { min-width: 2.75rem; min-height: 2.75rem; }
+}

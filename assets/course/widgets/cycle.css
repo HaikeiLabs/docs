@@ -1,5 +1,9 @@
-.cycle-widget { min-width: 0; font-family: Inter, sans-serif; color: var(--color-content); }
-.cycle-styles, .cycle-controls, .cycle-laps { display: flex; flex-wrap: wrap; gap: .5rem; }
+.cycle-widget { container-type: inline-size; min-width: 0; font-family: Inter, sans-serif; color: var(--color-content); }
+.cycle-styles, .cycle-laps { display: flex; flex-wrap: wrap; gap: .5rem; }
+/* Four equal columns: the row never wraps when Play becomes Replay or Pause. */
+.cycle-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
+.cycle-controls button { padding-inline: .25rem; font-size: .875rem; text-align: center; white-space: nowrap; }
+.cycle-widget button[aria-disabled="true"], .cycle-widget button[aria-disabled="true"]:hover { color: var(--color-muted); border-color: var(--color-line); cursor: not-allowed; }
 .cycle-widget button { font: inherit; font-weight: 500; color: var(--color-content); background: var(--color-surface); border: 1px solid var(--color-line); border-radius: .4rem; padding: .5rem .75rem; cursor: pointer; }
 .cycle-widget button:hover, .cycle-widget button[aria-pressed="true"] { color: var(--color-accent-text); border-color: var(--color-accent-text); }
 .cycle-widget button:focus-visible { outline: 2px solid var(--color-accent-text); outline-offset: 2px; }
@@ -24,3 +28,5 @@
 .cycle-message div { font: 500 .8rem 'JetBrains Mono', monospace; }
 .cycle-count { margin: 0; }
 @media (max-width: 700px) { .cycle-layout { grid-template-columns: minmax(0, 1fr); } }
+/* The side column needs room for four controls on one row; stack below the diagram when the widget is narrow. */
+@container (max-width: 720px) { .cycle-layout { grid-template-columns: minmax(0, 1fr); } }

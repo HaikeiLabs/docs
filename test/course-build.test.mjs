@@ -21,6 +21,7 @@ test('hash routes to a lesson or its owning inner anchor', async () => {
   assert.equal(lessonForHash('#api', lessons, root), lessons[1]);
   assert.equal(lessonForHash('#missing', lessons, root), lessons[0]);
   assert.equal(lessonForHash('#api-example', lessons, root), lessons[1]);
+  for (const hash of ['', '#']) assert.equal(lessonForHash(hash, lessons, root), lessons[0], `hash ${JSON.stringify(hash)}`);
 });
 
 test('course progress and lesson eyebrow use the mono role at weight 500', async () => {

@@ -41,7 +41,14 @@ export function mount(el, data, ctx) {
     <circle class="cycle-ring" cx="280" cy="150" r="58"/><circle class="cycle-ring-on" cx="280" cy="150" r="58" transform="rotate(-90 280 150)" stroke-dasharray="364.4"/>
     ${[['user','You','USER',30],['code','Your code','THE LOOP',46],['model','Model','LLM API',42],['tool','Tool','GET_WEATHER',42]].map(([id, name, sub, radius]) => `<g class="cycle-node" data-node="${id}"><circle cx="${points[id][0]}" cy="${points[id][1]}" r="${radius}"/><text x="${points[id][0]}" y="${points[id][1]-6}">${name}</text><text class="cycle-sub" x="${points[id][0]}" y="${points[id][1]+23}">${sub}</text></g>`).join('')}<circle class="cycle-packet" r="7"/></svg><div class="cycle-side"><div><div class="cycle-label">Laps</div><div class="cycle-laps"></div></div><div class="cycle-message" aria-live="polite"><strong></strong><div></div></div><div class="cycle-controls">${[['play',reduced ? 'Step' : 'Play'],['back','Back'],['next','Next'],['restart','Restart']].map(([action,label]) => `<button type="button" data-action="${action}">${label}</button>`).join('')}</div><p class="cycle-count"></p></div></div></div>`;
   const q = selector => el.querySelector(selector), packet = q('.cycle-packet');
-  function stop() { playing = false; clearTimeout(timer); q('[data-action="play"]').textContent = reduced ? 'Step' : index === frames.length - 1 ? 'Replay' : 'Play'; }
+  // Labels and disabled states follow the current frame, so Restart and a model switch reset Replay to Play.
+  function syncControls() {
+    const last = index === frames.length - 1;
+    if (!playing) q('[data-action="play"]').textContent = reduced ? 'Step' : last ? 'Replay' : 'Play';
+    const disabled = {next: last, back: index === 0, play: reduced && last};
+    el.querySelectorAll('[data-action]').forEach(b => { if (disabled[b.dataset.action]) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled'); });
+  }
+  function stop() { playing = false; clearTimeout(timer); syncControls(); }
   function show(animate = false) {
     const frame = frames[index], laps = data[style].length;
     q('.cycle-message strong').textContent = frame.who;
@@ -49,6 +56,7 @@ export function mount(el, data, ctx) {
     // Plain text appears immediately; highlighting is deliberately lazy and optional.
     highlight(frame.what, 'text').then(html => { if (!disposed && frames[index] === frame) message.innerHTML = html; });
     q('.cycle-count').textContent = `Message ${index + 1} of ${frames.length}`;
+    syncControls();
     el.querySelectorAll('[data-node]').forEach(node => node.classList.toggle('active', node.dataset.node === frame.b));
     el.querySelectorAll('[data-edge]').forEach(edge => edge.classList.toggle('active', edge.dataset.edge === `${frame.a}-${frame.b}` || edge.dataset.edge === `${frame.b}-${frame.a}`));
     const done = frame.done ? laps : Math.max(0, frame.lap - 1) + (frame.end ? 1 : 0);
@@ -65,6 +73,7 @@ export function mount(el, data, ctx) {
     const button = event.target.closest('button'); if (!button || !el.contains(button)) return;
     if (button.dataset.style) { stop(); style = button.dataset.style; frames = cycleFrames(data, style); index = 0; el.querySelectorAll('[data-style]').forEach(b => b.setAttribute('aria-pressed', String(b === button))); show(); return; }
     const action = button.dataset.action;
+    if (button.getAttribute('aria-disabled') === 'true') return;
     if (action === 'play' && !reduced) { if (playing) { stop(); return; } if (index === frames.length - 1) { index = 0; show(); } playing = true; button.textContent = 'Pause'; timer = setTimeout(loop, 400); return; }
     stop();
     if (action === 'play' || action === 'next') index = Math.min(index + 1, frames.length - 1);

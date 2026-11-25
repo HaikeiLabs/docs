@@ -3,8 +3,9 @@ export function lessonForHash(hash, lessons, documentRoot) {
   try { id = decodeURIComponent(hash.replace(/^#/, '')); } catch { id = ''; }
   const direct = lessons.find(lesson => lesson.id === id);
   if (direct) return direct;
-  const anchor = id && documentRoot?.getElementById(id);
-  return anchor?.closest('.lesson') ?? lessons[0];
+  // An empty or unknown hash falls back to the first lesson (the docs nav links to the bare URL).
+  const anchor = id ? documentRoot?.getElementById(id) : null;
+  return anchor?.closest?.('.lesson') ?? lessons[0];
 }
 export function readProgress(storage) {
   try { const value = JSON.parse(storage.getItem('aw-course-done') || '[]'); return new Set(Array.isArray(value) ? value : []); } catch { return new Set(); }
@@ -26,11 +27,30 @@ if (typeof document !== 'undefined') {
     document.querySelectorAll('[data-lesson-link]').forEach(link => {
       link.querySelector('[data-check]').textContent = done.has(link.dataset.lessonLink) ? '✓ ' : '';
     });
-    document.querySelectorAll('[data-progress]').forEach(el => { el.textContent = `${lessons.filter(l => done.has(l.id)).length} of ${lessons.length}`; });
+    const count = lessons.filter(l => done.has(l.id)).length;
+    document.querySelectorAll('[data-progress]').forEach(el => { el.textContent = `${count} of ${lessons.length}`; });
+    document.querySelectorAll('[data-course-complete]').forEach(el => { el.hidden = count < lessons.length; });
   };
+  const markQuiz = (quiz, button, correct) => {
+    quiz.querySelectorAll('[data-quiz-answer]').forEach(option => {
+      if (option === button) option.dataset.result = correct ? 'right' : 'wrong';
+      else if (correct) delete option.dataset.result;
+    });
+    const feedback = quiz.querySelector('[data-feedback]');
+    feedback.textContent = correct ? feedback.dataset.why : 'Not this one. Try again: reread the steps above for the detail the question asks about.';
+  };
+  // A completed lesson shows its answered quiz again after a reload.
+  for (const lesson of lessons) {
+    const quiz = lesson.querySelector('.course-quiz');
+    if (quiz && done.has(lesson.id)) markQuiz(quiz, quiz.querySelector(`[data-quiz-answer="${quiz.dataset.answer}"]`), true);
+  }
   const show = async () => {
     const current = lessonForHash(location.hash, lessons, document);
     if (!current) return;
+    // Give a bare or unknown URL the lesson's hash, so the address matches what is shown and can be shared.
+    let target = null;
+    try { target = document.getElementById(decodeURIComponent(location.hash.slice(1))); } catch {}
+    if (!target || !current.contains(target)) history.replaceState(null, '', `${location.pathname}${location.search}#${current.id}`);
     if (current !== currentLesson) {
       cleanups.forEach(fn => fn()); cleanups = []; currentLesson = current; generation++;
       track('course_lesson_view', current.id);
@@ -66,10 +86,10 @@ if (typeof document !== 'undefined') {
   document.addEventListener('focusout', event => markHover(event, false));
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-quiz-answer]'); if (!button) return;
-    const quiz = button.closest('.course-quiz'), lesson = button.closest('.lesson'), feedback = quiz.querySelector('[data-feedback]');
+    const quiz = button.closest('.course-quiz'), lesson = button.closest('.lesson');
     const result = recordAnswer(done, lesson.id, button.dataset.quizAnswer, quiz.dataset.answer);
-    if (!result.correct) { feedback.textContent = 'Try again.'; return; }
-    feedback.textContent = feedback.dataset.why;
+    markQuiz(quiz, button, result.correct);
+    if (!result.correct) return;
     if (result.newlyComplete) { saveProgress(storage, done); track('course_lesson_complete', lesson.id); progress(); }
   });
   progress(); addEventListener('hashchange', show); show();

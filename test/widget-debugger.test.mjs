@@ -44,3 +44,10 @@ test('rendered code preserves leading spaces and uses preformatted whitespace', 
     if (previous === undefined) delete globalThis.document; else globalThis.document = previous;
   }
 });
+
+test('counts use the singular for one item', async () => {
+  const { countOf } = await import('../assets/course/widgets/debugger.js');
+  assert.equal(countOf(1, 'message'), '1 message');
+  assert.equal(countOf(0, 'message'), '0 messages');
+  assert.equal(countOf(3, 'message'), '3 messages');
+});
