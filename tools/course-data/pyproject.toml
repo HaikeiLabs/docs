@@ -5,7 +5,7 @@ description = "Generates the widget data for the Agentware course on docs.haikei
 requires-python = ">=3.10"
 # The Agentware release the course data is captured from. Bump it and rerun
 # generate.py when a new release ships; lessons 8 to 10 describe this version.
-dependencies = ["haikeilabs-agentware==0.17.0"]
+dependencies = ["haikeilabs-agentware==0.18.0"]
 
 [tool.uv]
 package = false
