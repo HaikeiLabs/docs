@@ -35,6 +35,8 @@ for (const [name, change] of [
   ['HTML tag in compare note', d => edit(d, 'data/compare-fixture.json', s => s.replace('Tools are a TypeScript-style', 'Tools are <b>a</b> TypeScript-style'))],
   ['HTML entity in compare note', d => edit(d, 'data/compare-fixture.json', s => s.replace('Tools are a TypeScript-style', 'Tools &amp; a TypeScript-style'))],
   ['HTML in an unreferenced compare note', d => { const p = path.join(d, 'data', 'compare-unused.json'); const data = JSON.parse(fs.readFileSync(path.join(d, 'data', 'compare-fixture.json'))); data.tabs[0].note = 'A <code>tool</code>'; fs.writeFileSync(p, JSON.stringify(data)); }],
+  ['bare tag outside a code span in a compare note', d => edit(d, 'data/compare-fixture.json', s => s.replace('Tools are a TypeScript-style', 'Tools are <think> a TypeScript-style'))],
+  ['bare tag beside a code span in a lesson lede', d => edit(d, 'lessons/basics.md', s => s.replace('Fixture lesson.', '`<tools>` then <tools> lesson.'))],
 ]) test(`rejects ${name}`, () => mutated(change));
 
 test('allows raw token syntax in Markdown code and preserves verbatim source fields', () => {
@@ -46,6 +48,19 @@ test('allows raw token syntax in Markdown code and preserves verbatim source fie
     value.tabs[0].note = 'Call with `<|call|>` and **tools**.';
     value.tabs[0].panes[0].src = '<tool>&amp; verbatim</tool>';
     fs.writeFileSync(file, JSON.stringify(value));
+    assert.doesNotThrow(() => validateCourse(dir));
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('allows HTML tags and entities inside inline code spans', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'course-test-'));
+  try {
+    fs.cpSync(fixture, dir, { recursive: true });
+    const file = path.join(dir, 'data', 'compare-fixture.json');
+    const value = JSON.parse(fs.readFileSync(file));
+    value.tabs[0].note = 'Reasoning sits in `<think>`, tools in `<tools>`, arguments in `<parameter name=x>`, entities in `&amp;`.';
+    fs.writeFileSync(file, JSON.stringify(value));
+    edit(dir, 'lessons/basics.md', s => s.replace('Fixture lesson.', 'Fixture `<tool_call>` lesson with `&amp;`.'));
     assert.doesNotThrow(() => validateCourse(dir));
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });

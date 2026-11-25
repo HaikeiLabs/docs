@@ -32,7 +32,14 @@ test('only a correct answer completes a lesson once', async () => {
   assert.deepEqual(recordAnswer(done, 'basics', '1', '0'), { correct: false, newlyComplete: false });
   assert.equal(done.size, 0);
   assert.deepEqual(recordAnswer(done, 'basics', '0', '0'), { correct: true, newlyComplete: true });
-  assert.deepEqual(recordAnswer(done, 'basics', '0', '0'), { correct: true, newlyComplete: false });
+  assert.deepEqual(recordAnswer(done, 'basics', '0', '0'), { correct: true, newlyComplete: false, locked: true });
+});
+
+test('a completed quiz is locked: later answers change nothing', async () => {
+  const { recordAnswer } = await import('../assets/course/course.js');
+  const done = new Set(['basics']);
+  assert.deepEqual(recordAnswer(done, 'basics', '1', '0'), { correct: true, newlyComplete: false, locked: true });
+  assert.deepEqual([...done], ['basics']);
 });
 
 test('step code lines do not add extra whitespace and headings have a single divider', async () => {

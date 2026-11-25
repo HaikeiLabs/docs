@@ -47,6 +47,27 @@ for (const theme of ['light', 'dark']) {
       await expect(page.locator('[data-progress]')).toHaveText('1 of 6');
     });
 
+    test('a correctly answered quiz stays complete and locks its options', async ({ page }) => {
+      await page.goto('/agentware/course/#basics');
+      const quiz = page.locator('#basics .course-quiz');
+      const feedback = quiz.locator('[data-feedback]');
+      await quiz.locator('[data-quiz-answer="0"]').click();
+      const why = await feedback.textContent();
+      // Locked options are aria-disabled, which Playwright treats as not enabled; force sends the click anyway.
+      await quiz.locator('[data-quiz-answer="1"]').click({ force: true });
+      await expect(quiz.locator('[data-quiz-answer="0"]')).toHaveAttribute('data-result', 'right');
+      await expect(quiz.locator('[data-quiz-answer="1"]')).not.toHaveAttribute('data-result');
+      await expect(quiz.locator('[data-result]')).toHaveCount(1);
+      await expect(feedback).toHaveText(why);
+      await expect(quiz.locator('[data-quiz-answer]:not([aria-disabled="true"])')).toHaveCount(0);
+      await expect(page.locator('[data-progress]')).toHaveText('1 of 6');
+      await page.reload();
+      await quiz.locator('[data-quiz-answer="1"]').click({ force: true });
+      await expect(quiz.locator('[data-result]')).toHaveCount(1);
+      await expect(feedback).toHaveText(why);
+      await expect(quiz.locator('[data-quiz-answer]:not([aria-disabled="true"])')).toHaveCount(0);
+    });
+
     test('quiz still works when storage throws', async ({ browser }) => {
       const context = await browser.newContext();
       await context.addInitScript(() => { Object.defineProperty(window, 'localStorage', { get() { throw new Error('storage blocked'); } }); });
