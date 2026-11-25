@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "vendor": {
+        "type": "string"
+      },
+      "method": {
+        "type": "string"
+      },
+      "path": {
+        "type": "string"
+      },
+      "servers": {
+        "type": "string"
+      },
+      "summary": {
+        "type": "string"
+      },
+      "headers": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/field"
+        }
+      },
+      "req": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/field"
+        }
+      },
+      "res": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/field"
+        }
+      },
+      "ex_req": {
+        "type": "string"
+      },
+      "ex_res": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "vendor",
+      "method",
+      "path",
+      "servers",
+      "summary",
+      "headers",
+      "req",
+      "res",
+      "ex_req",
+      "ex_res"
+    ],
+    "additionalProperties": false
+  },
+  "minItems": 1,
+  "$defs": {
+    "field": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "string"
+        },
+        "t": {
+          "type": "string"
+        },
+        "d": {
+          "type": "string"
+        },
+        "r": {
+          "type": "boolean"
+        },
+        "k": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        },
+        "tag": {
+          "enum": [
+            null,
+            "tools",
+            "reasoning"
+          ]
+        }
+      },
+      "required": [
+        "n",
+        "t",
+        "d",
+        "r",
+        "k",
+        "tag"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

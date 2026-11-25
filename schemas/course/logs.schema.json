@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "anthropic": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "iteration": {
+            "type": "integer"
+          },
+          "request": {
+            "type": "object"
+          },
+          "chat_request": {
+            "type": "object"
+          },
+          "response": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "tools_run": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "args": {
+                  "type": "object"
+                },
+                "result": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "args",
+                "result"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "done": {
+            "type": "boolean"
+          },
+          "final": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "appended": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "iteration",
+          "request",
+          "response",
+          "tools_run",
+          "done",
+          "appended"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "gpt-oss": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "iteration": {
+            "type": "integer"
+          },
+          "request": {
+            "type": "object"
+          },
+          "chat_request": {
+            "type": "object"
+          },
+          "response": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "tools_run": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "args": {
+                  "type": "object"
+                },
+                "result": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "args",
+                "result"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "done": {
+            "type": "boolean"
+          },
+          "final": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "appended": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "iteration",
+          "request",
+          "response",
+          "tools_run",
+          "done",
+          "appended"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "qwen": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "iteration": {
+            "type": "integer"
+          },
+          "request": {
+            "type": "object"
+          },
+          "chat_request": {
+            "type": "object"
+          },
+          "response": {
+            "type": [
+              "object",
+              "string"
+            ]
+          },
+          "tools_run": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "args": {
+                  "type": "object"
+                },
+                "result": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "args",
+                "result"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "done": {
+            "type": "boolean"
+          },
+          "final": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "appended": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "iteration",
+          "request",
+          "response",
+          "tools_run",
+          "done",
+          "appended"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "anthropic",
+    "gpt-oss",
+    "qwen"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "tabs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sub": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "src": {
+            "type": "string"
+          },
+          "panes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "file": {
+                  "type": "string"
+                },
+                "lang": {
+                  "enum": [
+                    "json",
+                    "bash",
+                    "tokens",
+                    "python"
+                  ]
+                },
+                "src": {
+                  "type": "string"
+                },
+                "hl": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              },
+              "required": [
+                "label",
+                "file",
+                "lang",
+                "src"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 4
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "sub",
+          "note",
+          "panes"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 6
+    }
+  },
+  "required": [
+    "tabs"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "area": {
+            "type": "string"
+          },
+          "sev": {
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "wire": {
+            "type": "string"
+          },
+          "aw": {
+            "type": "string"
+          },
+          "effect": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "area",
+          "sev",
+          "wire",
+          "aw",
+          "effect"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "repro": {
+      "type": "object",
+      "properties": {
+        "qwen_parse_official": {
+          "type": "string"
+        },
+        "reason_thinking_tag": {
+          "type": "string"
+        },
+        "reason_think_tag": {
+          "type": "string"
+        },
+        "minimax_family": {
+          "type": "string"
+        },
+        "sdk_version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "qwen_parse_official",
+        "reason_thinking_tag",
+        "reason_think_tag",
+        "minimax_family",
+        "sdk_version"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "gaps",
+    "repro"
+  ],
+  "additionalProperties": false
+}

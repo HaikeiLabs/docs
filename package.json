@@ -14,11 +14,13 @@
     "sync:compat": "node scripts/sync-compat.mjs",
     "build": "node scripts/build.mjs",
     "test": "node --test",
-    "preview": "node scripts/preview.mjs"
+    "preview": "node scripts/preview.mjs",
+    "check:course": "node scripts/course-validate.mjs"
   },
   "dependencies": {
+    "@haikeilabs/brand": "file:vendor/haikeilabs-brand-0.8.0.tgz",
+    "ajv": "^8.20.0",
     "markdown-it": "^14.1.0",
-    "yaml": "^2.8.1",
-    "@haikeilabs/brand": "file:vendor/haikeilabs-brand-0.8.0.tgz"
+    "yaml": "^2.8.1"
   }
 }
