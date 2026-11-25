@@ -1,0 +1,22 @@
+.compare-widget { min-width: 0; color: var(--color-content); font-family: var(--font-sans); }
+.compare-widget * { box-sizing: border-box; }
+.compare-tabs { display: flex; flex-wrap: wrap; gap: .5rem; }
+.compare-tabs button { padding: .5rem .8rem; border: 1px solid var(--color-line-strong); border-radius: .4rem; background: var(--color-surface); color: var(--color-content); font: 500 .875rem var(--font-sans); cursor: pointer; }
+.compare-tabs button:hover { background: var(--color-surface-hover); }
+.compare-tabs button[aria-selected="true"] { color: var(--kei-permit-ink); background: var(--kei-permit-bg); border-color: var(--kei-permit-line); }
+.compare-tabs small { display: block; font-size: .75rem; }
+.compare-widget :focus-visible { outline: 2px solid var(--color-accent-text); outline-offset: 2px; }
+.compare-note { margin: 1rem 0; padding: .8rem 1rem; border: 1px solid var(--color-line); border-radius: .5rem; background: var(--color-ground); overflow-wrap: anywhere; }
+.compare-note code { font: 500 .875em var(--font-mono); }
+.compare-panes { display: grid; grid-template-columns: repeat(var(--compare-count), minmax(0, 1fr)); gap: 1rem; }
+.compare-pane { min-width: 0; }
+.compare-label, .compare-file { font: 500 .75rem/1.5 var(--font-mono); overflow-wrap: anywhere; }
+.compare-label { margin-bottom: .5rem; color: var(--color-muted); }
+.compare-block { min-width: 0; border: 1px solid var(--color-line); border-radius: .5rem; background: var(--color-surface); overflow: hidden; }
+.compare-file { padding: .55rem .8rem; color: var(--color-muted); background: var(--color-surface-hover); border-bottom: 1px solid var(--color-line); }
+.compare-widget pre { margin: 0; padding: .75rem 0; max-width: 100%; overflow: auto; font: 500 .8rem/1.6 var(--font-mono); }
+.compare-line { display: block; min-width: max-content; padding: 0 .8rem; }
+.compare-panes:has(> :nth-child(3)) .compare-line { min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.compare-line.is-highlighted { background: var(--kei-permit-bg); box-shadow: inset 3px 0 var(--kei-permit-line); }
+.compare-source { color: var(--color-muted); font-size: .8rem; overflow-wrap: anywhere; }
+@media (max-width: 859px) { .compare-panes { grid-template-columns: minmax(0, 1fr); } }
