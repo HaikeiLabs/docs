@@ -3,7 +3,7 @@ import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import YAML from 'yaml';
-import { loadCourse, renderCourse } from './course.mjs';
+import { courseJsonLd, lessonHref, lessonJsonLd, lessonMeta, loadCourse, renderCourseHub, renderCourseRail, renderLesson } from './course.mjs';
 import { createMarkdown, escapeHtml, neighbours, renderToc, stripHtmlComments, stripLeadingTitle } from './render.mjs';
 import { checkBuiltRoutes, checkLinks } from './check-links.mjs';
 
@@ -27,6 +27,9 @@ const navProducts = [['agentware', 'Agentware'], ['kei', 'Kei'], ['research', 'R
 const maxDescriptionLength = 160;
 // C5 share card. design-system exports it; copy it into assets/social/ (no runtime fetch).
 const shareCardPath = '/assets/social/share-docs-1200x627.png';
+const shareCard = { path: shareCardPath, width: 1200, height: 627, alt: 'Haikei Labs docs. Build, use and protect AI agents.' };
+// The course share card: assets/images/course-og.svg, rendered by scripts/course-og.mjs.
+const courseCard = { path: '/assets/images/course-og.png', width: 1200, height: 630, alt: 'Agentware course: how LLM tool calls work, from scratch. Haikei Labs.' };
 const siteName = 'Haikei docs';
 // Docs home head and H1: the p-docs row of the PAGES table (study.txt 1116).
 const homeTitle = 'Haikei docs: build, use and protect AI agents';
@@ -251,7 +254,7 @@ export function appLink(href, source) {
   return url.toString();
 }
 
-function seoHead({ title, description, canonical, ogType }) {
+function seoHead({ title, description, canonical, ogType, image = shareCard }) {
   const url = `${docsUrl}${canonical}`;
   return [
     `<meta name="description" content="${escapeHtml(description)}">`,
@@ -261,23 +264,31 @@ function seoHead({ title, description, canonical, ogType }) {
     `<meta property="og:description" content="${escapeHtml(description)}">`,
     `<meta property="og:url" content="${escapeHtml(url)}">`,
     `<meta property="og:type" content="${ogType}">`,
-    `<meta property="og:image" content="${docsUrl}${shareCardPath}">`,
-    '<meta property="og:image:alt" content="Haikei Labs docs. Build, use and protect AI agents.">',
-    '<meta property="og:image:width" content="1200">',
-    '<meta property="og:image:height" content="627">',
+    `<meta property="og:image" content="${docsUrl}${image.path}">`,
+    `<meta property="og:image:alt" content="${escapeHtml(image.alt)}">`,
+    `<meta property="og:image:width" content="${image.width}">`,
+    `<meta property="og:image:height" content="${image.height}">`,
     '<meta name="twitter:card" content="summary_large_image">',
-    `<meta name="twitter:image" content="${docsUrl}${shareCardPath}">`,
+    `<meta name="twitter:title" content="${escapeHtml(title)}">`,
+    `<meta name="twitter:description" content="${escapeHtml(description)}">`,
+    `<meta name="twitter:image" content="${docsUrl}${image.path}">`,
   ].join('\n  ');
 }
 
-function layout(title, nav, content, { toc = '', mermaid = false, description = homeDescription, canonical = '/', ogType = 'website', fullTitle = `${title} · ${siteName}`, links, currentPath = '', tutorial = '', notFound = false, variant = '' } = {}) {
+// JSON-LD inside <script>: escape < so no string in it can close the element.
+function structuredData(value) {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
+function layout(title, nav, content, { toc = '', mermaid = false, description = homeDescription, canonical = '/', ogType = 'website', fullTitle = `${title} · ${siteName}`, links, currentPath = '', tutorial = '', notFound = false, variant = '', image, jsonLd } = {}) {
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(fullTitle)}</title>
-  ${seoHead({ title: fullTitle, description, canonical, ogType })}
+  ${seoHead({ title: fullTitle, description, canonical, ogType, image })}
+  ${jsonLd ? `<script type="application/ld+json">${structuredData(jsonLd)}</script>` : ''}
   <script>${themeInit}</script>
   ${ga4Snippet}
   <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml">
@@ -350,6 +361,20 @@ function renderPage(page, pages, links = siteLinks(pages)) {
   return { outputPath, html: layout(page.title, sidebar(pages, page.relativePath, links), body, { toc: renderToc(env.toc), mermaid: rendered.includes('class="mermaid"'), description: page.description.trim(), canonical: pageHref(page), ogType: 'article', fullTitle, links, currentPath: page.relativePath, tutorial: tutorialSlug(page) }) };
 }
 
+// Course (owner, 2026-11-25): the hub at /agentware/course/ plus one indexable page per
+// lesson at /agentware/course/<id>/. Lessons stay out of index.json and _headers (no
+// Markdown twin), so they cost no _headers rules; sitemap.xml lists them.
+function renderCourseHubPage(page, course, links) {
+  const intro = markdown.render(stripHtmlComments(stripLeadingTitle(page.body)), { appSource: 'docs-course-console' });
+  const fullTitle = page.seo_title ?? `${page.title} · ${siteName}`;
+  return { outputPath: pageOutputPath(page), html: layout(page.title, renderCourseRail(course), renderCourseHub(course, intro), { variant: 'course', description: page.description.trim(), canonical: pageHref(page), fullTitle, links, currentPath: page.relativePath, image: courseCard, jsonLd: courseJsonLd(course) }) };
+}
+
+function renderLessonPage(page, course, lesson, links) {
+  const meta = lessonMeta(lesson);
+  return { outputPath: `${meta.path.slice(1)}index.html`, html: layout(lesson.title, renderCourseRail(course, lesson.id), renderLesson(course, lesson), { variant: 'course', description: meta.description, canonical: meta.path, ogType: 'article', fullTitle: meta.fullTitle, links, currentPath: page.relativePath, image: courseCard, jsonLd: lessonJsonLd(course, lesson) }) };
+}
+
 // Two paths (C3a): build your own agent, or bring the agent you use. Both link /skills/.
 function renderHome(pages) {
   const links = siteLinks(pages);
@@ -384,9 +409,10 @@ function renderHome(pages) {
   return layout('Haikei documentation', sidebar(pages, '', links), body, { fullTitle: homeTitle, links });
 }
 
-// Every canonical page: the home plus each page in the index.json manifest.
-function sitemapXml(manifest) {
-  const urls = ['/', ...manifest.map((entry) => entry.path)];
+// Every canonical page: the home, each page in the index.json manifest, then any
+// extra page that is not in the manifest (the course lessons).
+function sitemapXml(manifest, extra = []) {
+  const urls = ['/', ...manifest.map((entry) => entry.path), ...extra];
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((url) => `  <url><loc>${escapeHtml(`${docsUrl}${url}`)}</loc></url>`).join('\n')}\n</urlset>\n`;
 }
 
@@ -433,9 +459,18 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   if (existsSync(path.join(assetsDir, 'social'))) await cp(path.join(assetsDir, 'social'), path.join(outputDir, 'assets/social'), { recursive: true });
   const links = siteLinks(pages);
   if (course) { await cp(path.join(assetsDir, 'course'), path.join(outputDir, 'assets/course'), { recursive: true }); await cp(path.join(courseDir, 'data'), path.join(outputDir, 'agentware/course/data'), { recursive: true }); }
+  const lessonPaths = [];
   for (const page of pages) {
     let result = renderPage(page, pages, links);
-    if (page.course === 'agentware' && course) { const rendered = renderCourse(course); result = { outputPath: pageOutputPath(page), html: layout(page.title, rendered.rail, rendered.content, { variant: 'course', description: page.description, canonical: pageHref(page), links, currentPath: page.relativePath }) }; }
+    if (page.course === 'agentware' && course) {
+      result = renderCourseHubPage(page, course, links);
+      for (const lesson of course.lessons) {
+        const lessonPage = renderLessonPage(page, course, lesson, links);
+        await mkdir(path.dirname(path.join(outputDir, lessonPage.outputPath)), { recursive: true });
+        await writeFile(path.join(outputDir, lessonPage.outputPath), lessonPage.html);
+        lessonPaths.push(lessonHref(lesson.id));
+      }
+    }
     const { outputPath, html } = result;
     const htmlFile = path.join(outputDir, outputPath);
     const markdownFile = path.join(outputDir, page.relativePath);
@@ -479,7 +514,7 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   // Page manifest consumed by `kei docs` (HAI-735). Keep this shape stable.
   const manifest = orderedPages(pages).map((page) => ({ slug: pageSlug(page), title: page.title, path: pageHref(page), product: page.product }));
   await writeFile(path.join(outputDir, 'index.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-  await writeFile(path.join(outputDir, 'sitemap.xml'), sitemapXml(manifest));
+  await writeFile(path.join(outputDir, 'sitemap.xml'), sitemapXml(manifest, lessonPaths));
   await writeFile(path.join(outputDir, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${docsUrl}/sitemap.xml\n`);
   await writeFile(path.join(outputDir, '_headers'), markdownCopyHeaders(orderedPages(pages)));
   const notFoundLinks = siteLinks(pages);

@@ -1,9 +1,11 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { loadCourse, renderCourse } from '../scripts/course.mjs';
+import { loadCourse, renderLesson } from '../scripts/course.mjs';
+
+const renderAll = course => course.lessons.map(lesson => renderLesson(course, lesson)).join('');
 
 test('renders markers, code gutter, collapsed reference, widgets and quiz', () => {
-  const html = renderCourse(loadCourse('test/fixtures/course/agentware')).content;
+  const html = renderAll(loadCourse('test/fixtures/course/agentware'));
   assert.match(html, /class="mk"[^>]*>1<\/span>/);
   assert.match(html, /class="course-mark"[^>]*>1<\/span>/);
   assert.match(html, /<details class="course-reference">/);
@@ -41,7 +43,7 @@ test('a completed quiz is locked: later answers change nothing', async () => {
 });
 
 test('step code lines do not add extra whitespace and headings have a single divider', async () => {
-  const html = renderCourse(loadCourse('test/fixtures/course/agentware')).content;
+  const html = renderAll(loadCourse('test/fixtures/course/agentware'));
   assert.doesNotMatch(html, /<\/span>\s*\n<span class="course-code-line">/);
   const css = await (await import('node:fs/promises')).readFile('assets/course/course.css', 'utf8');
   assert.match(css, /\.course-step h2\s*\{[^}]*border(?:-top)?:\s*(?:0|none)/);

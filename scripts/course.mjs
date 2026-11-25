@@ -38,16 +38,95 @@ function renderItems(text, lesson) {
     return `<section class="course-step${widget ? ' has-widget' : ''}" id="${escapeHtml(id)}"><div class="course-step-text">${heading ? `<h2>${escapeHtml(heading)}</h2>` : ''}${textHtml}</div>${visual}</section>`;
   }).join('');
 }
-export function renderCourse(course) {
-  const rail = `<aside class="sidebar course-rail" id="site-nav"><div class="menu-hint">Press <kbd>Esc</kbd> to close</div><nav aria-label="Course lessons"><p>Course progress: <span data-progress>0 of ${course.lessons.length}</span></p><p class="course-complete" data-course-complete hidden>Course complete</p>${course.lessons.map(lesson => `${course.hub.groups.filter(g => g.from === lesson.id).map(g => `<h2>${escapeHtml(g.label)}</h2>`).join('')}<a href="#${escapeHtml(lesson.id)}" data-lesson-link="${escapeHtml(lesson.id)}"><span data-check></span>${lesson.num}. ${escapeHtml(lesson.title)}</a>`).join('')}</nav></aside>`;
-  const complete = `<p class="course-complete" data-course-complete role="status" hidden>Course complete: you finished all ${course.lessons.length} lessons.</p>`;
-  const content = course.lessons.map((lesson, index) => {
-    const [steps, reference] = lesson.body.split(/^# Reference\s*$/m);
-    const quiz = `<fieldset class="course-quiz" data-answer="${lesson.quiz.a}"><legend>${escapeHtml(lesson.quiz.q)}</legend>${lesson.quiz.opts.map((option, i) => `<button type="button" data-quiz-answer="${i}">${escapeHtml(option)}</button>`).join('')}<p data-feedback aria-live="polite" data-why="${escapeHtml(lesson.quiz.why)}"></p>${complete}</fieldset>`;
-    const previous = course.lessons[index - 1], next = course.lessons[index + 1];
-    const nav = `<nav class="course-pager" aria-label="Lesson navigation">${previous ? `<a href="#${previous.id}">Previous: ${escapeHtml(previous.title)}</a>` : '<span></span>'}${next ? `<a href="#${next.id}">Next: ${escapeHtml(next.title)}</a>` : ''}</nav>`;
-    const finish = lesson.finish ? `<div class="course-finish"><a class="button-primary" href="${escapeHtml(course.hub.finish.primary.href)}">${escapeHtml(course.hub.finish.primary.label)}</a><a href="${escapeHtml(course.hub.finish.secondary.href)}">${escapeHtml(course.hub.finish.secondary.label)}</a></div>` : '';
-    return `<section class="lesson" id="${escapeHtml(lesson.id)}"><p>Lesson ${lesson.num} of ${course.lessons.length} · ${lesson.mins} min</p><h1>${escapeHtml(lesson.title)}</h1><p>${createMarkdown().renderInline(lesson.lede)}</p><article class="prose">${renderItems(steps, lesson)}${reference ? `<details class="course-reference"><summary>Reference</summary>${renderItems(reference, lesson)}</details>` : ''}${quiz}${finish}${nav}</article></section>`;
+export const courseBase = '/agentware/course/';
+export const lessonHref = id => `${courseBase}${id}/`;
+const docsOrigin = 'https://docs.haikeilabs.com';
+const provider = { '@type': 'Organization', name: 'Haikei Labs', url: 'https://haikeilabs.com' };
+const maxDescription = 160;
+
+// Inline Markdown (a lede) as plain text: what a search snippet or share card shows.
+export function plainText(markdown, max = Infinity) {
+  const text = createMarkdown().renderInline(markdown).replace(/<[^>]*>/g, '')
+    .replace(/&(lt|gt|quot|#39|amp);/g, (_, entity) => ({ lt: '<', gt: '>', quot: '"', '#39': "'", amp: '&' })[entity])
+    .replace(/\s+/g, ' ').trim();
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max - 1);
+  return `${cut.slice(0, cut.lastIndexOf(' ') > 0 ? cut.lastIndexOf(' ') : cut.length).replace(/[\s,;:.]+$/, '')}…`;
+}
+
+// Head fields for one lesson page: optional seo_title and description, else title and lede.
+export function lessonMeta(lesson) {
+  return {
+    path: lessonHref(lesson.id),
+    fullTitle: lesson.seo_title ?? `${lesson.title} · Agentware course`,
+    description: lesson.description ?? plainText(lesson.lede, maxDescription),
+  };
+}
+
+function courseRef(course) {
+  return { '@type': 'Course', name: course.hub.title, url: `${docsOrigin}${courseBase}` };
+}
+
+// schema.org Course for the hub page; each lesson is one LearningResource part.
+export function courseJsonLd(course) {
+  return {
+    '@context': 'https://schema.org',
+    ...courseRef(course),
+    description: course.hub.description,
+    provider,
+    educationalLevel: 'Beginner',
+    inLanguage: 'en',
+    isAccessibleForFree: true,
+    hasPart: course.lessons.map(lesson => ({ '@type': 'LearningResource', name: lesson.title, url: `${docsOrigin}${lessonHref(lesson.id)}` })),
+  };
+}
+
+export function lessonJsonLd(course, lesson) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    name: lesson.title,
+    description: lessonMeta(lesson).description,
+    url: `${docsOrigin}${lessonHref(lesson.id)}`,
+    provider,
+    educationalLevel: 'Beginner',
+    learningResourceType: 'Lesson',
+    inLanguage: 'en',
+    isAccessibleForFree: true,
+    position: lesson.num,
+    timeRequired: `PT${lesson.mins}M`,
+    isPartOf: courseRef(course),
+  };
+}
+
+// The course rail on the hub and every lesson page. currentId is null on the hub.
+// data-course-lessons lists every lesson id, so progress counts lessons that are not on this page.
+export function renderCourseRail(course, currentId = null) {
+  const current = id => (id === currentId ? ' aria-current="page"' : '');
+  const links = course.lessons.map(lesson => `${course.hub.groups.filter(g => g.from === lesson.id).map(g => `<h2>${escapeHtml(g.label)}</h2>`).join('')}<a href="${lessonHref(lesson.id)}" data-lesson-link="${escapeHtml(lesson.id)}"${current(lesson.id)}><span data-check></span>${lesson.num}. ${escapeHtml(lesson.title)}</a>`).join('');
+  return `<aside class="sidebar course-rail" id="site-nav"><div class="menu-hint">Press <kbd>Esc</kbd> to close</div><nav aria-label="Course lessons" data-course-lessons="${escapeHtml(course.lessons.map(l => l.id).join(' '))}"><p>Course progress: <span data-progress>0 of ${course.lessons.length}</span></p><p class="course-complete" data-course-complete hidden>Course complete</p><a href="${courseBase}"${currentId ? '' : ' aria-current="page"'}>Course overview</a>${links}</nav></aside>`;
+}
+
+// The hub: course intro, a start link and every lesson grouped as in the rail. No lesson bodies.
+export function renderCourseHub(course, introHtml) {
+  const minutes = course.lessons.reduce((sum, lesson) => sum + lesson.mins, 0);
+  const groups = course.hub.groups.map((group, index) => {
+    const from = course.lessons.findIndex(l => l.id === group.from);
+    const to = course.hub.groups[index + 1] ? course.lessons.findIndex(l => l.id === course.hub.groups[index + 1].from) : course.lessons.length;
+    const items = course.lessons.slice(from, to).map(lesson => `<li><a href="${lessonHref(lesson.id)}" data-lesson-link="${escapeHtml(lesson.id)}"><strong><span data-check></span>${lesson.num}. ${escapeHtml(lesson.title)}</strong><span>${escapeHtml(plainText(lesson.lede))} · ${lesson.mins} min</span></a></li>`).join('');
+    return `<h2>${escapeHtml(group.label)}</h2><ul class="tutorial-list">${items}</ul>`;
   }).join('');
-  return { rail, content };
+  return `<div class="course-hub" data-course-hub><p class="eyebrow">Course · ${course.lessons.length} lessons · ${minutes} min</p><h1>${escapeHtml(course.hub.title)}</h1><article class="prose">${introHtml}</article><p><a class="button-primary" href="${lessonHref(course.lessons[0].id)}">Start the course</a></p><div class="prose">${groups}</div></div>`;
+}
+
+// One lesson page: the lesson server-rendered and visible, prev/next as real links.
+export function renderLesson(course, lesson) {
+  const index = course.lessons.indexOf(lesson);
+  const [steps, reference] = lesson.body.split(/^# Reference\s*$/m);
+  const complete = `<p class="course-complete" data-course-complete role="status" hidden>Course complete: you finished all ${course.lessons.length} lessons.</p>`;
+  const quiz = `<fieldset class="course-quiz" data-answer="${lesson.quiz.a}"><legend>${escapeHtml(lesson.quiz.q)}</legend>${lesson.quiz.opts.map((option, i) => `<button type="button" data-quiz-answer="${i}">${escapeHtml(option)}</button>`).join('')}<p data-feedback aria-live="polite" data-why="${escapeHtml(lesson.quiz.why)}"></p>${complete}</fieldset>`;
+  const previous = course.lessons[index - 1], next = course.lessons[index + 1];
+  const nav = `<nav class="course-pager" aria-label="Lesson navigation">${previous ? `<a href="${lessonHref(previous.id)}" rel="prev">Previous: ${escapeHtml(previous.title)}</a>` : '<span></span>'}${next ? `<a href="${lessonHref(next.id)}" rel="next">Next: ${escapeHtml(next.title)}</a>` : ''}</nav>`;
+  const finish = lesson.finish ? `<div class="course-finish"><a class="button-primary" href="${escapeHtml(course.hub.finish.primary.href)}">${escapeHtml(course.hub.finish.primary.label)}</a><a href="${escapeHtml(course.hub.finish.secondary.href)}">${escapeHtml(course.hub.finish.secondary.label)}</a></div>` : '';
+  return `<section class="lesson" id="${escapeHtml(lesson.id)}"><p>Lesson ${lesson.num} of ${course.lessons.length} · ${lesson.mins} min</p><h1>${escapeHtml(lesson.title)}</h1><p>${createMarkdown().renderInline(lesson.lede)}</p><article class="prose">${renderItems(steps, lesson)}${reference ? `<details class="course-reference"><summary>Reference</summary>${renderItems(reference, lesson)}</details>` : ''}${quiz}${finish}${nav}</article></section>`;
 }
