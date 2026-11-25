@@ -51,10 +51,18 @@
     }
   ],
   "repro": {
-    "qwen_parse_official": "[]",
-    "reason_thinking_tag": "'Calling tool.'",
-    "reason_think_tag": "'<think>Need weather</think>Calling tool.'",
-    "minimax_family": "generic",
-    "sdk_version": "0.17.0"
+    "sdk_version": "0.17.0",
+    "entries": [
+      {
+        "label": "Fixture: a call that returns nothing",
+        "code": "fixture_parse('<call>{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Tokyo\", \"units\": \"metric\", \"detail\": \"hourly\"}}</call>')",
+        "output": "[]"
+      },
+      {
+        "label": "Fixture: a value left unchanged",
+        "code": "fixture_strip(\"<note>Need weather</note>Calling tool.\")",
+        "output": "'<note>Need weather</note>Calling tool.'"
+      }
+    ]
   }
 }
