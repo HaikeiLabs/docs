@@ -28,3 +28,24 @@ for (const [name, change] of [
   ['id differs from filename', d => edit(d, 'lessons/basics.md', s => s.replace('id: basics', 'id: other'))],
   ['quiz answer out of range', d => edit(d, 'lessons/basics.md', s => s.replace('  a: 0', '  a: 5'))],
 ]) test(`rejects ${name}`, () => mutated(change));
+
+for (const [name, change] of [
+  ['HTML tag in lesson lede', d => edit(d, 'lessons/basics.md', s => s.replace('Fixture lesson.', '<b>Fixture</b> lesson.'))],
+  ['HTML entity in lesson lede', d => edit(d, 'lessons/basics.md', s => s.replace('Fixture lesson.', 'Fixture &amp; lesson.'))],
+  ['HTML tag in compare note', d => edit(d, 'data/compare-fixture.json', s => s.replace('Tools are a TypeScript-style', 'Tools are <b>a</b> TypeScript-style'))],
+  ['HTML entity in compare note', d => edit(d, 'data/compare-fixture.json', s => s.replace('Tools are a TypeScript-style', 'Tools &amp; a TypeScript-style'))],
+  ['HTML in an unreferenced compare note', d => { const p = path.join(d, 'data', 'compare-unused.json'); const data = JSON.parse(fs.readFileSync(path.join(d, 'data', 'compare-fixture.json'))); data.tabs[0].note = 'A <code>tool</code>'; fs.writeFileSync(p, JSON.stringify(data)); }],
+]) test(`rejects ${name}`, () => mutated(change));
+
+test('allows raw token syntax in Markdown code and preserves verbatim source fields', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'course-test-'));
+  try {
+    fs.cpSync(fixture, dir, { recursive: true });
+    const file = path.join(dir, 'data', 'compare-fixture.json');
+    const value = JSON.parse(fs.readFileSync(file));
+    value.tabs[0].note = 'Call with `<|call|>` and **tools**.';
+    value.tabs[0].panes[0].src = '<tool>&amp; verbatim</tool>';
+    fs.writeFileSync(file, JSON.stringify(value));
+    assert.doesNotThrow(() => validateCourse(dir));
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
