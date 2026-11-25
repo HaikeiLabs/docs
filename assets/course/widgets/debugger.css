@@ -1,0 +1,38 @@
+.debugger-widget { color: var(--color-content); font-family: Inter, sans-serif; min-width: 0; }
+.debugger-widget * { box-sizing: border-box; }
+.prose .debugger-widget code { background: none; border: 0; padding: 0; font: inherit; }
+.debugger-toolbar, .debugger-controls { display: flex; flex-wrap: wrap; gap: .5rem; }
+.debugger-toolbar { justify-content: space-between; gap: 1rem; }
+.debugger-widget button { font: inherit; color: inherit; background: var(--color-surface); border: 1px solid var(--color-line-strong); border-radius: .35rem; padding: .45rem .7rem; cursor: pointer; }
+.debugger-widget button:hover { background: var(--color-surface-hover); }
+.debugger-widget button:focus-visible, .debugger-widget summary:focus-visible { outline: 2px solid var(--color-accent-text); outline-offset: 2px; }
+.debugger-widget button[aria-pressed="true"], .debugger-widget button[aria-current] { color: var(--kei-permit-ink); background: var(--kei-permit-bg); border-color: var(--kei-permit-line); }
+.debugger-status { margin: 1rem 0; padding: .7rem 1rem; background: var(--kei-permit-bg); color: var(--kei-permit-ink); border-left: 3px solid var(--kei-permit-line); }
+.debugger-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+.debugger-left, .debugger-inspector { min-width: 0; }
+.debugger-block, .debugger-vars, .debugger-inspector, .debugger-message { border: 1px solid var(--color-line); border-radius: .4rem; background: var(--color-surface); }
+.debugger-file, .debugger-vars h4 { margin: 0; padding: .6rem .8rem; color: var(--color-muted); border-bottom: 1px solid var(--color-line); font: 500 .75rem 'JetBrains Mono', monospace; }
+.debugger-code, .debugger-widget pre { overflow: auto; max-width: 100%; }
+.debugger-code { padding: .6rem 0; }
+.debugger-line { display: grid; grid-template-columns: 2rem 2rem max-content; align-items: center; min-width: max-content; font: 500 .8rem/1.7 'JetBrains Mono', monospace; }
+.debugger-line code { white-space: pre; }
+.debugger-line.current { background: var(--kei-permit-bg); }
+.debugger-line button { padding: 0; border: 0; color: var(--color-accent-text); background: transparent; }
+.debugger-number { color: var(--color-muted); text-align: right; padding-right: .7rem; }
+.debugger-widget pre { margin: 0; padding: .8rem; white-space: pre; font: 500 .8rem/1.6 'JetBrains Mono', monospace; }
+.debugger-vars { margin-top: 1rem; }
+.debugger-vars > div { display: grid; grid-template-columns: 5rem minmax(0, 1fr); gap: .5rem; padding: .35rem .8rem; border-bottom: 1px solid var(--color-line); font-size: .85rem; }
+.debugger-vars code { overflow-wrap: anywhere; }
+.debugger-inspector { padding: 1rem; }
+.debugger-inspector h4 { margin: 0 0 .5rem; }
+.debugger-inspector p { color: var(--color-muted); margin: 0 0 1rem; }
+.debugger-inspector .debugger-controls { margin-bottom: 1rem; }
+.debugger-messages { display: grid; gap: .5rem; }
+.debugger-message { min-width: 0; }
+.debugger-message strong { display: block; padding: .5rem .8rem 0; color: var(--color-accent-text); font-size: .8rem; }
+.debugger-widget details { margin-top: 1rem; }
+.debugger-widget summary { cursor: pointer; font-weight: 600; }
+.debugger-timeline { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0; }
+.debugger-timeline button { font-size: .8rem; }
+.debugger-real .debugger-block { margin-top: .75rem; }
+@media (max-width: 800px) { .debugger-grid { grid-template-columns: minmax(0, 1fr); } }
