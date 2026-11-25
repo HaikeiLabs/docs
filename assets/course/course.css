@@ -1,0 +1,10 @@
+.layout.course-layout { grid-template-columns: 16rem minmax(0, 1fr); }
+.course-rail nav { display: grid; gap: .5rem; }
+.course-rail h2 { font-size: .875rem; margin: 1rem 0 0; }
+.course-rail a { color: var(--color-muted); text-decoration: none; }
+.course-rail a[aria-current] { color: var(--color-accent-text); font-weight: 600; }
+.lesson { min-width: 0; }
+.lesson[hidden] { display: none; }
+.widget { min-width: 0; }
+@media (max-width: 860px) { .layout.course-layout { grid-template-columns: minmax(0, 1fr); } }
+.course-rail nav > p, .lesson > p:first-child { font: 500 .875rem/1.5 var(--font-mono); }
