@@ -87,7 +87,9 @@
     var button = event.target.closest('.copy');
     if (!button) return;
     var block = button.closest('.code-block');
-    var code = block.querySelector('code').textContent;
+    var codeNode = block.querySelector('code').cloneNode(true);
+    codeNode.querySelectorAll('.course-mark, .course-mark-empty').forEach(function (mark) { mark.remove(); });
+    var code = codeNode.textContent;
     var copied = classifyCopy(code, block.getAttribute('data-assistant') || '', location.pathname);
     if (copied) track(copied.name, copied.params);
     var done = function () {

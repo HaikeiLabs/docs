@@ -287,9 +287,10 @@ function layout(title, nav, content, { toc = '', mermaid = false, description = 
   <link rel="stylesheet" href="/assets/brand.css">
   <link rel="stylesheet" href="/assets/tokens.css">
   <link rel="stylesheet" href="/assets/site.css">
-  ${variant === 'course' ? '<link rel="stylesheet" href="/assets/course/course.css"><script type="module" src="/assets/course/course.js"></script>' : ''}
+  ${variant === 'course' ? '<link rel="stylesheet" href="/assets/course/course.css">' : ''}
   ${mermaid ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js" defer></script>' : ''}
   <script src="/assets/site.js" defer></script>
+  ${variant === 'course' ? '<script type="module" src="/assets/course/course.js"></script>' : ''}
 </head>
 <body${notFound ? ' class="not-found-page"' : ''}>
   <a class="skip-link" href="#main">Skip to content</a>
