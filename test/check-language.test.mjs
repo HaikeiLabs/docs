@@ -110,6 +110,25 @@ test('exempts the product: enum value but still checks title and description', (
   );
 });
 
+test('exempts the course: front-matter const but still checks title and prose', () => {
+  const text =
+    '---\ntitle: The agentware course\ncourse: agentware\n---\n\n' +
+    'course: agentware is prose here.\n';
+  assert.deepEqual(
+    findViolations(text).map((v) => v.line),
+    [2, 6],
+  );
+});
+
+test('a course hub page with course: agentware passes check:language', async () => {
+  await withTempFiles(
+    { 'index.md': '---\ntitle: Agentware course\ncourse: agentware\n---\n\nLearn Agentware.\n' },
+    async (dir) => {
+      assert.deepEqual(await checkLanguage(dir), []);
+    },
+  );
+});
+
 test('skips text after a verbatim:begin marker, which reproduces a historical document as written', async () => {
   await withTempFiles(
     {
