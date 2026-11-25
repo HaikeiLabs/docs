@@ -48,7 +48,7 @@ for (const theme of ['light', 'dark']) {
     });
 
     test('a correctly answered quiz stays complete and locks its options', async ({ page }) => {
-      await page.goto('/agentware/course/#basics');
+      await page.goto('/agentware/course/basics/');
       const quiz = page.locator('#basics .course-quiz');
       const feedback = quiz.locator('[data-feedback]');
       await quiz.locator('[data-quiz-answer="0"]').click();
