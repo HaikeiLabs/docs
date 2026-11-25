@@ -1,5 +1,6 @@
 .debugger-widget { color: var(--color-content); font-family: Inter, sans-serif; min-width: 0; }
 .debugger-widget * { box-sizing: border-box; }
+.prose .debugger-widget code { background: none; border: 0; padding: 0; font: inherit; }
 .debugger-toolbar, .debugger-controls { display: flex; flex-wrap: wrap; gap: .5rem; }
 .debugger-toolbar { justify-content: space-between; gap: 1rem; }
 .debugger-widget button { font: inherit; color: inherit; background: var(--color-surface); border: 1px solid var(--color-line-strong); border-radius: .35rem; padding: .45rem .7rem; cursor: pointer; }

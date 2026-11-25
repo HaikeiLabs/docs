@@ -24,3 +24,8 @@ test('raw view is available only for completion formats', () => {
 test('widget files use role tokens rather than raw colors', async () => {
   for (const file of ['debugger.js', 'debugger.css']) assert.doesNotMatch(await readFile(new URL(`../assets/course/widgets/${file}`, import.meta.url), 'utf8'), /#[0-9a-f]{3,8}\b|rgba?\s*\(/i);
 });
+test('code lines reset the site inline-code styling', async () => {
+  const css = await readFile(new URL('../assets/course/widgets/debugger.css', import.meta.url), 'utf8');
+  const rule = css.match(/\.prose\s+\.debugger-widget\s+code\s*\{([^}]*)\}/)?.[1] || '';
+  for (const declaration of [/background\s*:\s*none/, /border\s*:\s*0/, /padding\s*:\s*0/, /font\s*:\s*inherit/]) assert.match(rule, declaration);
+});
