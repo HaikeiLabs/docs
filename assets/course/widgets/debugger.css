@@ -15,6 +15,7 @@
 .debugger-code, .debugger-widget pre { overflow: auto; max-width: 100%; }
 .debugger-code { padding: .6rem 0; }
 .debugger-line { display: grid; grid-template-columns: 2rem 2rem max-content; align-items: center; min-width: max-content; font: 500 .8rem/1.7 'JetBrains Mono', monospace; }
+.debugger-line code { white-space: pre; }
 .debugger-line.current { background: var(--kei-permit-bg); }
 .debugger-line button { padding: 0; border: 0; color: var(--color-accent-text); background: transparent; }
 .debugger-number { color: var(--color-muted); text-align: right; padding-right: .7rem; }

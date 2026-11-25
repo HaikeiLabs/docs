@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { dbgStops, breakpointLines, supportsRawTokens } from '../assets/course/widgets/debugger.js';
+import { dbgStops, breakpointLines, supportsRawTokens, mount } from '../assets/course/widgets/debugger.js';
 
 const code = ['build_request(', 'call_model(', 'return final_text(', 'run_tool(', 'tool_results('].join('\n');
 const logs = {
@@ -28,4 +28,19 @@ test('code lines reset the site inline-code styling', async () => {
   const css = await readFile(new URL('../assets/course/widgets/debugger.css', import.meta.url), 'utf8');
   const rule = css.match(/\.prose\s+\.debugger-widget\s+code\s*\{([^}]*)\}/)?.[1] || '';
   for (const declaration of [/background\s*:\s*none/, /border\s*:\s*0/, /padding\s*:\s*0/, /font\s*:\s*inherit/]) assert.match(rule, declaration);
+});
+
+test('rendered code preserves leading spaces and uses preformatted whitespace', async () => {
+  const previous = globalThis.document;
+  globalThis.document = {querySelector: () => ({})};
+  const el = {innerHTML: '', addEventListener() {}, removeEventListener() {}};
+  const source = ['    build_request(', 'call_model(', 'return final_text(', 'run_tool(', 'tool_results('].join('\n');
+  try {
+    mount(el, {logs: {qwen: [{chat_request: {messages: []}, request: {prompt: ''}, done: true}]}, debugger: {code: source, help: {qwen: {}}, fns: {qwen: []}}}, {onCleanup() {}});
+    assert.match(el.innerHTML, /<code>    build_request\(<\/code>/);
+    const css = await readFile(new URL('../assets/course/widgets/debugger.css', import.meta.url), 'utf8');
+    assert.match(css, /\.debugger-line\s+code\s*\{[^}]*white-space\s*:\s*pre\s*[;}]/);
+  } finally {
+    if (previous === undefined) delete globalThis.document; else globalThis.document = previous;
+  }
 });
