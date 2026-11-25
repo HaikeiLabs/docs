@@ -26,8 +26,23 @@ if (typeof document !== 'undefined') {
     document.querySelectorAll('[data-lesson-link]').forEach(link => {
       link.querySelector('[data-check]').textContent = done.has(link.dataset.lessonLink) ? '✓ ' : '';
     });
-    document.querySelectorAll('[data-progress]').forEach(el => { el.textContent = `${lessons.filter(l => done.has(l.id)).length} of ${lessons.length}`; });
+    const count = lessons.filter(l => done.has(l.id)).length;
+    document.querySelectorAll('[data-progress]').forEach(el => { el.textContent = `${count} of ${lessons.length}`; });
+    document.querySelectorAll('[data-course-complete]').forEach(el => { el.hidden = count < lessons.length; });
   };
+  const markQuiz = (quiz, button, correct) => {
+    quiz.querySelectorAll('[data-quiz-answer]').forEach(option => {
+      if (option === button) option.dataset.result = correct ? 'right' : 'wrong';
+      else if (correct) delete option.dataset.result;
+    });
+    const feedback = quiz.querySelector('[data-feedback]');
+    feedback.textContent = correct ? feedback.dataset.why : 'Not this one. Try again: reread the steps above for the detail the question asks about.';
+  };
+  // A completed lesson shows its answered quiz again after a reload.
+  for (const lesson of lessons) {
+    const quiz = lesson.querySelector('.course-quiz');
+    if (quiz && done.has(lesson.id)) markQuiz(quiz, quiz.querySelector(`[data-quiz-answer="${quiz.dataset.answer}"]`), true);
+  }
   const show = async () => {
     const current = lessonForHash(location.hash, lessons, document);
     if (!current) return;
@@ -66,10 +81,10 @@ if (typeof document !== 'undefined') {
   document.addEventListener('focusout', event => markHover(event, false));
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-quiz-answer]'); if (!button) return;
-    const quiz = button.closest('.course-quiz'), lesson = button.closest('.lesson'), feedback = quiz.querySelector('[data-feedback]');
+    const quiz = button.closest('.course-quiz'), lesson = button.closest('.lesson');
     const result = recordAnswer(done, lesson.id, button.dataset.quizAnswer, quiz.dataset.answer);
-    if (!result.correct) { feedback.textContent = 'Try again.'; return; }
-    feedback.textContent = feedback.dataset.why;
+    markQuiz(quiz, button, result.correct);
+    if (!result.correct) return;
     if (result.newlyComplete) { saveProgress(storage, done); track('course_lesson_complete', lesson.id); progress(); }
   });
   progress(); addEventListener('hashchange', show); show();

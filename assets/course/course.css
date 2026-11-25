@@ -25,3 +25,15 @@
 @media (max-width: 860px) { .course-step { grid-template-columns: minmax(0, 1fr); } }
 .course-code-line.is-highlighted { background: var(--course-hl-line); }
 .course-rail nav > p, .lesson > p:first-child { font: 500 .875rem/1.5 var(--font-mono); }
+/* Token text must render literally: JetBrains Mono ligatures turn <|im_start|> into arrow glyphs.
+   Widget rules set fonts with the `font` shorthand, which resets ligatures, so this selector
+   outranks them (0,3,0) instead of relying on inheritance. */
+.course-layout .lesson :is(code, pre, kbd, samp, .mk, .course-mark, .widget, .widget *) { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+.lesson > p, .lesson > h1 { max-width: 46rem; }
+.course-quiz button[data-result="right"] { color: var(--kei-permit-ink); background: var(--kei-permit-bg); border-color: var(--kei-permit-line); }
+.course-quiz button[data-result="wrong"], .course-quiz button[data-result="wrong"]:hover { color: var(--color-muted); background: var(--color-ground); border-color: var(--color-line-strong); border-style: dashed; }
+.course-quiz button[data-result]::before { font: 500 .875em var(--font-mono); margin-right: .5rem; }
+.course-quiz button[data-result="right"]::before { content: "✓"; }
+.course-quiz button[data-result="wrong"]::before { content: "✕"; }
+.course-complete { margin: 0; font-weight: 600; color: var(--color-accent-text); }
+.course-complete[hidden] { display: none; }

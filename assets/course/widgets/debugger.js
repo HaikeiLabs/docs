@@ -20,6 +20,7 @@ export function dbgStops(logs, style, code) {
     ]),
   ]);
 }
+export const countOf = (n, noun) => `${n} ${noun}${n === 1 ? '' : 's'}`;
 export const supportsRawTokens = style => style === 'gpt-oss' || style === 'qwen';
 const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
 const pretty = value => JSON.stringify(value, null, 2);
@@ -32,7 +33,8 @@ export function mount(el, data, ctx) {
   const {logs, debugger: config} = data;
   const lines = breakpointLines(config.code);
   const bps = new Set(Object.values(lines));
-  let style = 'qwen', view = 'messages', pos = 0, stops = dbgStops(logs, style, config.code);
+  // Claude first and selected, matching the other model pickers in the course.
+  let style = Object.keys(styles).find(id => logs[id]), view = 'messages', pos = 0, stops = dbgStops(logs, style, config.code);
   // TODO: lazily import ../highlight.js and call highlight(src, lang) when the shared highlighter lands.
   const block = (source, label) => `<div class="debugger-block"><div class="debugger-file">${esc(label)}</div><pre>${esc(source)}</pre></div>`;
   const cards = messages => `<div class="debugger-messages">${messages.map(m => `<div class="debugger-message"><strong>${esc(m.role)}</strong><pre>${esc(pretty(m))}</pre></div>`).join('')}</div>`;
@@ -62,13 +64,15 @@ export function mount(el, data, ctx) {
     }
     const history = request.messages.length + (st.kind === 'append' ? it.appended.length : 0);
     const tool = st.kind === 'tool' ? it.tools_run[st.k] : null;
-    const vars = {lap: st.lap + 1, history: `${history} messages`, response: st.kind === 'send' ? '—' : raw ? `${it.response.length} chars` : `stop_reason="${it.response.stop_reason}"`, calls: st.kind === 'send' ? '—' : (it.tools_run || []).map(t => `${t.name}(${t.args.city})`).join(', ') || '[]', call: tool ? `${tool.name}(${pretty(tool.args)})` : '—', output: tool?.result || '—'};
+    const vars = {lap: st.lap + 1, history: countOf(history, 'message'), response: st.kind === 'send' ? '—' : raw ? `${it.response.length} chars` : `stop_reason="${it.response.stop_reason}"`, calls: st.kind === 'send' ? '—' : (it.tools_run || []).map(t => `${t.name}(${t.args.city})`).join(', ') || '[]', call: tool ? `${tool.name}(${pretty(tool.args)})` : '—', output: tool?.result || '—'};
     const code = config.code.split('\n').map((line, i) => {
       const n = i + 1, kind = Object.keys(lines).find(k => lines[k] === n);
       return `<div class="debugger-line${n === st.line ? ' current' : ''}">${kind ? `<button type="button" data-bp="${n}" aria-label="Breakpoint on line ${n}: ${esc(labels[kind])}" aria-pressed="${bps.has(n)}">${bps.has(n) ? '●' : '○'}</button>` : '<span></span>'}<span class="debugger-number">${n}</span><code>${esc(line)}</code></div>`;
     }).join('');
-    el.innerHTML = `<div class="debugger-widget"><div class="debugger-toolbar"><div class="debugger-controls" aria-label="Model">${Object.entries(styles).map(([id, name]) => `<button type="button" data-style="${id}" aria-pressed="${id === style}">${name}</button>`).join('')}</div><div class="debugger-controls">${[['continue','Continue'],['step','Step'],['back','Back'],['restart','Restart']].map(([id, name]) => `<button type="button" data-action="${id}">${name}</button>`).join('')}</div></div>
-      <div class="debugger-status" aria-live="polite">Paused at line ${st.line}: ${labels[st.kind]} · stop ${pos + 1} of ${stops.length}</div>
+    const last = pos === stops.length - 1, disabled = {continue: last, step: last, back: pos === 0};
+    el.innerHTML = `<div class="debugger-widget"><div class="debugger-controls debugger-models" role="group" aria-label="Model">${Object.entries(styles).filter(([id]) => logs[id]).map(([id, name]) => `<button type="button" data-style="${id}" aria-pressed="${id === style}">${name}</button>`).join('')}</div>
+      <div class="debugger-bar"><div class="debugger-controls" role="group" aria-label="Debugger controls">${[['continue','Continue'],['step','Step'],['back','Back'],['restart','Restart']].map(([id, name]) => `<button type="button" data-action="${id}"${disabled[id] ? ' aria-disabled="true"' : ''}>${name}</button>`).join('')}</div>
+      <div class="debugger-status" aria-live="polite">Paused at line ${st.line}: ${labels[st.kind]} · stop ${pos + 1} of ${stops.length}</div></div>
       <div class="debugger-grid"><div class="debugger-left"><div class="debugger-block"><div class="debugger-file">agent_loop.py · toggle breakpoints in the gutter</div><div class="debugger-code">${code}</div></div><div class="debugger-vars"><h4>Variables</h4>${Object.entries(vars).map(([k,v]) => `<div><span>${k}</span><code>${esc(v)}</code></div>`).join('')}</div></div>
       <section class="debugger-inspector"><h4>${esc(title)}</h4><p>${esc(explanation)}</p>${raw && st.kind !== 'tool' && st.kind !== 'done' ? `<div class="debugger-controls"><button type="button" data-view="messages" aria-pressed="${view === 'messages'}">Messages · chat API</button><button type="button" data-view="raw" aria-pressed="${view === 'raw'}">Raw tokens</button></div>` : ''}${body}</section></div>
       <nav class="debugger-timeline" aria-label="Every stop in this run">${stops.map((s,i) => `<button type="button" data-stop="${i}" ${i === pos ? 'aria-current="step"' : ''}>${i === 0 || stops[i-1].lap !== s.lap ? `Lap ${s.lap+1}: ` : ''}${labels[s.kind]}${s.kind === 'tool' ? ` ${s.k+1}` : ''}</button>`).join('')}</nav>
@@ -76,7 +80,7 @@ export function mount(el, data, ctx) {
     if (focus) el.querySelector(focus)?.focus();
   }
   const click = event => {
-    const b = event.target.closest('button'); if (!b || !el.contains(b)) return;
+    const b = event.target.closest('button'); if (!b || !el.contains(b) || b.getAttribute('aria-disabled') === 'true') return;
     let focus;
     if (b.dataset.bp) { const n = +b.dataset.bp; bps.has(n) ? bps.delete(n) : bps.add(n); focus = `[data-bp="${n}"]`; }
     else if (b.dataset.style) { style = b.dataset.style; view = 'messages'; stops = dbgStops(logs, style, config.code); pos = 0; focus = `[data-style="${style}"]`; }
