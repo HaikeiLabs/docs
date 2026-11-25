@@ -1,7 +1,7 @@
 ---
 id: gaps
 num: 10
-title: "Agentware: gaps to fix"
+title: "Agentware tool-calling gaps: what doesn't work yet?"
 mins: 4
 lede: "A few things in Agentware don't match the real requests and formats from Lessons 3 to 5, or the loop from Lesson 9. Each one below was reproduced by running the Python SDK."
 quiz:

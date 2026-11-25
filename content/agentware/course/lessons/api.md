@@ -1,9 +1,9 @@
 ---
 id: api
 num: 3
-title: "The API: where tools go"
+title: "OpenAI vs Anthropic tool calling"
 mins: 4
-lede: "Two APIs cover most models: the OpenAI-compatible Chat Completions API, which most model servers copy, and Anthropic's Messages API. They do the same three things with different field names."
+lede: "OpenAI-compatible APIs and Anthropic's Messages API do the same three things: declare the tool, return the model's call, and take the result back. Only the field names differ, and most model servers copy the OpenAI-compatible API."
 quiz:
   q: In an OpenAI-compatible response, what type is function.arguments?
   opts:
@@ -17,7 +17,7 @@ quiz:
 
 ## Same tool call, two APIs
 
-Pick a moment. Highlighted lines are where the two APIs differ.
+Both APIs declare the tool, return the model's call and take the result back; only the field names and shapes differ. Pick a moment: highlighted lines are where they differ.
 
 [widget:compare data=compare-api]
 

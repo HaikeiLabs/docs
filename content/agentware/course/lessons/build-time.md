@@ -1,9 +1,9 @@
 ---
 id: build-time
 num: 8
-title: Agentware at build time
+title: "How does Agentware format tools for each model?"
 mins: 4
-lede: "Some things are decided once, before the first request: which tools exist, which model format to use, and how the tools are written into the prompt."
+lede: "Agentware picks a formatter from the model name once, when you build the agent. The formatter writes your tools into the request, or into the prompt as text when the server can't parse tool calls."
 quiz:
   q: When does get_formatter(model_name) run?
   opts:

@@ -1,9 +1,9 @@
 ---
 id: schema
 num: 2
-title: Describe the tool
+title: "How do you describe a tool to an LLM?"
 mins: 4
-lede: "The model reads a name, a description, and a JSON Schema. That's all it knows about your function."
+lede: "You give the model a name, a description and a JSON Schema for the parameters. That's all it knows about your function."
 quiz:
   q: What does the model receive about your tool?
   opts:
@@ -16,6 +16,8 @@ quiz:
 ---
 
 ## Name, description, parameters
+
+The model never sees your code. It sees only this declaration.
 
 [[1]] **name** is what the model writes to call it.
 

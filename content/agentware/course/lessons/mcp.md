@@ -1,9 +1,9 @@
 ---
 id: mcp
 num: 6
-title: "MCP: tools from another process"
+title: "What is MCP?"
 mins: 5
-lede: MCP is a standard way for a separate server to offer tools. Your harness, the code that runs the loop, speaks MCP. The model never does.
+lede: "MCP (Model Context Protocol) is a standard way for a separate server to offer tools to your agent. Your harness, the code that runs the loop, speaks MCP; the model never does."
 quiz:
   q: Which side speaks MCP?
   opts:
@@ -17,7 +17,7 @@ quiz:
 
 ## Two methods matter
 
-MCP uses JSON-RPC 2.0: every request is a JSON object with a method name and parameters. After the `initialize` handshake, you only need these two methods.
+An MCP server lists its tools and runs them when your harness asks. It uses JSON-RPC 2.0: every request is a JSON object with a method name and parameters. After the `initialize` handshake, you only need these two methods.
 
 [widget:api data=api-mcp]
 
