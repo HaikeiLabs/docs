@@ -7,7 +7,8 @@
 // identifiers (governed_call, JSON keys, shipped error strings) are never
 // flagged. Lowercase agentware is allowed in URLs and paths: preceded by
 // / - _ . or followed by / (haikeilabs.com/agentware, agentware/README.md),
-// and in the frontmatter product: value (an enum: product: agentware).
+// in the frontmatter product: value (an enum: product: agentware), and in
+// the front-matter course: value (a const: course: agentware), front matter only.
 // title/description stay checked.
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -31,13 +32,17 @@ function isUrlOrPath(line, index, length) {
   return ['/', '-', '_', '.', '#'].includes(before) || after === '/';
 }
 
+const blankValue = (m, key, value) => key + ' '.repeat(value.length);
+
 // Strips fenced code blocks and inline code spans while keeping every input
 // line (blanked), so reported line numbers match the source file.
 export function stripCode(source) {
   const lines = source.split(/\r?\n/);
   const out = [];
   let fence = null; // { char, len } while inside a fenced block
-  for (const line of lines) {
+  let frontMatter = lines[0]?.trim() === '---'; // true until the closing ---
+  for (const [i, line] of lines.entries()) {
+    if (frontMatter && i > 0 && line.trim() === '---') frontMatter = false;
     const marker = line.match(/^\s{0,3}(`{3,}|~{3,})(.*)$/);
     if (!fence && marker) {
       fence = { char: marker[1][0], len: marker[1].length };
@@ -49,15 +54,19 @@ export function stripCode(source) {
       out.push('');
       continue;
     }
-    out.push(
-      fence
-        ? ''
-        : line
-            .replace(/`[^`\n]*`/g, (span) => ' '.repeat(span.length))
-            // The frontmatter product: value is an enum (product: agentware),
-            // not prose. Blank it like code; title/description stay checked.
-            .replace(/^(\s*product:\s*)(.*)$/, (m, key, value) => key + ' '.repeat(value.length)),
-    );
+    if (fence) {
+      out.push('');
+      continue;
+    }
+    let stripped = line
+      .replace(/`[^`\n]*`/g, (span) => ' '.repeat(span.length))
+      // The frontmatter product: value is an enum (product: agentware),
+      // not prose. Blank it like code; title/description stay checked.
+      .replace(/^(\s*product:\s*)(.*)$/, blankValue);
+    // The course hub's course: value is a schema const (course: agentware).
+    // Blank it in front matter only; a "course:" line in prose stays checked.
+    if (frontMatter) stripped = stripped.replace(/^(\s*course:\s*)(.*)$/, blankValue);
+    out.push(stripped);
   }
   return out.join('\n');
 }
