@@ -17,11 +17,13 @@ quiz:
   why: The model only writes the request. Your code runs it and sends back the result.
 ---
 
-## Start with a plain function
+## How can a model look up the weather?
 
-A tool is a plain function in your code, and a tool call is the model asking you to run it. Nothing about the function is AI-specific: [[1]] takes arguments, [[2]] does the work, [[3]] returns data the model can read.
+To answer “Do I need an umbrella in Tokyo?”, the model needs a weather report. You can give it a **tool**, a function your program makes available. A **tool call** is the model’s request to run that function with particular arguments.
 
-The model never sees this code. It only sees a description of it, which you'll write in Lesson 2.
+Here `get_weather` accepts a city and an optional unit [[1]]. It looks up the city in a small table of sample weather [[2]] and returns a dictionary [[3]]. For Tokyo, the temperature is `22` and the sky is `rain`.
+
+Your Python program runs the lookup. The model sees a description of the function and, once you send it back, the result.
 
 ```python title="tools.py" marks="1=1;3=2;4=3"
 def get_weather(city: str, unit: str = "celsius") -> dict:
@@ -30,15 +32,19 @@ def get_weather(city: str, unit: str = "celsius") -> dict:
     return {"city": city, "temp": temp, "sky": sky}
 ```
 
-## Watch the loop run
+## Why does the model need another turn?
 
-Press play. Every arrow is one message. Your code sits in the middle and does all the routing. The rings count laps: each lap is one call to the model. Switch the model to see the count change: Claude is a hosted model, and GPT-OSS and Qwen3 are open models you can run yourself. GPT-OSS asks for one city per turn here, so it needs an extra lap. Message counts are for the conversation as a chat API holds it; Lesson 7 shows the raw text each model reads.
+The first reply can ask for the weather. To use the result in its answer, the model needs a second request from your program. Each request to the model counts as one **lap** of the loop.
+
+Press play and follow the arrows from the model to your code and back. Switch from Claude to GPT-OSS and watch the lap count. In this recording Claude asks for both cities together, while GPT-OSS asks for one city per turn and takes an extra lap.
 
 [widget:cycle]
 
-## That loop is the agent
+## What makes this loop an agent?
 
-The history starts with the system prompt (`system`, the instructions the model reads first) and the user's question. Call the model [[1]]. If it didn't ask for a tool [[2]], you're done. Otherwise run what it asked for [[3]], add the results to the conversation, and go around again [[4]].
+An agent can use one reply to decide what to do next. This loop starts with a **history**, the messages so far. `system` holds instructions for the model, and `question` holds the user’s request.
+
+Send the history and the available tools to the model [[1]]. If the reply has no tool calls [[2]], return its text to the user. Otherwise, visit each requested call [[3]], run the named function with its arguments, and append the result [[4]] so the next request includes it.
 
 ```python title="loop.py" marks="3=1;4=2;6=3;7=4"
 history = [system, question]
