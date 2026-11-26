@@ -34,8 +34,8 @@ finish:
     href: https://playground.haikeilabs.com
 ---
 
-A tool call is a message in which the model asks your code to run a function: it writes the function's name and arguments, and your code runs it and sends the result back. Repeat that until the model answers in plain text, and you have an agent.
+Should you pack an umbrella for Tokyo? To answer with a weather report, a large language model (LLM) can ask your program to look up the city. That request is a **tool call**. The model supplies the function name and arguments, your Python code runs the lookup, and you send the result back so the model can answer.
 
-These ten lessons follow one tool call from a plain Python function through the OpenAI and Anthropic APIs, the text formats models read, and MCP, to a full agent loop you can step through under a debugger. The last three lessons show what Agentware does at build time and at runtime, and where it still differs from the real formats.
+Start with a weather function small enough to read in one sitting. Follow its call through the OpenAI and Anthropic message formats, then see how a separate server can offer the same tool. In the debugger, step through the **agent loop**, the code that keeps asking the model what to do until it has an answer.
 
-Each lesson takes four to twelve minutes and ends with one question. You need some Python. You don't need a model or an API key: every example runs on recorded data.
+The last three lessons show how Agentware describes tools to different models, checks requests before running them, and handles formats its text parser can miss. Each of the ten lessons takes four to twelve minutes and ends with one question. If you can read Python, you can start with the first example. The recordings let you follow every call without a model or an API key.
