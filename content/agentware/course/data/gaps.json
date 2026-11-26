@@ -13,17 +13,10 @@
       "wire": "<minimax:tool_call><invoke name=…>",
       "aw": "Python and TypeScript use GenericFormatter. Go matches <tool_call><tool_name>.",
       "effect": "Text-mode parsing misses real calls."
-    },
-    {
-      "area": "Tool result text",
-      "sev": "low",
-      "wire": "Raw result, matched by id",
-      "aw": "InferenceExecutor sends \"Tool {name} result: …\"",
-      "effect": "Adds a prefix the model wasn't trained on."
     }
   ],
   "repro": {
-    "sdk_version": "0.18.0",
+    "sdk_version": "0.18.1",
     "entries": [
       {
         "label": "GPT-OSS: a Harmony tool call in text mode",
@@ -34,11 +27,6 @@
         "label": "MiniMax: a real MiniMax M2 tool call",
         "code": "fmt = get_formatter(\"MiniMax-M2\")\nfmt.model_family(), fmt.parse_tool_calls('<minimax:tool_call><invoke name=\"get_weather\"><parameter name=\"city\">Tokyo</parameter></invoke></minimax:tool_call>')",
         "output": "('generic', [])"
-      },
-      {
-        "label": "Tool result text: what InferenceExecutor sends back (scripted model)",
-        "code": "executor.execute(ExecuteRequest(system_prompt=\"You are a weather assistant.\", user_message=\"Weather in Tokyo?\"))\nbackend.seen[-1][-1].content",
-        "output": "'Tool get_weather result: {\"temp\": 22, \"sky\": \"rain\"}'"
       }
     ]
   }

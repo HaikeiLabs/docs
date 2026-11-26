@@ -43,7 +43,7 @@ dependencies = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "haikeilabs-agentware", specifier = "==0.18.0" }]
+requires-dist = [{ name = "haikeilabs-agentware", specifier = "==0.18.1" }]
 
 [[package]]
 name = "exceptiongroup"
@@ -68,16 +68,16 @@ wheels = [
 
 [[package]]
 name = "haikeilabs-agentware"
-version = "0.18.0"
+version = "0.18.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "haikeilabs-connector-contracts" },
     { name = "httpx" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/00/8c/77a32eeb7591b011a203e5398143537b0425c8b2eef3f0473bb1d92fd8aa/haikeilabs_agentware-0.18.0.tar.gz", hash = "sha256:1fa0745a3fa7330c0de5615026a11273dde8b56d73b3c3432de4d14d024ade99", size = 269709, upload-time = "2026-11-25T23:18:01.199Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8a/7c/87804e57ddf8c9476a43475e2e873ef6dc2d2e23fb3bdca52ad9808f8da9/haikeilabs_agentware-0.18.1.tar.gz", hash = "sha256:0b933086c860557024da96f79db6520d1a9769a0ccb6af3e97d791fb620dd2d5", size = 272134, upload-time = "2026-11-26T18:55:28.1Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4f/66/372b3dd7261ad6b5109b9ded0468860ff4a8be3a95a8de5d92120fd92b87/haikeilabs_agentware-0.18.0-py3-none-any.whl", hash = "sha256:7e3a1054ef0a595519adb8c7c7c8f4fd4ef25fa61840f14984d91d5216f34a3b", size = 154644, upload-time = "2026-11-25T23:17:59.885Z" },
+    { url = "https://files.pythonhosted.org/packages/19/8c/b6c5ca20f06471aa850bec2381bf324fa9598c796572439227572f12087c/haikeilabs_agentware-0.18.1-py3-none-any.whl", hash = "sha256:1de7396ca07c0834c2364f2c456e61541f4281564c86253ec9c2db31196de632", size = 155381, upload-time = "2026-11-26T18:55:26.843Z" },
 ]
 
 [[package]]

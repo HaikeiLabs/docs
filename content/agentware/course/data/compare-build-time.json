@@ -5,7 +5,7 @@
       "name": "claude-sonnet-4-5",
       "sub": "→ anthropic",
       "note": "`get_formatter(\"claude-sonnet-4-5\")` returns the **anthropic** formatter.",
-      "src": "Captured by running haikeilabs-agentware 0.18.0",
+      "src": "Captured by running haikeilabs-agentware 0.18.1",
       "panes": [
         {
           "label": "Build time: tool definitions",
@@ -26,7 +26,7 @@
       "name": "Qwen/Qwen3-8B",
       "sub": "→ qwen",
       "note": "`get_formatter(\"Qwen/Qwen3-8B\")` returns the **qwen** formatter.",
-      "src": "Captured by running haikeilabs-agentware 0.18.0",
+      "src": "Captured by running haikeilabs-agentware 0.18.1",
       "panes": [
         {
           "label": "Build time: tool definitions",
@@ -38,7 +38,7 @@
           "label": "Runtime: tool result",
           "file": "format_tool_result()",
           "lang": "tokens",
-          "src": "<tool_response>\n\"{\\\"temp\\\": 22}\"\n</tool_response>"
+          "src": "<tool_response>\n{\"temp\": 22}\n</tool_response>"
         }
       ]
     },
@@ -47,7 +47,7 @@
       "name": "openai/gpt-oss-20b",
       "sub": "→ openai",
       "note": "`get_formatter(\"openai/gpt-oss-20b\")` returns the **openai** formatter.",
-      "src": "Captured by running haikeilabs-agentware 0.18.0",
+      "src": "Captured by running haikeilabs-agentware 0.18.1",
       "panes": [
         {
           "label": "Build time: tool definitions",
@@ -68,7 +68,7 @@
       "name": "MiniMax-M2",
       "sub": "→ generic",
       "note": "`get_formatter(\"MiniMax-M2\")` returns the **generic** formatter.",
-      "src": "Captured by running haikeilabs-agentware 0.18.0",
+      "src": "Captured by running haikeilabs-agentware 0.18.1",
       "panes": [
         {
           "label": "Build time: tool definitions",
