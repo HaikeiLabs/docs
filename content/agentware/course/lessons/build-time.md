@@ -17,9 +17,13 @@ quiz:
   why: "The model format doesn't change mid-run, so the formatter is picked once."
 ---
 
-## In code
+## How does Agentware prepare a tool for a model?
 
-Register the tool [[1]] and pick a formatter, the class that writes and reads one model family's tool format, from the model name [[2]]. Then render the tools: `DefaultPromptGenerator` writes the OpenAI-style list for the request's `tools` field [[3]], and the formatter writes them as text for the system prompt when the server has no tool parser [[4]].
+You can keep one weather function even when two models need different instructions for calling it. At build time, when you put the agent together, register `Weather()` [[1]] so Agentware can find the tool. Then choose a **formatter**, the code that reads and writes a model family’s tool format. `get_formatter` uses the model name [[2]] and runs once when you build the agent.
+
+The last two lines show two ways to describe that tool. In **native mode**, the server handles structured tool calls. `generate_tool_schemas` builds the OpenAI-style list for the request’s `tools` field [[3]].
+
+In **text mode**, the program supplies the tool instructions as part of the prompt and reads calls from the reply text. `format_tool_definitions` writes the instructions for that model [[4]]. Use this form when the server leaves tool calls as text.
 
 ```python title="build.py" marks="2=1;4=2;6=3;7=4"
 registry = ToolRegistry()
@@ -31,8 +35,10 @@ native = DefaultPromptGenerator().generate_tool_schemas(registry)
 text = fmt.format_tool_definitions(registry.all())
 ```
 
-## The templates it renders
+## What does the weather tool look like in each format?
 
-Real output from the Python SDK for the same `get_weather` tool. Pick a model name to see which formatter it gets. Qwen gets its own text block; the Anthropic and OpenAI formatters write JSON in their API's shape, and MiniMax falls back to the generic JSON formatter (Lesson 10).
+Choose Qwen3 and look for `get_weather` inside the `<tools>` tags. Below the declaration, the formatter gives the model an example of how to ask for a function inside `<tool_call>` tags.
+
+Switch to Claude and find the same city argument under `input_schema`. GPT-OSS gets an OpenAI-style JSON declaration, and MiniMax M2 gets the generic JSON formatter in this version of the Python SDK. The second pane in each tab shows how that formatter writes the result after the lookup.
 
 [widget:compare data=compare-build-time]
