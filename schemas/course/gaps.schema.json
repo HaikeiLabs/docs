@@ -39,36 +39,72 @@
     },
     "repro": {
       "type": "object",
+      "description": "Optional. Reproductions of the open gaps, shown under \"Reproduce it\". Omit it, or omit entries, and no block is shown.",
       "properties": {
+        "sdk_version": {
+          "type": "string",
+          "description": "The SDK version the entries were captured with, e.g. \"0.18.0\"."
+        },
+        "entries": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Plain text heading for this reproduction."
+              },
+              "code": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Python source, verbatim; shown after >>> (continuation lines after ...)."
+              },
+              "output": {
+                "type": "string",
+                "description": "Captured output, verbatim; empty for none."
+              }
+            },
+            "required": [
+              "label",
+              "code",
+              "output"
+            ],
+            "additionalProperties": false
+          }
+        },
         "qwen_parse_official": {
-          "type": "string"
+          "type": "string",
+          "deprecated": true,
+          "description": "Legacy captured value; ignored by the widget."
         },
         "reason_thinking_tag": {
-          "type": "string"
+          "type": "string",
+          "deprecated": true,
+          "description": "Legacy captured value; ignored by the widget."
         },
         "reason_think_tag": {
-          "type": "string"
+          "type": "string",
+          "deprecated": true,
+          "description": "Legacy captured value; ignored by the widget."
         },
         "minimax_family": {
-          "type": "string"
-        },
-        "sdk_version": {
-          "type": "string"
+          "type": "string",
+          "deprecated": true,
+          "description": "Legacy captured value; ignored by the widget."
         }
       },
-      "required": [
-        "qwen_parse_official",
-        "reason_thinking_tag",
-        "reason_think_tag",
-        "minimax_family",
-        "sdk_version"
-      ],
+      "dependentRequired": {
+        "entries": [
+          "sdk_version"
+        ]
+      },
       "additionalProperties": false
     }
   },
   "required": [
-    "gaps",
-    "repro"
+    "gaps"
   ],
   "additionalProperties": false
 }
