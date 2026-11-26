@@ -15,6 +15,6 @@ quiz:
   why: "Claude and Qwen3 group results from one turn into one message. GPT-OSS calls one tool per turn in this run, so each result goes back alone."
 ---
 
-The model's replies are scripted, and every request is built exactly as you would send it. Claude and Qwen3 ask for both cities at once; GPT-OSS asks for one city per turn, so it never sends back two results together. **Messages · chat API** shows the conversation as the OpenAI-compatible Chat Completions API from Lesson 3 holds it, and **Raw tokens** shows the text GPT-OSS and Qwen3 actually read.
+The model's replies are scripted, and every request is built exactly as you would send it. Claude and Qwen3 ask for both cities at once; GPT-OSS asks for one city per turn, so it never sends back two results together. When two results come back, Claude puts both `tool_result` blocks in one user message, and Qwen3 puts both `<tool_response>` blocks in one user turn. **Messages · chat API** shows the conversation as the OpenAI-compatible Chat Completions API from Lesson 3 holds it, and **Raw tokens** shows the text GPT-OSS and Qwen3 actually read.
 
 [widget:debugger]

@@ -15,6 +15,12 @@ quiz:
   why: With a response validator configured, every turn must be a tool call. Agentware keeps the plain-text answer in the history, adds a retry nudge after it (a short message telling the model what to fix), and the model then calls final_answer.
 ---
 
-The agent has three tools: `get_weather`, `post_to_slack` (which policy denies) and `final_answer`, which it must call to finish. A response validator checks every reply and sends a retry nudge when the model names a tool that doesn't exist or answers in plain text. Each message's `meta` field is Agentware's label for it, such as `tool_result` or `retry_nudge`.
+The agent has three tools: `get_weather`, `post_to_slack` (which policy denies) and `final_answer`, which it must call to finish. The debugger stops at each gate:
+
+- **Reasoning:** `reasoning.strip` takes the model's thinking out of the reply.
+- **Validate:** a response validator checks the tool calls if the reply has any (`mode: tool_calls`), or else the plain text (`mode: text`). Every reply must be a tool call, so plain text fails unless the validator can rescue a tool call written as text (`rescued`). A failed check adds a retry nudge, a short message telling the model what to fix, and calls the model again in the same lap.
+- **Policy and audit:** policy allows or denies each call, and every decision is recorded before the tool runs.
+
+Each message's `meta` field is Agentware's label for it, such as `tool_result` or `retry_nudge`.
 
 [widget:rtdebugger data=runtime-trace]

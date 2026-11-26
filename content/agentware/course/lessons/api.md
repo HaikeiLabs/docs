@@ -23,7 +23,7 @@ Both APIs declare the tool, return the model's call and take the result back; on
 
 ## Close the loop
 
-`MODEL` is the model id, `URL` the server's `/v1/chat/completions` endpoint, and `TOOLS` your Lesson 2 tool in the OpenAI shape. Keep the assistant message exactly as returned [[1]]: the API keeps no state, so the model only sees its own tool calls if you send them back. Decode the arguments string [[2]], run the tool, and answer each call by its id [[3]]. If there were calls, go again [[4]].
+`MODEL` is the model id, `URL` the server's `/v1/chat/completions` endpoint, and `TOOLS` your Lesson 2 tool in the OpenAI shape. Keep the assistant message exactly as returned [[1]]: the API keeps no state, so the model only sees its own tool calls if you send them back. In an OpenAI-compatible response, `function.arguments` is a JSON-encoded string, so decode it [[2]] (Anthropic's `input` is already an object). Run the tool, and answer each call by its id [[3]]. If there were calls, go again [[4]].
 
 ```python title="openai_step.py" marks="4=1;6=2;8=3;9=4"
 def step(messages):
