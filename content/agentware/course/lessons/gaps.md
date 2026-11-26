@@ -2,6 +2,8 @@
 id: gaps
 num: 10
 title: "Agentware tool-calling gaps: what doesn't work yet?"
+seo_title: "Agentware tool-calling gaps: what doesn't work yet?"
+description: "See where the Agentware SDK still differs from real tool-call formats, for GPT-OSS raw prompts, MiniMax tool calls and tool results, with each gap reproduced."
 mins: 4
 lede: "Agentware still differs from the real formats in a few places: GPT-OSS raw prompts, MiniMax tool calls, and the text it sends back after a tool runs. Each one below was reproduced by running the Python SDK."
 quiz:

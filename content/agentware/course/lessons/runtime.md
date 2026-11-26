@@ -2,6 +2,8 @@
 id: runtime
 num: 9
 title: "What does Agentware check on every tool call?"
+seo_title: "What does Agentware check on every tool call?"
+description: "Step through a real Agentware run and see each check on a tool call: reasoning removal, response validation and retry, policy allow or deny, and audit."
 mins: 8
 lede: "Before a tool runs, Agentware strips the model's reasoning, validates the reply, checks policy and records an audit entry. Step through a real run under a debugger; it pauses at each of those gates."
 quiz:

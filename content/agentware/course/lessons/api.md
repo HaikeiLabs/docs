@@ -2,6 +2,8 @@
 id: api
 num: 3
 title: "OpenAI vs Anthropic tool calling"
+seo_title: "OpenAI vs Anthropic tool calling: what differs"
+description: "Compare OpenAI and Anthropic tool calling: how each API declares a tool, returns the model's tool call and takes the tool result back, field by field."
 mins: 4
 lede: "OpenAI-compatible APIs and Anthropic's Messages API do the same three things: declare the tool, return the model's call, and take the result back. Only the field names differ, and most model servers copy the OpenAI-compatible API."
 quiz:

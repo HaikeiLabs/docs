@@ -2,6 +2,8 @@
 id: loop
 num: 7
 title: "How does an agent loop work, step by step?"
+seo_title: "How does an agent loop work? Step through one"
+description: "Step through an agent loop under a debugger and see how tool calls, tool results and messages flow in Claude, GPT-OSS Harmony and Qwen3 ChatML formats."
 mins: 12
 lede: "An agent loop calls the model, runs the tools it asks for, appends the results and calls the model again until it answers in plain text. Step through a recorded loop under a debugger, in three formats: Claude's Messages API, GPT-OSS Harmony and Qwen3 ChatML."
 quiz:

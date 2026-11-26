@@ -1,5 +1,6 @@
 ---
 title: "How do LLM tool calls work? A course from scratch"
+seo_title: "How do LLM tool calls work? A free course from scratch"
 description: "Learn how LLM tool calling works: one Python function, the OpenAI and Anthropic APIs, model chat templates, MCP, and a full agent loop, in ten short lessons."
 type: read-and-use
 product: agentware
