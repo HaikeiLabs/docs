@@ -18,8 +18,12 @@ quiz:
 finish: true
 ---
 
-## What doesn't match
+## When can Agentware miss a tool call or change a result?
 
-The GPT-OSS and MiniMax gaps only matter in text mode: raw completions, or a server with no tool parser. Behind a correctly configured server, Agentware receives clean `tool_calls`. The tool result gap applies when you run tools through `InferenceExecutor`.
+If you can see a weather request in the reply but the tool never runs, check who reads the reply. In **native mode**, a server with the matching tool parser hands Agentware structured `tool_calls`. In **text mode**, Agentware has to recognize the model’s own spelling of a call. This happens with raw completions or when the server has no tool parser.
+
+Look at the two parsing examples from the recorded Python SDK version. GPT-OSS addresses its call to `functions.get_weather` in Harmony text. MiniMax M2 wraps its call in `<minimax:tool_call>` tags. Both examples produce `[]`, an empty list of recognized calls. The MiniMax gap matters only when Agentware has to parse that text itself.
+
+The last example follows a lookup that *did* run. `InferenceExecutor`, the component running the tool loop here, puts `Tool get_weather result:` before the weather data in the message it sends back. You can see the temperature and sky in that message, along with the extra words.
 
 [widget:gaps]

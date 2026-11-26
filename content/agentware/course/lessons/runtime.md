@@ -17,12 +17,10 @@ quiz:
   why: With a response validator configured, every turn must be a tool call. Agentware keeps the plain-text answer in the history, adds a retry nudge after it (a short message telling the model what to fix), and the model then calls final_answer.
 ---
 
-The agent has three tools: `get_weather`, `post_to_slack` (which policy denies) and `final_answer`, which it must call to finish. The debugger stops at each gate:
+Follow the weather lookup to see why a tool request might never run. Agentware first separates the model’s reasoning from its reply. A **response validator** then checks whether the reply is a tool call this agent can accept. On the first lap, `weather_lookup` fails that check because the registered name is `get_weather`.
 
-- **Reasoning:** `reasoning.strip` takes the model's thinking out of the reply.
-- **Validate:** a response validator checks the tool calls if the reply has any (`mode: tool_calls`), or else the plain text (`mode: text`). Every reply must be a tool call, so plain text fails unless the validator can rescue a tool call written as text (`rescued`). A failed check adds a retry nudge, a short message telling the model what to fix, and calls the model again in the same lap.
-- **Policy and audit:** policy allows or denies each call, and every decision is recorded before the tool runs.
+Once a call passes validation, **policy** decides whether this agent has permission to run it. The weather lookups are allowed. On lap 2, `post_to_slack` is a valid call, but the rule requires approval, so the post is denied. An **audit record** logs each decision before an allowed tool runs.
 
-Each message's `meta` field is Agentware's label for it, such as `tool_result` or `retry_nudge`.
+On lap 3, the model gives a weather report in plain text. This agent requires a tool call to finish. The validator finds no call in the text, so Agentware keeps the reply in the history and adds a **retry nudge**, a message explaining what to fix. Look for `retry_nudge` in the message’s `meta` field. The model tries again in the same lap and calls `final_answer`.
 
 [widget:rtdebugger data=runtime-trace]
