@@ -17,17 +17,23 @@ quiz:
   why: MCP sits between your harness and tool servers. The model still sees tools in its own format.
 ---
 
-## Two methods matter
+## How do you find and run a tool on an MCP server?
 
-An MCP server lists its tools and runs them when your harness asks. It uses JSON-RPC 2.0: every request is a JSON object with a method name and parameters. After `initialize`, where client and server agree on the protocol version and what each supports, you only need these two methods.
+A weather function can live in a separate program. **Model Context Protocol (MCP)** gives your agent loop and that tool server a shared way to communicate. Your **harness**, the code that runs the loop, acts as the client.
+
+The client and server use JSON-RPC, a format for naming an operation in a JSON message and getting its result. They first use `initialize` to agree on the protocol version and supported features.
+
+Select `tools/list` to see how the harness discovers the available names and arguments. Then select `tools/call` to see how it asks the server to run a named tool. The model still exchanges messages with your harness through its usual model API.
 
 [widget:api data=api-mcp]
 
-## Translate for your model
+## How do you describe an MCP tool to OpenAI or Anthropic?
 
-An MCP tool isn't tied to any model, so converting it is just a rename: [[1]] for OpenAI-compatible APIs, [[2]] for Anthropic.
+Use the declaration you got from `tools/list`. The name, description and rules for the arguments mean the same thing to both model APIs. Your harness puts them in the fields each API expects.
 
-Agentware, the SDK in Lessons 8 to 10, does this in its Go MCP server (`go/mcp`). It runs one process per user, and each process sends calls through that user's Agentware client, which checks policy (allow or deny) and writes an audit record (a log of each call) before the tool runs.
+For OpenAI Chat Completions, wrap the declaration in `function` and copy the MCP tool’s `inputSchema` into `parameters` [[1]]. For Anthropic, put the same schema under `input_schema` next to the tool name [[2]]. In both cases, the harness can use the name in the model’s reply to call the right tool on the MCP server.
+
+Agentware’s Go MCP server runs a process for each user. It sends calls through that user’s Agentware client, which checks whether the call is allowed and records the decision before the tool runs.
 
 ```python title="mcp_bridge.py" marks="4=1;8=2"
 def mcp_to_openai(t):

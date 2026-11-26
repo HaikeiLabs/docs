@@ -17,11 +17,11 @@ quiz:
   why: Harmony, used by GPT-OSS, puts reasoning, tool calls and the answer on separate channels.
 ---
 
-## Your JSON becomes one string
+## How does a chat template turn messages into text?
 
-Your messages [[1]] never reach the model as JSON. The server runs the model's **chat template**, a small file shipped with the model that lays the messages out as one string [[2]]. The string ends by opening an assistant turn [[3]] for the model to continue.
+To see how Qwen3 knows who asked about the umbrella, start with the two messages your program sends [[1]]. Each has a `role` that identifies the speaker and `content` that holds the words.
 
-Hosted APIs like Claude's do this out of sight.
+A **chat template** is a set of rules for writing those messages as one string. Qwen3’s template marks the start and end of each message [[2]]. It ends with the start of an assistant turn [[3]], which tells the model whose words to write next.
 
 ```tokens title="before and after" marks="2=1;6=2;10=3"
 # What you send
@@ -36,9 +36,13 @@ Do I need an umbrella in Tokyo?<|im_end|>
 <|im_start|>assistant
 ```
 
-## Same call, three formats
+## How do Qwen3, GPT-OSS and Claude mark a tool call?
 
-Each family has a **prompt format**: the text layout its chat template produces. Qwen uses **ChatML**, which wraps every message in `<|im_start|>` and `<|im_end|>`. GPT-OSS uses **Harmony**, which splits each assistant turn into channels: `analysis` for reasoning, `commentary` for tool calls, and `final` for the answer. Here is the same call in each; the `final` channel shows up in Lesson 5.
+Look for `get_weather` in each tab. Qwen3 uses a format called **ChatML**. It wraps the request in `<tool_call>` tags, and the result comes back inside `<tool_response>` tags in a user turn.
+
+GPT-OSS uses **Harmony**, a format that labels parts of an assistant turn by purpose. These labels are called channels. `analysis` carries reasoning, `commentary` carries the call addressed to `functions.get_weather`, and `final` carries the answer.
+
+Claude’s hosted service handles the underlying text format for you. In the Claude tab you see the JSON blocks your program exchanges with the service.
 
 [widget:compare data=compare-tags]
 
