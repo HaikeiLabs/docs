@@ -159,19 +159,19 @@ def build_time_and_gaps(version: str) -> None:
         )
     write_json("compare-build-time.json", {"tabs": tabs})
 
-    write_json(
-        "gaps.json",
-        {
-            "gaps": [fill_captures(gap, captures(captured)) for gap in read_json(SOURCES / "gaps.json")],
-            "repro": {
-                "qwen_parse_official": captured["qwen_parse_official"],
-                "reason_thinking_tag": captured["reason_thinking_tag"],
-                "reason_think_tag": captured["reason_think_tag"],
-                "minimax_family": captured["fmt_MiniMax-M2"]["family"],
-                "sdk_version": version,
-            },
-        },
-    )
+    gaps = [fill_captures(gap, captures(captured)) for gap in read_json(SOURCES / "gaps.json")]
+    # One reproduction per open gap, run by aw_templates.py against the installed SDK.
+    # Deleting a fixed gap from sources/gaps.json drops its reproduction too.
+    open_areas = {gap["area"] for gap in gaps}
+    entries = [
+        {key: entry[key] for key in ("label", "code", "output")}
+        for entry in captured["repro_entries"]
+        if entry["gap"] in open_areas
+    ]
+    data = {"gaps": gaps}
+    if entries:
+        data["repro"] = {"sdk_version": version, "entries": entries}
+    write_json("gaps.json", data)
 
 
 def main() -> None:
