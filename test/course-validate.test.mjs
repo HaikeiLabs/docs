@@ -73,3 +73,8 @@ test('check:course explains a lessons folder without a hub page and exits 0', ()
     assert.match(out, /no hub page.*course not built/i);
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
+
+test('hub schema accepts both supported course ids and rejects unknown ids', () => {
+  for (const id of ['agentware', 'evals']) assert.equal(validateCourse(`test/fixtures/course/${id}`).course, id);
+  mutated(d => edit(d, 'index.md', s => s.replace('course: agentware', 'course: unknown')));
+});
