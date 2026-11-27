@@ -17,15 +17,19 @@ quiz:
   why: Thinking blocks are signed. In a tool-use turn they must be replayed unchanged.
 ---
 
-## On, out, and back
+## Which reasoning should you send back after a tool call?
 
-You turn reasoning on in the request, find it in the reply, and send it back the way the model family expects. Claude's thinking blocks are signed, so in a tool-use turn you send them back unchanged. Pick a family to see all three.
+When you send a weather result back, the next request must include the parts of the previous reply that the model’s format expects. For Claude with extended thinking enabled, that includes the original `thinking` block from the tool-use turn. The block carries a signature that lets the service check it came back unchanged. Editing or dropping it makes the next request fail.
+
+Pick a model to follow its reasoning from the request through the reply and back into the history. GPT-OSS keeps its `analysis` messages while the tool calls are in progress. After the `final` answer, you leave that earlier analysis out of the next prompt.
 
 [widget:compare data=compare-reasoning]
 
-## Strip it before you parse tool calls
+## Why separate reasoning before looking for tool calls?
 
-Models often draft a tool call inside their thinking. In a text format like Qwen3's, where reasoning sits in `<think>` tags and calls in `<tool_call>` tags, searching the whole output runs the draft. Pull the reasoning out first [[1]], then look for tool calls only in what's left [[2]].
+A model can write a possible call to `get_weather` while deciding what to do. If your program searches the entire reply for a call, it can mistake that draft for a request to run the function.
+
+In Qwen3’s text format, `<think>` and `</think>` enclose the reasoning. `split` collects the contents of those blocks [[1]] and removes the blocks from a copy of the reply. It returns both pieces [[2]] so you can search just the remaining text for `<tool_call>` tags.
 
 ```python title="parse.py" marks="4=1;6=2"
 THINK = re.compile(r"<think>(.*?)</think>", re.S)
