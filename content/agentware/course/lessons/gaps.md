@@ -5,6 +5,8 @@ title: "Agentware tool-calling gaps: what doesn't work yet?"
 seo_title: "Agentware tool-calling gaps: what doesn't work yet?"
 description: "See where the Agentware SDK still differs from real tool-call formats, for GPT-OSS raw Harmony prompts and MiniMax M2 tool calls, with each gap reproduced."
 mins: 4
+updated: 2026-11-27
+agentware: 0.18.1
 lede: "Agentware still differs from the real formats in two places: GPT-OSS raw prompts and MiniMax tool calls. Each one below was reproduced by running the Python SDK."
 quiz:
   q: When does the MiniMax parsing gap actually bite?

@@ -5,6 +5,7 @@ title: "What does an LLM actually read? Chat templates and tags"
 seo_title: "What does an LLM actually read? Chat templates and tags"
 description: "Learn how a chat template turns your messages and tool calls into one string of text, and how Qwen3 ChatML and GPT-OSS Harmony tag tool calls differently."
 mins: 4
+updated: 2026-11-27
 lede: "The model never sees your JSON: the server turns your messages and tools into one string of text. Each model family uses its own text format, with its own tags."
 quiz:
   q: Which format splits an assistant turn into analysis, commentary and final channels?

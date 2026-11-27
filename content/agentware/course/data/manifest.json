@@ -1,0 +1,88 @@
+{
+  "files": {
+    "api-chat.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "80e2548e64be372ae497048f8bd5b1bd987be1a05631182ad62b2f9881d249d2"
+    },
+    "api-mcp.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "bacc46ac7572fdef724a3476bd7b9b88464e1d27c9ddfae63729d2d093bc394d"
+    },
+    "compare-api.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "c8043b69c18795b0e897cc910e2ba1ae75af1eb45b15b85eadecf4e85aecd83a"
+    },
+    "compare-build-time.json": {
+      "generated_with": {
+        "agentware": "0.18.1",
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "a82addaa157b9d2b662447813f3f772ecbc030949131b28a0480706891eeeb04"
+    },
+    "compare-reasoning-minimax.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "0397655f13f25b665b25c235bbfcab82b80e7e584c6b04752e28ecaf4fcaac1a"
+    },
+    "compare-reasoning.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "53ce629a613ee06d1aa88c671489eef0ee8f493ff6fe575b417121de63470ec5"
+    },
+    "compare-tags-more.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "e3a8c8c8ddae4635067c107878eb57c60b7336b8132151e53da18949e67cc286"
+    },
+    "compare-tags.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "053aebf2bed026badc531c1265af13b788bdf2fbcc13e8fc4906ea28f6743f26"
+    },
+    "debugger.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "d03855590bcf137acf61e7c6df06e789618b1b7afe3f8ec15ec4ef020bff8a02"
+    },
+    "gaps.json": {
+      "generated_with": {
+        "agentware": "0.18.1",
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "aa07b86916d12935c35ca077c2d3cf57cf7960d4d0c655832d1fe89ca1c90bdd"
+    },
+    "logs.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "762c82aa8f9c88c829459240497a1f26d9a9dd1757156438f95b992e529d1af3"
+    },
+    "runtime-trace.json": {
+      "generated_with": {
+        "agentware": "0.18.1",
+        "generator": "generate.py 0.1.0"
+      },
+      "source_sha256": "b94c8ce752166dadd0d40ea5d928f815b10e42ca2d256d9170114a83fccfddb4"
+    }
+  }
+}

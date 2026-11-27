@@ -5,6 +5,7 @@ title: "How do you describe a tool to an LLM?"
 seo_title: "How do you describe a tool to an LLM? Name and JSON Schema"
 description: "Learn how to describe a tool to an LLM with a name, a description and a JSON Schema for its parameters, and how to map tool names back to your functions."
 mins: 4
+updated: 2026-11-27
 lede: "You give the model a name, a description and a JSON Schema for the parameters. That's all it knows about your function."
 quiz:
   q: What does the model receive about your tool?
