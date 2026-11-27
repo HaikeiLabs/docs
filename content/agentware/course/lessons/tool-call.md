@@ -1,9 +1,9 @@
 ---
 id: tool-call
 num: 1
-title: What a tool call is
+title: "What is a tool call?"
 mins: 4
-lede: A model can only write text. A tool call is text that asks your code to run a function.
+lede: "A tool call is a message in which the model asks your code to run a function. The model only writes the request; your code runs the function and sends the result back."
 quiz:
   q: Who runs get_weather?
   opts:
@@ -17,7 +17,7 @@ quiz:
 
 ## Start with a plain function
 
-This is the whole tool. Nothing about it is AI-specific. [[1]] takes arguments, [[2]] does the work, [[3]] returns data the model can read.
+A tool is a plain function in your code, and a tool call is the model asking you to run it. Nothing about the function is AI-specific: [[1]] takes arguments, [[2]] does the work, [[3]] returns data the model can read.
 
 The model never sees this code. It only sees a description of it, which you'll write in Lesson 2.
 

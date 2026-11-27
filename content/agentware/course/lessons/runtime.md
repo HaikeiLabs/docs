@@ -1,9 +1,9 @@
 ---
 id: runtime
 num: 9
-title: Agentware at runtime
+title: "What does Agentware check on every tool call?"
 mins: 8
-lede: "Run a real Agentware loop under a debugger. It pauses at every gate: the model call, reasoning, validation, policy, audit, the tool, and the append."
+lede: "Before a tool runs, Agentware strips the model's reasoning, validates the reply, checks policy and records an audit entry. Step through a real run under a debugger; it pauses at each of those gates."
 quiz:
   q: In lap 3 the model answered in plain text. What did Agentware do?
   opts:

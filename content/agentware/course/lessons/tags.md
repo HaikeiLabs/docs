@@ -1,9 +1,9 @@
 ---
 id: tags
 num: 4
-title: "Tags: what the model actually reads"
+title: "What does an LLM actually read? Chat templates and tags"
 mins: 4
-lede: The model never sees your JSON. Each model family reads its own text format, with its own tags.
+lede: "The model never sees your JSON: the server turns your messages and tools into one string of text. Each model family uses its own text format, with its own tags."
 quiz:
   q: Which format splits an assistant turn into analysis, commentary and final channels?
   opts:

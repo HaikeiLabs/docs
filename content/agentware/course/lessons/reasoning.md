@@ -1,9 +1,9 @@
 ---
 id: reasoning
 num: 5
-title: Reasoning and thinking
+title: "How do reasoning models handle tool calls?"
 mins: 4
-lede: Reasoning models write out their thinking before they answer. Each family puts it somewhere different and has its own rules for sending it back.
+lede: "Reasoning models write out their thinking before they answer or call a tool. Each family puts that thinking somewhere different and has its own rules for sending it back."
 quiz:
   q: "You're looping with Claude with extended thinking (its reasoning mode) turned on. What happens to the thinking block before you send the tool_result?"
   opts:
@@ -17,7 +17,7 @@ quiz:
 
 ## On, out, and back
 
-For each family: how to turn reasoning on, where it shows up, and what to send back on the next lap.
+You turn reasoning on in the request, find it in the reply, and send it back the way the model family expects. Pick a family to see all three.
 
 [widget:compare data=compare-reasoning]
 

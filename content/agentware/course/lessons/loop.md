@@ -1,9 +1,9 @@
 ---
 id: loop
 num: 7
-title: Debug one agent loop
+title: "How does an agent loop work, step by step?"
 mins: 12
-lede: "Run a real loop under a debugger. It pauses each time it sends to the model, gets a reply, runs a tool, or appends results. Same task in three formats: Claude's Messages API, GPT-OSS Harmony and Qwen3 ChatML."
+lede: "An agent loop calls the model, runs the tools it asks for, appends the results and calls the model again until it answers in plain text. Step through a real loop under a debugger, in three formats: Claude's Messages API, GPT-OSS Harmony and Qwen3 ChatML."
 quiz:
   q: Two parallel tool results. What does each format append?
   opts:
