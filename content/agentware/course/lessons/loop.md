@@ -17,6 +17,10 @@ quiz:
   why: "Claude and Qwen3 group results from one turn into one message. GPT-OSS calls one tool per turn in this run, so each result goes back alone."
 ---
 
-The model's replies are scripted, and every request is built exactly as you would send it. Claude and Qwen3 ask for both cities at once; GPT-OSS asks for one city per turn, so it never sends back two results together. When two results come back, Claude puts both `tool_result` blocks in one user message, and Qwen3 puts both `<tool_response>` blocks in one user turn. **Messages · chat API** shows the conversation as the OpenAI-compatible Chat Completions API from Lesson 3 holds it, and **Raw tokens** shows the text GPT-OSS and Qwen3 actually read.
+To see how the model learns which city is warmer, follow one weather result into the next request. The debugger lets you pause the Python loop and inspect its history. The model replies are scripted so you can replay the same calls.
+
+Start with Claude. Its first reply asks for Tokyo and Seoul together. Step past `run_tool` for both cities, then past `tool_results`. The next request carries both `tool_result` blocks in one user message. Qwen3 also asks for both cities together and puts two `<tool_response>` blocks in one user turn.
+
+Switch to GPT-OSS. In this run it asks for Tokyo first and Seoul on the next lap, so each result goes back alone. For GPT-OSS and Qwen3, compare **Messages · chat API**, the conversation as chat messages, with **Raw tokens**, the text those messages become for the model.
 
 [widget:debugger]
