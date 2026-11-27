@@ -4,7 +4,7 @@
       "id": "gptoss",
       "name": "GPT-OSS",
       "sub": "",
-      "note": "Tools are a TypeScript-style `namespace functions`. A call goes on the `commentary` channel, addressed `to=functions.NAME`, and ends with `<|call|>`. There are no call ids.",
+      "note": "Tools are a TypeScript-style `namespace functions`. A call goes on the `commentary` channel, addressed `to=functions.NAME`, and ends with `<|call|>`; `<|constrain|>json` says the arguments are JSON. There are no call ids.",
       "src": "openai/harmony docs/format.md and test-data",
       "panes": [
         {

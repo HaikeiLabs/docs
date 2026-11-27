@@ -2,13 +2,13 @@
   "tabs": [
     {
       "id": "claude",
-      "name": "claude-…",
+      "name": "claude-sonnet-4-5",
       "sub": "→ anthropic",
-      "note": "`get_formatter(\"claude-…\")` returns the **anthropic** formatter.",
+      "note": "`get_formatter(\"claude-sonnet-4-5\")` returns the **anthropic** formatter.",
       "src": "Captured by running haikeilabs-agentware 0.18.0",
       "panes": [
         {
-          "label": "Build time: tool definitions (text mode)",
+          "label": "Build time: tool definitions",
           "file": "format_tool_definitions()",
           "lang": "json",
           "src": "[\n  {\n    \"name\": \"get_weather\",\n    \"description\": \"Get the current weather for a city.\",\n    \"input_schema\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"city\": {\n          \"type\": \"string\",\n          \"description\": \"City name, e.g. Tokyo\"\n        },\n        \"unit\": {\n          \"type\": \"string\",\n          \"enum\": [\n            \"celsius\",\n            \"fahrenheit\"\n          ]\n        }\n      },\n      \"required\": [\n        \"city\"\n      ]\n    }\n  }\n]"
@@ -29,7 +29,7 @@
       "src": "Captured by running haikeilabs-agentware 0.18.0",
       "panes": [
         {
-          "label": "Build time: tool definitions (text mode)",
+          "label": "Build time: tool definitions",
           "file": "format_tool_definitions()",
           "lang": "tokens",
           "src": "# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"function\":{\"description\":\"Get the current weather for a city.\",\"name\":\"get_weather\",\"parameters\":{\"properties\":{\"city\":{\"description\":\"City name, e.g. Tokyo\",\"type\":\"string\"},\"unit\":{\"enum\":[\"celsius\",\"fahrenheit\"],\"type\":\"string\"}},\"required\":[\"city\"],\"type\":\"object\"}},\"type\":\"function\"}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call>"
@@ -50,7 +50,7 @@
       "src": "Captured by running haikeilabs-agentware 0.18.0",
       "panes": [
         {
-          "label": "Build time: tool definitions (text mode)",
+          "label": "Build time: tool definitions",
           "file": "format_tool_definitions()",
           "lang": "json",
           "src": "[\n  {\n    \"type\": \"function\",\n    \"function\": {\n      \"name\": \"get_weather\",\n      \"description\": \"Get the current weather for a city.\",\n      \"parameters\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"city\": {\n            \"type\": \"string\",\n            \"description\": \"City name, e.g. Tokyo\"\n          },\n          \"unit\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"celsius\",\n              \"fahrenheit\"\n            ]\n          }\n        },\n        \"required\": [\n          \"city\"\n        ]\n      }\n    }\n  }\n]"
@@ -71,7 +71,7 @@
       "src": "Captured by running haikeilabs-agentware 0.18.0",
       "panes": [
         {
-          "label": "Build time: tool definitions (text mode)",
+          "label": "Build time: tool definitions",
           "file": "format_tool_definitions()",
           "lang": "json",
           "src": "[\n  {\n    \"type\": \"function\",\n    \"function\": {\n      \"name\": \"get_weather\",\n      \"description\": \"Get the current weather for a city.\",\n      \"parameters\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"city\": {\n            \"type\": \"string\",\n            \"description\": \"City name, e.g. Tokyo\"\n          },\n          \"unit\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"celsius\",\n              \"fahrenheit\"\n            ]\n          }\n        },\n        \"required\": [\n          \"city\"\n        ]\n      }\n    }\n  }\n]"

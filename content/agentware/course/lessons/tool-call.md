@@ -30,7 +30,7 @@ def get_weather(city: str, unit: str = "celsius") -> dict:
 
 ## Watch the loop run
 
-Press play. Every arrow is one message. Your code sits in the middle and does all the routing. The rings count laps: each lap is one call to the model. Switch the model to see the count change: Claude is a hosted model, and GPT-OSS and Qwen3 are open models you can run yourself.
+Press play. Every arrow is one message. Your code sits in the middle and does all the routing. The rings count laps: each lap is one call to the model. Switch the model to see the count change: Claude is a hosted model, and GPT-OSS and Qwen3 are open models you can run yourself. GPT-OSS asks for one city per turn here, so it needs an extra lap. Message counts are for the conversation as a chat API holds it; Lesson 7 shows the raw text each model reads.
 
 [widget:cycle]
 

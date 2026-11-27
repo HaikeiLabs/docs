@@ -10,6 +10,7 @@ from haikeilabs.agentware.llm import Message
 from haikeilabs.agentware.llm.request import Role, ToolDefinition
 from haikeilabs.agentware.llm.response import Response, ToolCall
 from haikeilabs.agentware.middleware import (Action, AuditedToolClient, CallerContext, Decision)
+from haikeilabs.agentware.middleware.types import MessageMeta, MessageType
 from haikeilabs.agentware.middleware.guardrails.response_validator import ResponseValidator
 from haikeilabs.agentware.middleware.inference import InferenceConfig, run_inference
 from haikeilabs.agentware.reasoning import ReasoningAdapter
@@ -116,7 +117,8 @@ async def main():
     client = AuditedToolClient(source="weather-agent").with_policy(LocalPolicy())
     cfg = InferenceConfig(client=ScriptedBackend(), validator=TracedValidator([s.name for s in SPECS]),
                           tool_specs=SPECS, reasoning=TracedAdapter(), max_attempts=3)
-    messages = [Message(role=Role.SYSTEM, content="You are a weather assistant. Always finish with final_answer."),
+    messages = [Message(role=Role.SYSTEM, content="You are a weather assistant. Always finish with final_answer.",
+                        meta=MessageMeta(type=MessageType.SYSTEM_PROMPT)),
                 Message(role=Role.USER, content="Is it warmer in Tokyo or Seoul? Tell #travel if it's raining.")]
     lap = 0
     while lap < 5:
@@ -126,7 +128,8 @@ async def main():
         ev("inference_done", attempts=result.attempts, retries_added=[msg_json(m) for m in result.new_messages[len(messages):]])
         messages = result.new_messages
         resp = result.response
-        messages.append(Message(role=Role.ASSISTANT, content=resp.content, tool_calls=resp.tool_calls))
+        messages.append(Message(role=Role.ASSISTANT, content=resp.content, tool_calls=resp.tool_calls,
+                                meta=MessageMeta(type=MessageType.TOOL_CALL)))
         finished = False
         for call in resp.tool_calls:
             try:
@@ -139,7 +142,8 @@ async def main():
                audit={"session_id": rec.session_id, "invoking_subject": rec.invoking_subject, "framework": rec.framework,
                       "tool_name": rec.tool_name, "decision": rec.decision.action.value, "rule": rec.decision.rule,
                       "delegation_depth": rec.delegation_depth})
-            messages.append(Message(role=Role.TOOL, content=content, tool_call_id=call.id))
+            messages.append(Message(role=Role.TOOL, content=content, tool_call_id=call.id,
+                                    meta=MessageMeta(type=MessageType.TOOL_RESULT)))
             ev("append", message=msg_json(messages[-1]))
             if call.name == "final_answer" and status == "ok":
                 finished = True
