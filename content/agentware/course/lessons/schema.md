@@ -17,17 +17,13 @@ quiz:
   why: Only the declaration crosses the wire, which is why the description matters.
 ---
 
-## Name, description, parameters
+## How does the model know when to call a function?
 
-The model never sees your code. It sees only this declaration.
+Give the model a **tool declaration**, a description it can use to choose a function and supply its arguments. For the weather lookup, you send three things.
 
-[[1]] **name** is what the model writes to call it.
+The **name** [[1]] gives the model the exact spelling to request, `get_weather`. The **description** [[2]] tells it when that function is useful, such as when someone asks about the weather in a city.
 
-[[2]] **description** is a prompt. It's how the model decides *when* to use the tool.
-
-[[3]] **parameters** is JSON Schema, the standard way to describe the shape of JSON data.
-
-[[4]] `enum` keeps values valid, and [[5]] `required` marks what can't be left out.
+The **parameters** [[3]] use JSON Schema, a way to describe the shape and allowed values of JSON data. Here `enum` [[4]] lists the two allowed spellings for `unit`. The `required` list [[5]] means the model must supply `city` and may leave out `unit`.
 
 ```python title="tools.py" marks="2=1;3=2;4=3;8=4;10=5"
 TOOL = {
@@ -44,9 +40,13 @@ TOOL = {
 }
 ```
 
-## Map names to functions
+## How does a tool name become a Python call?
 
-This is the `run_tool` the Lesson 1 loop calls. Look up the name [[1]] and run it [[2]]: `**args` passes each key in the arguments dict as a keyword argument. Return errors as data [[3]]: the model can read the error and fix its arguments on the next lap, but a crash ends the run.
+Your program needs a way to turn the string `get_weather` into the function you wrote. A **registry** is the dictionary that pairs each available name with its function.
+
+When the model asks for a tool, `run_tool` looks up its name [[1]]. For a known name, `fn(**args)` passes the arguments by keyword [[2]]. A request with `city` set to `Tokyo` becomes `get_weather(city="Tokyo")`.
+
+An unknown name produces an error message in JSON. If a required argument is missing, Python raises `TypeError`, which this code also returns as JSON [[3]]. The next time you call the model, it can read the error and try again.
 
 ```python title="tools.py" marks="4=1;8=2;10=3"
 REGISTRY = {"get_weather": get_weather}
