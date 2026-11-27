@@ -28,4 +28,23 @@ for label,raw in [("thinking_tag","<thinking>Need weather</thinking>Calling tool
                   ("field",{"choices":[{"message":{"content":"Calling tool.","reasoning_content":"Need weather"}}]})]:
     try: out["reason_"+label]=repr(ra.strip(raw))
     except Exception as e: out["reason_"+label]="ERROR "+type(e).__name__
+# Tools never reach the model: record what run_inference hands the backend.
+import asyncio
+from haikeilabs.agentware.llm import Message
+from haikeilabs.agentware.llm.request import Role, ToolDefinition
+from haikeilabs.agentware.llm.response import Response
+from haikeilabs.agentware.middleware.inference import InferenceConfig, run_inference
+class RecordingBackend:
+    calls=[]
+    def model_name(self): return "Qwen/Qwen3-8B"
+    def supports_native_tool_calling(self): return True
+    def context_window_size(self): return 32768
+    def complete(self,messages,tools=None):
+        RecordingBackend.calls.append({"messages":len(messages),"tools":tools})
+        return Response(content="Done.",finish_reason="stop")
+spec=ToolDefinition(name=Weather.name,description=Weather.description,input_schema=SCHEMA)
+asyncio.run(run_inference([Message(role=Role.USER,content="Weather in Tokyo?")],
+    InferenceConfig(client=RecordingBackend(),tool_specs=[spec],max_attempts=1),session_id="s"))
+call=RecordingBackend.calls[0]
+out["tools_sent"]={"tool_specs":[spec.name],"backend_received":call["tools"]}
 print(json.dumps(out,indent=1))

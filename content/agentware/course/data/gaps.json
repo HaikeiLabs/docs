@@ -1,11 +1,18 @@
 {
   "gaps": [
     {
-      "area": "Qwen3 tool calls",
+      "area": "Tools never reach the model",
       "sev": "high",
-      "wire": "<tool_call>{\"name\": …, \"arguments\": {…}}</tool_call>",
-      "aw": "QwenFormatter expects <tool_call><tool name=\"…\">{args}</tool></tool_call>",
-      "effect": "parse_tool_calls() returns [] on real Qwen3 output."
+      "wire": "\"tools\": [{\"type\": \"function\", \"function\": {\"name\": \"get_weather\", \"description\": \"Get the current weather for a city.\", \"parameters\": …}}]",
+      "aw": "run_inference gets tool_specs ['get_weather'] but calls client.complete(messages); the backend receives tools=None",
+      "effect": "The model never sees the tools, so it can't make native tool calls."
+    },
+    {
+      "area": "Retry history order",
+      "sev": "high",
+      "wire": "The failed assistant turn, then the correction",
+      "aw": "run_inference appends the nudge before the failed assistant turn, and the failed turn keeps no tool_calls",
+      "effect": "The model reads a correction before the answer it corrects. Seen in the lesson 9 trace."
     },
     {
       "area": "Thinking tags",
@@ -13,6 +20,13 @@
       "wire": "<think> (Qwen3, MiniMax M2, DeepSeek), <mm:think> (M3), Harmony analysis",
       "aw": "ReasoningAdapter recognizes <thinking> and [THINK] only",
       "effect": "<think> reasoning stays in the visible content."
+    },
+    {
+      "area": "Qwen3 tool calls",
+      "sev": "medium",
+      "wire": "<tool_call>{\"name\": …, \"arguments\": {…}}</tool_call>",
+      "aw": "QwenFormatter expects <tool_call><tool name=\"…\">{args}</tool></tool_call>",
+      "effect": "parse_tool_calls() returns [] on real Qwen3 output."
     },
     {
       "area": "GPT-OSS",
@@ -41,13 +55,6 @@
       "wire": "Raw result, matched by id",
       "aw": "InferenceExecutor sends \"Tool {name} result: …\"",
       "effect": "Adds a prefix the model wasn't trained on."
-    },
-    {
-      "area": "Retry history order",
-      "sev": "low",
-      "wire": "The failed assistant turn, then the correction",
-      "aw": "run_inference appends the nudge before the failed assistant turn, and the failed turn keeps no tool_calls",
-      "effect": "The model reads a correction before the answer it corrects. Seen in the lesson 9 trace."
     }
   ],
   "repro": {

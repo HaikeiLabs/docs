@@ -74,7 +74,7 @@
       "id": "qwen3",
       "name": "Qwen3",
       "sub": "",
-      "note": "Reasoning sits inside `think` tags. With `--reasoning-parser qwen3` the server moves it to `reasoning_content`. The template keeps thinking only for assistant turns after the latest user message.",
+      "note": "Reasoning sits inside `think` tags. With `--reasoning-parser qwen3` the server moves it to `reasoning_content`. The chat template keeps thinking only for assistant turns after the latest user message.",
       "src": "Qwen3 chat template, vLLM qwen3 reasoning parser",
       "panes": [
         {

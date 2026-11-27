@@ -3,7 +3,7 @@ id: mcp
 num: 6
 title: "MCP: tools from another process"
 mins: 5
-lede: MCP is a standard way for a separate server to offer tools. Your harness speaks MCP. The model never does.
+lede: MCP is a standard way for a separate server to offer tools. Your harness, the code that runs the loop, speaks MCP. The model never does.
 quiz:
   q: Which side speaks MCP?
   opts:
@@ -17,7 +17,7 @@ quiz:
 
 ## Two methods matter
 
-MCP is JSON-RPC 2.0. After `initialize`, you only need these two.
+MCP uses JSON-RPC 2.0: every request is a JSON object with a method name and parameters. After the `initialize` handshake, you only need these two methods.
 
 [widget:api data=api-mcp]
 
@@ -25,7 +25,7 @@ MCP is JSON-RPC 2.0. After `initialize`, you only need these two.
 
 An MCP tool isn't tied to any model, so converting it is just a rename: [[1]] for OpenAI-compatible APIs, [[2]] for Anthropic.
 
-Agentware's Go MCP server (`go/mcp`) serves a `ToolRegistry` this way, with one process per user, so every call still goes through policy and audit.
+Agentware, the SDK in Lessons 8 to 10, does this in its Go MCP server (`go/mcp`). It runs one process per user, so every call still goes through policy (allow or deny) and audit (a record of each call).
 
 ```python title="mcp_bridge.py" marks="4=1;8=2"
 def mcp_to_openai(t):

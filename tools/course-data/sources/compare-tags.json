@@ -59,7 +59,7 @@
       "name": "Qwen3",
       "sub": "",
       "note": "Tools are JSON lines inside a `tools` tag. A call is a JSON object inside `<tool_call>`. Results come back in a **user** turn inside `<tool_response>`. This also covers Qwen2.5.",
-      "src": "Qwen3 chat template, vLLM hermes parser",
+      "src": "Qwen3 chat template, vLLM hermes tool parser",
       "panes": [
         {
           "label": "Declare",

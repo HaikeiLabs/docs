@@ -3,9 +3,9 @@ id: reasoning
 num: 5
 title: Reasoning and thinking
 mins: 4
-lede: Reasoning models write a scratchpad first. Each family puts it somewhere different and has its own rules for sending it back.
+lede: Reasoning models write out their thinking before they answer. Each family puts it somewhere different and has its own rules for sending it back.
 quiz:
-  q: "You're looping with Claude and extended thinking. What happens to the thinking block before you send the tool_result?"
+  q: "You're looping with Claude with extended thinking (its reasoning mode) turned on. What happens to the thinking block before you send the tool_result?"
   opts:
     - Delete it
     - Summarize it
@@ -37,5 +37,7 @@ def split(output):
 # Reference
 
 ## MiniMax
+
+MiniMax M2 and M3, two more open models, mark their reasoning in their own ways.
 
 [widget:compare data=compare-reasoning-minimax]

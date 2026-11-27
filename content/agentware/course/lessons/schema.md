@@ -21,7 +21,7 @@ quiz:
 
 [[2]] **description** is a prompt. It's how the model decides *when* to use the tool.
 
-[[3]] **parameters** is standard JSON Schema.
+[[3]] **parameters** is JSON Schema, the standard way to describe the shape of JSON data.
 
 [[4]] `enum` keeps values valid, and [[5]] `required` marks what can't be left out.
 
@@ -42,7 +42,7 @@ TOOL = {
 
 ## Map names to functions
 
-When a call comes back, look up the name [[1]] and run it [[2]]. Return errors as data [[3]]: the model can read the error and fix its arguments on the next lap, but a crash ends the run.
+This is the `run_tool` the Lesson 1 loop calls. Look up the name [[1]] and run it [[2]]: `**args` passes each key in the arguments dict as a keyword argument. Return errors as data [[3]]: the model can read the error and fix its arguments on the next lap, but a crash ends the run.
 
 ```python title="tools.py" marks="4=1;8=2;10=3"
 REGISTRY = {"get_weather": get_weather}

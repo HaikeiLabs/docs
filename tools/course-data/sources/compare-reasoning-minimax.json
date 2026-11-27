@@ -34,7 +34,7 @@
       "id": "minimax3",
       "name": "MiniMax M3",
       "sub": "",
-      "note": "Explicit `mm:think` blocks. With `thinking_mode` enabled the template may pre-open the block, so output can start inside it.",
+      "note": "Explicit `mm:think` blocks. With `thinking_mode` enabled the chat template may pre-open the block, so output can start inside it.",
       "src": "vLLM reasoning/minimax_m3_reasoning_parser.py",
       "panes": [
         {

@@ -5,7 +5,7 @@
     "method": "POST",
     "path": "/v1/chat/completions",
     "servers": "OpenAI, vLLM, SGLang, Ollama, OpenRouter, LM Studio",
-    "summary": "Send the conversation and the tools. The server applies the model's chat template and parses tool calls back into JSON.",
+    "summary": "Send the conversation and the tools. The server lays them out in the model's own text format and parses tool calls back into JSON.",
     "headers": [
       {
         "n": "Authorization",
@@ -427,11 +427,11 @@
   },
   {
     "id": "completions",
-    "vendor": "Open-weight, raw",
+    "vendor": "Self-hosted, raw",
     "method": "POST",
     "path": "/v1/completions",
     "servers": "vLLM, SGLang, llama.cpp",
-    "summary": "No messages, no tools field. You render the chat template yourself and parse the tags out of the text. That's what Lessons 4 and 7 do by hand.",
+    "summary": "No messages, no tools field. You write the prompt in the model's own text format and parse the tags out of the reply. Lessons 4 and 7 show how.",
     "headers": [],
     "req": [
       {
@@ -445,7 +445,7 @@
       {
         "n": "prompt",
         "t": "string",
-        "d": "The fully rendered chat template, tools included, ending with the assistant header.",
+        "d": "The whole conversation as one string in the model's format, tools included, ending where the assistant's reply starts.",
         "r": true,
         "k": [],
         "tag": "tools"

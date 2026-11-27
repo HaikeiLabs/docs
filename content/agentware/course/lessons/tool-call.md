@@ -30,13 +30,13 @@ def get_weather(city: str, unit: str = "celsius") -> dict:
 
 ## Watch the loop run
 
-Press play. Every arrow is one message. Your code sits in the middle and does all the routing. The rings count laps: each lap is one call to the model. Switch the model to see the count change.
+Press play. Every arrow is one message. Your code sits in the middle and does all the routing. The rings count laps: each lap is one call to the model. Switch the model to see the count change: Claude is a hosted model, and GPT-OSS and Qwen3 are open models you can run yourself.
 
 [widget:cycle]
 
 ## That loop is the agent
 
-Call the model [[1]]. If it didn't ask for a tool [[2]], you're done. Otherwise run what it asked for [[3]], add the results to the conversation, and go around again [[4]].
+The history starts with the system prompt (`system`, the instructions the model reads first) and the user's question. Call the model [[1]]. If it didn't ask for a tool [[2]], you're done. Otherwise run what it asked for [[3]], add the results to the conversation, and go around again [[4]].
 
 ```python title="loop.py" marks="3=1;4=2;6=3;7=4"
 history = [system, question]
@@ -45,5 +45,5 @@ while True:
     if not reply.tool_calls:
         return reply.text
     for call in reply.tool_calls:
-        history.append(run(call))
+        history.append(run_tool(call.name, call.args))
 ```
