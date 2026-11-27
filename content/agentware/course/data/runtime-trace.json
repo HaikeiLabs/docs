@@ -1,5 +1,5 @@
 {
-  "code": "while lap < max_laps:\n    resp = backend.complete(messages)\n    clean = reasoning.strip(resp)\n    check = validator.validate(resp.tool_calls or clean)\n    if check.needs_retry:\n        messages += [user(check.nudge), assistant(clean)]\n        continue\n    messages.append(assistant(resp))\n    for call in resp.tool_calls:\n        # inside AuditedToolClient.Execute()\n        decision = policy.evaluate(call.name, call.args, caller)\n        auditor.record(AuditRecord(call, decision, caller))\n        if decision.action == \"deny\":\n            out = {\"error\": f\"denied by policy: {decision.reason}\"}\n        else:\n            out = tool(**call.args)\n        messages.append(tool_message(call.id, out))\n    if final_answer_called:\n        return answer",
+  "code": "while lap < max_laps:\n    resp = backend.complete(messages)\n    clean = reasoning.strip(resp)\n    check = validator.validate(resp.tool_calls or clean)\n    if check.needs_retry:\n        if clean:\n            messages.append(assistant(clean))\n        messages.append(user(check.nudge))\n        continue\n    messages.append(assistant(resp))\n    for call in resp.tool_calls:\n        # inside AuditedToolClient.Execute()\n        decision = policy.evaluate(call.name, call.args, caller)\n        auditor.record(AuditRecord(call, decision, caller))\n        if decision.action == \"deny\":\n            out = {\"error\": f\"denied by policy: {decision.reason}\"}\n        else:\n            out = tool(**call.args)\n        messages.append(tool_message(call.id, out))\n    if final_answer_called:\n        return answer",
   "trace": [
     {
       "kind": "lap",
@@ -71,11 +71,6 @@
           "role": "user",
           "content": "Tool 'weather_lookup' does not exist. Available tools: post_to_slack, final_answer, and get_weather. Call one of them.",
           "meta": "retry_nudge"
-        },
-        {
-          "role": "assistant",
-          "content": "",
-          "meta": "text_response"
         }
       ],
       "response": {
@@ -134,11 +129,6 @@
           "role": "user",
           "content": "Tool 'weather_lookup' does not exist. Available tools: post_to_slack, final_answer, and get_weather. Call one of them.",
           "meta": "retry_nudge"
-        },
-        {
-          "role": "assistant",
-          "content": "",
-          "meta": "text_response"
         }
       ]
     },
@@ -239,11 +229,6 @@
           "role": "user",
           "content": "Tool 'weather_lookup' does not exist. Available tools: post_to_slack, final_answer, and get_weather. Call one of them.",
           "meta": "retry_nudge"
-        },
-        {
-          "role": "assistant",
-          "content": "",
-          "meta": "text_response"
         },
         {
           "role": "assistant",
@@ -386,11 +371,6 @@
         {
           "role": "assistant",
           "content": "",
-          "meta": "text_response"
-        },
-        {
-          "role": "assistant",
-          "content": "",
           "tool_calls": [
             {
               "id": "call_2",
@@ -485,11 +465,6 @@
         {
           "role": "assistant",
           "content": "",
-          "meta": "text_response"
-        },
-        {
-          "role": "assistant",
-          "content": "",
           "tool_calls": [
             {
               "id": "call_2",
@@ -542,14 +517,14 @@
           "meta": "user_input"
         },
         {
-          "role": "user",
-          "content": "Your previous response was not a valid tool call. You must respond with a tool call, not free text. Available tools: post_to_slack, final_answer, and get_weather. Please try again with a valid tool call.",
-          "meta": "retry_nudge"
-        },
-        {
           "role": "assistant",
           "content": "Tokyo is warmer at 22°C, but it's raining. Bring an umbrella.",
           "meta": "text_response"
+        },
+        {
+          "role": "user",
+          "content": "Your previous response was not a valid tool call. You must respond with a tool call, not free text. Available tools: post_to_slack, final_answer, and get_weather. Please try again with a valid tool call.",
+          "meta": "retry_nudge"
         }
       ],
       "response": {
@@ -592,14 +567,14 @@
       "attempts": 2,
       "retries_added": [
         {
-          "role": "user",
-          "content": "Your previous response was not a valid tool call. You must respond with a tool call, not free text. Available tools: post_to_slack, final_answer, and get_weather. Please try again with a valid tool call.",
-          "meta": "retry_nudge"
-        },
-        {
           "role": "assistant",
           "content": "Tokyo is warmer at 22°C, but it's raining. Bring an umbrella.",
           "meta": "text_response"
+        },
+        {
+          "role": "user",
+          "content": "Your previous response was not a valid tool call. You must respond with a tool call, not free text. Available tools: post_to_slack, final_answer, and get_weather. Please try again with a valid tool call.",
+          "meta": "retry_nudge"
         }
       ]
     },

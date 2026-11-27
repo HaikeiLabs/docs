@@ -17,7 +17,7 @@ out["section"]=DefaultPromptGenerator().generate_tool_section(reg)
 for m in ["claude-x","Qwen/Qwen3-8B","openai/gpt-oss-20b","MiniMax-M2"]:
     f=get_formatter(m)
     out["fmt_"+m]={"family":f.model_family(),"defs":f.format_tool_definitions([Weather()]),
-      "result":f.format_tool_result("get_weather",Result(success=True,data='{"temp": 22}'))}
+      "result":f.format_tool_result("get_weather",Result(success=True,data='{"temp": 22}'),call_id="toolu_01A")}
 q=get_formatter("qwen3")
 out["qwen_parse_official"]=str(q.parse_tool_calls('<tool_call>\n{"name": "get_weather", "arguments": {"city": "Tokyo"}}\n</tool_call>'))
 out["qwen_parse_aw"]=str(q.parse_tool_calls('<tool_call><tool name="get_weather">{"city": "Tokyo"}</tool></tool_call>'))
@@ -40,7 +40,7 @@ class RecordingBackend:
     def supports_native_tool_calling(self): return True
     def context_window_size(self): return 32768
     def complete(self,messages,tools=None):
-        RecordingBackend.calls.append({"messages":len(messages),"tools":tools})
+        RecordingBackend.calls.append({"messages":len(messages),"tools":None if tools is None else [t.name for t in tools]})
         return Response(content="Done.",finish_reason="stop")
 spec=ToolDefinition(name=Weather.name,description=Weather.description,input_schema=SCHEMA)
 asyncio.run(run_inference([Message(role=Role.USER,content="Weather in Tokyo?")],

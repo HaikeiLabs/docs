@@ -43,7 +43,7 @@ dependencies = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "haikeilabs-agentware", specifier = "==0.17.0" }]
+requires-dist = [{ name = "haikeilabs-agentware", specifier = "==0.18.0" }]
 
 [[package]]
 name = "exceptiongroup"
@@ -68,15 +68,28 @@ wheels = [
 
 [[package]]
 name = "haikeilabs-agentware"
-version = "0.17.0"
+version = "0.18.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "haikeilabs-connector-contracts" },
     { name = "httpx" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f4/9a/e1a9c3ec629a1e66aeb0f18f03457d7f9abf1f4d09f2212ab1729658fc3e/haikeilabs_agentware-0.17.0.tar.gz", hash = "sha256:19ca9e9b0addb27d776b8b09efb28761a09b590cf6b8746c6bc2023c613c5bb6", size = 228524, upload-time = "2026-11-10T00:25:34.04Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/00/8c/77a32eeb7591b011a203e5398143537b0425c8b2eef3f0473bb1d92fd8aa/haikeilabs_agentware-0.18.0.tar.gz", hash = "sha256:1fa0745a3fa7330c0de5615026a11273dde8b56d73b3c3432de4d14d024ade99", size = 269709, upload-time = "2026-11-25T23:18:01.199Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/74/79/e7432890df7bd32d13f7492e4a5fc28417beb6773bbb3db10f05da888552/haikeilabs_agentware-0.17.0-py3-none-any.whl", hash = "sha256:9a270b73d07c02234f65db37aef49e09f018676b0514806f8724411441effca3", size = 133890, upload-time = "2026-11-10T00:25:32.566Z" },
+    { url = "https://files.pythonhosted.org/packages/4f/66/372b3dd7261ad6b5109b9ded0468860ff4a8be3a95a8de5d92120fd92b87/haikeilabs_agentware-0.18.0-py3-none-any.whl", hash = "sha256:7e3a1054ef0a595519adb8c7c7c8f4fd4ef25fa61840f14984d91d5216f34a3b", size = 154644, upload-time = "2026-11-25T23:17:59.885Z" },
+]
+
+[[package]]
+name = "haikeilabs-connector-contracts"
+version = "0.20.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "protobuf" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/88/b2/d893143bd7be9df56e7f07a011d1860e44d4a0c9b4aebd9be3303de7754e/haikeilabs_connector_contracts-0.20.1.tar.gz", hash = "sha256:2a98360831472304118c59ad9b7a582a83359051dad8b8bcc9ca755103023cef", size = 82057, upload-time = "2026-11-23T20:51:27.959Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b1/63/d27fe07559a0d871b882acde536d07a4b5f093de25530694d6cb36025959/haikeilabs_connector_contracts-0.20.1-py3-none-any.whl", hash = "sha256:70c8d3fa560bb1f7d68c8cebf19829503281cca597abc1a3796d4e2f37d3f726", size = 139820, upload-time = "2026-11-23T20:51:26.294Z" },
 ]
 
 [[package]]
@@ -114,6 +127,21 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f5/08/8eea9d4b8302028f3abb2c0813953f7aec26d33b7a8960ed760e65ff29fa/idna-3.20.tar.gz", hash = "sha256:a7db850025b95ded1eae8a46181a1a6c56c92c96f0e2b005d9ff8dc0210cab44", size = 216463, upload-time = "2026-09-17T14:11:04.752Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/58/a2/bb081bab032533a855d44de1d56f8e8426114ff1ba5d1f07a438a0a654f8/idna-3.20-py3-none-any.whl", hash = "sha256:ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c", size = 69583, upload-time = "2026-09-17T14:11:03.168Z" },
+]
+
+[[package]]
+name = "protobuf"
+version = "7.36.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d9/89/5b8517baa72f84a67b8a307ba953c91057af618bf40bf676f3c03551f8f0/protobuf-7.36.2.tar.gz", hash = "sha256:497d0463ff3316681da6c0b9e8d06cb465d61abce00b613ab42226175644d1bb", size = 512737, upload-time = "2026-09-17T20:07:59.326Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/32/72/98342feb672507c8f3a69e34b4fa8961f608edba5c1a48a6f47156d92cb5/protobuf-7.36.2-cp310-abi3-macosx_10_9_universal2.whl", hash = "sha256:cbc70b17ee27e28894c7fee8bb04be1abead49e936bc70eb60052531eee2079e", size = 456039, upload-time = "2026-09-17T20:07:51.542Z" },
+    { url = "https://files.pythonhosted.org/packages/b6/ea/91fdf7c2b8bbd49cde056f00a9df6773532987e1c00fe2830b895af95c7e/protobuf-7.36.2-cp310-abi3-manylinux2014_aarch64.whl", hash = "sha256:e11e1f0180583a2af89db6a2ecd9e8dc40aa6d2988ca175bfd0e6d12ea72d74e", size = 344219, upload-time = "2026-09-17T20:07:52.914Z" },
+    { url = "https://files.pythonhosted.org/packages/17/ab/5fd5f8ece73fad885c5a09aa849b32d70472f954ba3a92d3bb5974ea953b/protobuf-7.36.2-cp310-abi3-manylinux2014_s390x.whl", hash = "sha256:f4fee11ec330d238b34a05c9b675f693c20415d1c5bd7d5320cc2f8a798eb9cf", size = 357223, upload-time = "2026-09-17T20:07:53.985Z" },
+    { url = "https://files.pythonhosted.org/packages/db/f3/3996583dd2906297a637af12114deddf7658af6e683fedb83be061983fb5/protobuf-7.36.2-cp310-abi3-manylinux2014_x86_64.whl", hash = "sha256:89f23aa53c24553a2416fd4fd1ec06f74fa42b14b546d8883128813f775bbfd2", size = 343223, upload-time = "2026-09-17T20:07:54.931Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/1b/dcc64f358fcb51811b58ae40b3d28f820725f116d86487cc20bd4b130701/protobuf-7.36.2-cp310-abi3-win32.whl", hash = "sha256:912c1221170e16c08d1f086762f563dd61ff83c18b5fa6652952dfaded66f728", size = 442998, upload-time = "2026-09-17T20:07:55.826Z" },
+    { url = "https://files.pythonhosted.org/packages/8a/55/b77bda4e5e5f5971fb51b07663694690e9afdb9402136c16a522bd621cad/protobuf-7.36.2-cp310-abi3-win_amd64.whl", hash = "sha256:a300819d441e078a5608c0d3c709796bb548136058fda017ae51d425b44fd353", size = 456514, upload-time = "2026-09-17T20:07:57.188Z" },
+    { url = "https://files.pythonhosted.org/packages/e4/04/d52c7016b04b6c5108f26691f9d33ec82a9b65d041f1a9c771137693d618/protobuf-7.36.2-py3-none-any.whl", hash = "sha256:bdb3a345d48db958e6ce1f18e508beb0cc981d64f24088427549c866cd039f1e", size = 179806, upload-time = "2026-09-17T20:07:58.211Z" },
 ]
 
 [[package]]

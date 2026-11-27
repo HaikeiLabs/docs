@@ -3,7 +3,9 @@ while lap < max_laps:
     clean = reasoning.strip(resp)
     check = validator.validate(resp.tool_calls or clean)
     if check.needs_retry:
-        messages += [user(check.nudge), assistant(clean)]
+        if clean:
+            messages.append(assistant(clean))
+        messages.append(user(check.nudge))
         continue
     messages.append(assistant(resp))
     for call in resp.tool_calls:

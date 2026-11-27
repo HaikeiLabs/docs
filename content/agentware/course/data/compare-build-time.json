@@ -5,19 +5,19 @@
       "name": "claude-…",
       "sub": "→ anthropic",
       "note": "`get_formatter(\"claude-…\")` returns the **anthropic** formatter.",
-      "src": "Captured by running haikeilabs-agentware 0.17.0",
+      "src": "Captured by running haikeilabs-agentware 0.18.0",
       "panes": [
         {
           "label": "Build time: tool definitions (text mode)",
           "file": "format_tool_definitions()",
           "lang": "json",
-          "src": "[\n  {\n    \"type\": \"function\",\n    \"function\": {\n      \"name\": \"get_weather\",\n      \"description\": \"Get the current weather for a city.\",\n      \"parameters\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"city\": {\n            \"type\": \"string\",\n            \"description\": \"City name, e.g. Tokyo\"\n          },\n          \"unit\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"celsius\",\n              \"fahrenheit\"\n            ]\n          }\n        },\n        \"required\": [\n          \"city\"\n        ]\n      }\n    }\n  }\n]"
+          "src": "[\n  {\n    \"name\": \"get_weather\",\n    \"description\": \"Get the current weather for a city.\",\n    \"input_schema\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"city\": {\n          \"type\": \"string\",\n          \"description\": \"City name, e.g. Tokyo\"\n        },\n        \"unit\": {\n          \"type\": \"string\",\n          \"enum\": [\n            \"celsius\",\n            \"fahrenheit\"\n          ]\n        }\n      },\n      \"required\": [\n        \"city\"\n      ]\n    }\n  }\n]"
         },
         {
           "label": "Runtime: tool result",
           "file": "format_tool_result()",
           "lang": "tokens",
-          "src": "<function_results><result tool=\"get_weather\">{\"temp\": 22}</result></function_results>"
+          "src": "{\"type\":\"tool_result\",\"tool_use_id\":\"toolu_01A\",\"content\":\"{\\\"temp\\\": 22}\"}"
         }
       ]
     },
@@ -26,19 +26,19 @@
       "name": "Qwen/Qwen3-8B",
       "sub": "→ qwen",
       "note": "`get_formatter(\"Qwen/Qwen3-8B\")` returns the **qwen** formatter.",
-      "src": "Captured by running haikeilabs-agentware 0.17.0",
+      "src": "Captured by running haikeilabs-agentware 0.18.0",
       "panes": [
         {
           "label": "Build time: tool definitions (text mode)",
           "file": "format_tool_definitions()",
           "lang": "tokens",
-          "src": "<tool_description>\n<tool_name>get_weather</tool_name>\n<description>Get the current weather for a city.</description>\n<parameters>{\"type\":\"object\",\"properties\":{\"city\":{\"type\":\"string\",\"description\":\"City name, e.g. Tokyo\"},\"unit\":{\"type\":\"string\",\"enum\":[\"celsius\",\"fahrenheit\"]}},\"required\":[\"city\"]}</parameters>\n</tool_description>\n"
+          "src": "# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"function\":{\"description\":\"Get the current weather for a city.\",\"name\":\"get_weather\",\"parameters\":{\"properties\":{\"city\":{\"description\":\"City name, e.g. Tokyo\",\"type\":\"string\"},\"unit\":{\"enum\":[\"celsius\",\"fahrenheit\"],\"type\":\"string\"}},\"required\":[\"city\"],\"type\":\"object\"}},\"type\":\"function\"}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call>"
         },
         {
           "label": "Runtime: tool result",
           "file": "format_tool_result()",
           "lang": "tokens",
-          "src": "<tool_response>\n<tool_name>get_weather</tool_name>\n<result>{\"temp\": 22}</result>\n</tool_response>"
+          "src": "<tool_response>\n\"{\\\"temp\\\": 22}\"\n</tool_response>"
         }
       ]
     },
@@ -47,7 +47,7 @@
       "name": "openai/gpt-oss-20b",
       "sub": "→ openai",
       "note": "`get_formatter(\"openai/gpt-oss-20b\")` returns the **openai** formatter.",
-      "src": "Captured by running haikeilabs-agentware 0.17.0",
+      "src": "Captured by running haikeilabs-agentware 0.18.0",
       "panes": [
         {
           "label": "Build time: tool definitions (text mode)",
@@ -68,7 +68,7 @@
       "name": "MiniMax-M2",
       "sub": "→ generic",
       "note": "`get_formatter(\"MiniMax-M2\")` returns the **generic** formatter.",
-      "src": "Captured by running haikeilabs-agentware 0.17.0",
+      "src": "Captured by running haikeilabs-agentware 0.18.0",
       "panes": [
         {
           "label": "Build time: tool definitions (text mode)",
