@@ -38,3 +38,8 @@
 .course-quiz button[data-result="wrong"]::before { content: "✕"; }
 .course-complete { margin: 0; font-weight: 600; color: var(--color-accent-text); }
 .course-complete[hidden] { display: none; }
+/* Content versioning: "Updated <date> · Agentware <version>" under the lesson line,
+   the optional change note and the behind-latest note. Plain muted text, no colour. */
+.lesson > .course-version { margin-top: -.5rem; color: var(--color-muted); font: 400 .875rem/1.5 var(--font-sans); }
+.lesson > :is(.course-change-note, .course-behind) { color: var(--color-muted); font-size: .875rem; line-height: 1.5; }
+.lesson > .course-version + :is(.course-change-note, .course-behind), .lesson > .course-change-note + .course-behind { margin-top: -.5rem; }

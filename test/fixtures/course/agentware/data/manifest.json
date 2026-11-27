@@ -1,0 +1,10 @@
+{
+  "files": {
+    "api-fixture.json": { "generated_with": { "agentware": null, "generator": "fixture 0.0.0" }, "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+    "compare-fixture.json": { "generated_with": { "agentware": null, "generator": "fixture 0.0.0" }, "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+    "debugger.json": { "generated_with": { "agentware": null, "generator": "fixture 0.0.0" }, "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+    "gaps.json": { "generated_with": { "agentware": "0.3.0", "generator": "fixture 0.0.0" }, "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+    "logs.json": { "generated_with": { "agentware": null, "generator": "fixture 0.0.0" }, "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+    "runtime-trace.json": { "generated_with": { "agentware": "0.2.0", "generator": "fixture 0.0.0" }, "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+  }
+}

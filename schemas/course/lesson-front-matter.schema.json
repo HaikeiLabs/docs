@@ -30,6 +30,23 @@
       "type": "integer",
       "minimum": 1
     },
+    "updated": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Date (YYYY-MM-DD) the lesson's content, quiz or the data it shows last changed in a way a reader would notice. Set by hand. Shown under the lesson line, and used for JSON-LD dateModified and the sitemap lastmod."
+    },
+    "agentware": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "The Agentware SDK version (X.Y.Z) the lesson describes. Required when the lesson shows SDK-derived data and data/manifest.json exists; must equal generated_with.agentware for those files. Rendered from here, so lesson prose does not state the version."
+    },
+    "change_note": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[^\\n]+$",
+      "description": "Optional one-sentence note for readers about the latest change, in inline Markdown (bold, italic, code)."
+    },
     "lede": {
       "type": "string",
       "minLength": 1
