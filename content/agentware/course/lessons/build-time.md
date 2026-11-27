@@ -5,6 +5,8 @@ title: "How does Agentware format tools for each model?"
 seo_title: "How does Agentware format tools for each model?"
 description: "See how the Agentware SDK picks a tool-call formatter from the model name and writes your tools for Claude, Qwen3, GPT-OSS and MiniMax, with real output."
 mins: 4
+updated: 2026-11-27
+agentware: 0.18.1
 lede: "Agentware picks a formatter from the model name once, when you build the agent. The formatter writes your tools into the request, or into the prompt as text when the server can't parse tool calls."
 quiz:
   q: When does get_formatter(model_name) run?

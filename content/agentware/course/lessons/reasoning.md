@@ -5,6 +5,7 @@ title: "How do reasoning models handle tool calls?"
 seo_title: "How do reasoning models handle tool calls?"
 description: "Learn how reasoning models handle tool calls: how Claude, GPT-OSS and Qwen3 return their thinking, and why you strip it out before you parse tool calls."
 mins: 4
+updated: 2026-11-27
 lede: "Reasoning models write out their thinking before they answer or call a tool. Each family puts that thinking somewhere different and has its own rules for sending it back."
 quiz:
   q: "You're looping with Claude with extended thinking (its reasoning mode) turned on. What happens to the thinking block before you send the tool_result?"

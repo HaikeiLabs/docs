@@ -5,6 +5,7 @@ title: "What is MCP?"
 seo_title: "What is MCP? Model Context Protocol tools explained"
 description: "Learn what MCP (Model Context Protocol) is: how a tool server lists and runs tools over JSON-RPC, and how to convert MCP tools for OpenAI and Anthropic."
 mins: 5
+updated: 2026-11-27
 lede: "MCP (Model Context Protocol) is a standard way for a separate server to offer tools to your agent. Your harness, the code that runs the loop, speaks MCP; the model never does."
 quiz:
   q: Which side speaks MCP?

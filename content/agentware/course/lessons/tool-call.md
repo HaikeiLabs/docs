@@ -5,6 +5,7 @@ title: "What is a tool call?"
 seo_title: "How do LLM tool calls work? A tool call explained"
 description: "Learn how LLM tool calls work: the model writes a request to run a function, your code runs it and sends back the result, and that loop is the whole agent."
 mins: 4
+updated: 2026-11-27
 lede: "A tool call is a message in which the model asks your code to run a function. The model only writes the request; your code runs the function and sends the result back."
 quiz:
   q: Who runs get_weather?
