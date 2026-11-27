@@ -1,0 +1,76 @@
+{
+  "tabs": [
+    {
+      "id": "gptoss",
+      "name": "GPT-OSS",
+      "sub": "",
+      "note": "Tools are a TypeScript-style `namespace functions`. A call goes on the `commentary` channel, addressed `to=functions.NAME`, and ends with `<|call|>`. There are no call ids.",
+      "panes": [
+        {
+          "label": "Declare",
+          "file": "developer message",
+          "lang": "tokens",
+          "src": "<|start|>developer<|message|># Instructions\n\nYou are a concise weather assistant.\n\n# Tools\n\n## functions\n\nnamespace functions {\n\n// Get the current weather for a city.\ntype get_weather = (_: {\n// City name, e.g. Tokyo\ncity: string,\nunit?: \"celsius\" | \"fahrenheit\",\n}) => any;\n\n} // namespace functions<|end|>",
+          "hl": [
+            1
+          ]
+        },
+        {
+          "label": "Model calls it",
+          "file": "model output",
+          "lang": "tokens",
+          "src": "<|channel|>analysis<|message|>Need weather for Tokyo.<|end|>\n<|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{\"city\":\"Tokyo\"}<|call|>",
+          "hl": [
+            1
+          ]
+        },
+        {
+          "label": "You send the result",
+          "file": "next prompt",
+          "lang": "tokens",
+          "src": "<|start|>functions.get_weather to=assistant<|channel|>commentary<|message|>{\"temp\": 22, \"sky\": \"rain\"}<|end|>",
+          "hl": [
+            1
+          ]
+        }
+      ],
+      "src": "openai/harmony docs/format.md and test-data"
+    },
+    {
+      "id": "claude",
+      "name": "Claude",
+      "sub": "",
+      "note": "Anthropic doesn't publish Claude's raw prompt format. You only work with JSON blocks, so there's no template to render and nothing to parse.",
+      "panes": [
+        {
+          "label": "Declare",
+          "file": "tools[0]",
+          "lang": "json",
+          "src": "{\n  \"name\": \"get_weather\",\n  \"description\": \"Get the current weather for a city.\",\n  \"input_schema\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"city\": {\n        \"type\": \"string\"\n      }\n    },\n    \"required\": [\n      \"city\"\n    ]\n  }\n}",
+          "hl": [
+            1
+          ]
+        },
+        {
+          "label": "Model calls it",
+          "file": "content[0]",
+          "lang": "json",
+          "src": "{\n  \"type\": \"tool_use\",\n  \"id\": \"toolu_01A\",\n  \"name\": \"get_weather\",\n  \"input\": {\n    \"city\": \"Tokyo\"\n  }\n}",
+          "hl": [
+            1
+          ]
+        },
+        {
+          "label": "You send the result",
+          "file": "user message",
+          "lang": "json",
+          "src": "{\n  \"role\": \"user\",\n  \"content\": [\n    {\n      \"type\": \"tool_result\",\n      \"tool_use_id\": \"toolu_01A\",\n      \"content\": \"{\\\"temp\\\": 22, \\\"sky\\\": \\\"rain\\\"}\"\n    }\n  ]\n}",
+          "hl": [
+            1
+          ]
+        }
+      ],
+      "src": "Anthropic Messages API"
+    }
+  ]
+}
