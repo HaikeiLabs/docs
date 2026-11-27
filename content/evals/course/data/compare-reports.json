@@ -1,0 +1,46 @@
+{
+  "tabs": [
+    {
+      "id": "reports",
+      "name": "The two reports",
+      "sub": "",
+      "note": "Main passes 5 of 12 attempts (41.7%). The pull request passes 6 of 12 (50%). The score went up, but `refund-policy` went from 3/3 to 0/3.",
+      "src": "agent-evals ch05 results",
+      "panes": [
+        {
+          "label": "Main",
+          "file": "example-main.json",
+          "lang": "json",
+          "src": "{\n  \"name\": \"main\",\n  \"status\": \"scored\",\n  \"error\": null,\n  \"threshold\": 1.0,\n  \"pass_rate\": 0.4166666666666667,\n  \"passed\": false,\n  \"cases\": [\n    {\"id\": \"refund-policy\", \"passes\": 3, \"repeats\": 3, \"flaky\": false, \"passed\": true},\n    {\"id\": \"greeting\", \"passes\": 0, \"repeats\": 3, \"flaky\": false, \"passed\": false},\n    {\"id\": \"edge-case\", \"passes\": 2, \"repeats\": 3, \"flaky\": true, \"passed\": false},\n    {\"id\": \"billing-lookup\", \"passes\": 0, \"repeats\": 3, \"flaky\": false, \"passed\": false}\n  ]\n}",
+          "hl": [
+            9
+          ]
+        },
+        {
+          "label": "Pull request",
+          "file": "example-pr.json",
+          "lang": "json",
+          "src": "{\n  \"name\": \"pr\",\n  \"status\": \"scored\",\n  \"error\": null,\n  \"threshold\": 1.0,\n  \"pass_rate\": 0.5,\n  \"passed\": false,\n  \"cases\": [\n    {\"id\": \"refund-policy\", \"passes\": 0, \"repeats\": 3, \"flaky\": false, \"passed\": false},\n    {\"id\": \"greeting\", \"passes\": 3, \"repeats\": 3, \"flaky\": false, \"passed\": true},\n    {\"id\": \"edge-case\", \"passes\": 3, \"repeats\": 3, \"flaky\": false, \"passed\": true},\n    {\"id\": \"billing-lookup\", \"passes\": 0, \"repeats\": 3, \"flaky\": false, \"passed\": false}\n  ]\n}",
+          "hl": [
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "id": "compare",
+      "name": "Case by case",
+      "sub": "",
+      "note": "`compare` matches case ids across the two runs. A case that passes or fails on every attempt on both sides gets a real label. A case with mixed results on either side is `noise`.",
+      "src": "report.compare",
+      "panes": [
+        {
+          "label": "Labels",
+          "file": "compare(main, pr)",
+          "lang": "json",
+          "src": "{\n  \"cases\": [\n    {\n      \"id\": \"refund-policy\",\n      \"main\": \"3/3\",\n      \"pr\": \"0/3\",\n      \"label\": \"regression\"\n    },\n    {\n      \"id\": \"greeting\",\n      \"main\": \"0/3\",\n      \"pr\": \"3/3\",\n      \"label\": \"fixed\"\n    },\n    {\n      \"id\": \"edge-case\",\n      \"main\": \"2/3\",\n      \"pr\": \"3/3\",\n      \"label\": \"noise\"\n    },\n    {\n      \"id\": \"billing-lookup\",\n      \"main\": \"0/3\",\n      \"pr\": \"0/3\",\n      \"label\": \"still failing\"\n    }\n  ],\n  \"regressions\": [\n    \"refund-policy\"\n  ],\n  \"fixed\": [\n    \"greeting\"\n  ],\n  \"noise\": [\n    \"edge-case\"\n  ]\n}"
+        }
+      ]
+    }
+  ]
+}

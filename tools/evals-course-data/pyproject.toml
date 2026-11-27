@@ -1,0 +1,18 @@
+[project]
+name = "evals-course-data"
+version = "0.1.0"
+description = "Generates the recorded data for the agent evals course on docs.haikeilabs.com"
+requires-python = ">=3.12"
+# The generator imports the tutorials solution project directly; it needs no
+# packages of its own. pytest is only for its tests.
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,0 +1,64 @@
+{
+  "tabs": [
+    {
+      "id": "good",
+      "name": "Good",
+      "sub": "3 cases, 3 repeats",
+      "note": "Uses the order id it was given. All three cases pass on all three attempts: 9 of 9.",
+      "src": "run_matrix",
+      "panes": [
+        {
+          "label": "Profile good",
+          "file": "matrix result",
+          "lang": "json",
+          "src": "{\n  \"name\": \"good\",\n  \"status\": \"scored\",\n  \"error\": null,\n  \"threshold\": 0.8,\n  \"pass_rate\": 1.0,\n  \"passed\": true,\n  \"cases\": [\n    {\n      \"id\": \"status\",\n      \"passes\": 3,\n      \"repeats\": 3,\n      \"flaky\": false,\n      \"passed\": true\n    },\n    {\n      \"id\": \"refund\",\n      \"passes\": 3,\n      \"repeats\": 3,\n      \"flaky\": false,\n      \"passed\": true\n    },\n    {\n      \"id\": \"faq\",\n      \"passes\": 3,\n      \"repeats\": 3,\n      \"flaky\": false,\n      \"passed\": true\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "id": "weak",
+      "name": "Weak",
+      "sub": "3 cases, 3 repeats",
+      "note": "Looks up ORD-000 instead of ORD-123, every time. The lookup still runs, so only the `args` check sees it. 6 of 9 is below the 80% threshold.",
+      "src": "run_matrix",
+      "panes": [
+        {
+          "label": "Profile weak",
+          "file": "matrix result",
+          "lang": "json",
+          "src": "{\n  \"name\": \"weak\",\n  \"status\": \"scored\",\n  \"error\": null,\n  \"threshold\": 0.8,\n  \"pass_rate\": 0.6666666666666666,\n  \"passed\": false,\n  \"cases\": [\n    {\n      \"id\": \"status\",\n      \"passes\": 0,\n      \"repeats\": 3,\n      \"flaky\": false,\n      \"passed\": false\n    },\n    {\n      \"id\": \"refund\",\n      \"passes\": 3,\n      \"repeats\": 3,\n      \"flaky\": false,\n      \"passed\": true\n    },\n    {\n      \"id\": \"faq\",\n      \"passes\": 3,\n      \"repeats\": 3,\n      \"flaky\": false,\n      \"passed\": true\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "id": "flaky",
+      "name": "Flaky",
+      "sub": "3 cases, 3 repeats",
+      "note": "Calls the wrong tool on the `faq` case once in three tries. The profile still clears 80% with 8 of 9, but `faq` is `flaky`: 2 of 3.",
+      "src": "run_matrix",
+      "panes": [
+        {
+          "label": "Profile flaky",
+          "file": "matrix result",
+          "lang": "json",
+          "src": "{\n  \"name\": \"flaky\",\n  \"status\": \"scored\",\n  \"error\": null,\n  \"threshold\": 0.8,\n  \"pass_rate\": 0.8888888888888888,\n  \"passed\": true,\n  \"cases\": [\n    {\n      \"id\": \"status\",\n      \"passes\": 3,\n      \"repeats\": 3,\n      \"flaky\": false,\n      \"passed\": true\n    },\n    {\n      \"id\": \"refund\",\n      \"passes\": 3,\n      \"repeats\": 3,\n      \"flaky\": false,\n      \"passed\": true\n    },\n    {\n      \"id\": \"faq\",\n      \"passes\": 2,\n      \"repeats\": 3,\n      \"flaky\": true,\n      \"passed\": false\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "id": "unreachable",
+      "name": "Unreachable",
+      "sub": "3 cases, 3 repeats",
+      "note": "The model server never answered. The profile is `blocked` and `pass_rate` is null: there was no answer to grade, so there is no score.",
+      "src": "run_matrix",
+      "panes": [
+        {
+          "label": "Profile unreachable",
+          "file": "matrix result",
+          "lang": "json",
+          "src": "{\n  \"name\": \"unreachable\",\n  \"status\": \"blocked\",\n  \"error\": \"ConnectionError: connection refused: api.example.com:443\",\n  \"threshold\": 0.8,\n  \"pass_rate\": null,\n  \"passed\": null,\n  \"cases\": []\n}"
+        }
+      ]
+    }
+  ]
+}
