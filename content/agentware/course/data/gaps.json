@@ -23,10 +23,23 @@
     }
   ],
   "repro": {
-    "qwen_parse_official": "[ParsedToolCall(id='', name='get_weather', args={'city': 'Tokyo'}, raw='<tool_call>\\n{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Tokyo\"}}\\n</tool_call>')]",
-    "reason_thinking_tag": "'Calling tool.'",
-    "reason_think_tag": "'Calling tool.'",
-    "minimax_family": "generic",
-    "sdk_version": "0.18.0"
+    "sdk_version": "0.18.0",
+    "entries": [
+      {
+        "label": "GPT-OSS: a Harmony tool call in text mode",
+        "code": "fmt = get_formatter(\"openai/gpt-oss-20b\")\nfmt.parse_tool_calls('<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{\"city\": \"Tokyo\"}<|call|>')",
+        "output": "[]"
+      },
+      {
+        "label": "MiniMax: a real MiniMax M2 tool call",
+        "code": "fmt = get_formatter(\"MiniMax-M2\")\nfmt.model_family(), fmt.parse_tool_calls('<minimax:tool_call><invoke name=\"get_weather\"><parameter name=\"city\">Tokyo</parameter></invoke></minimax:tool_call>')",
+        "output": "('generic', [])"
+      },
+      {
+        "label": "Tool result text: what InferenceExecutor sends back (scripted model)",
+        "code": "executor.execute(ExecuteRequest(system_prompt=\"You are a weather assistant.\", user_message=\"Weather in Tokyo?\"))\nbackend.seen[-1][-1].content",
+        "output": "'Tool get_weather result: {\"temp\": 22, \"sky\": \"rain\"}'"
+      }
+    ]
   }
 }
