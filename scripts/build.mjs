@@ -3,6 +3,8 @@ import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import YAML from 'yaml';
+import { newestUpdated, readLatestAgentware } from './course-version.mjs';
+import { defaultCompatFile, formatWarning } from './course-validate.mjs';
 import { courseJsonLd, lessonHref, lessonJsonLd, lessonMeta, loadCourse, renderCourseHub, renderCourseRail, renderLesson } from './course.mjs';
 import { createMarkdown, escapeHtml, neighbours, renderToc, stripHtmlComments, stripLeadingTitle } from './render.mjs';
 import { checkBuiltRoutes, checkLinks } from './check-links.mjs';
@@ -410,10 +412,11 @@ function renderHome(pages) {
 }
 
 // Every canonical page: the home, each page in the index.json manifest, then any
-// extra page that is not in the manifest (the course lessons).
-function sitemapXml(manifest, extra = []) {
+// extra page that is not in the manifest (the course lessons). lastmod maps a path to
+// a YYYY-MM-DD date; only course URLs have one (their updated front matter).
+function sitemapXml(manifest, extra = [], lastmod = new Map()) {
   const urls = ['/', ...manifest.map((entry) => entry.path), ...extra];
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((url) => `  <url><loc>${escapeHtml(`${docsUrl}${url}`)}</loc></url>`).join('\n')}\n</urlset>\n`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((url) => `  <url><loc>${escapeHtml(`${docsUrl}${url}`)}</loc>${lastmod.has(url) ? `<lastmod>${lastmod.get(url)}</lastmod>` : ''}</url>`).join('\n')}\n</urlset>\n`;
 }
 
 // Cloudflare Pages _headers: each raw .md copy names its HTML page as canonical
@@ -435,7 +438,7 @@ export async function loadDocs(contentDir = path.join(repoRoot, 'content')) {
   return pages;
 }
 
-export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), outputDir = path.join(repoRoot, 'dist'), assetsDir = path.join(repoRoot, 'assets'), courseDir = process.env.COURSE_DIR ?? path.join(contentDir, 'agentware/course') } = {}) {
+export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), outputDir = path.join(repoRoot, 'dist'), assetsDir = path.join(repoRoot, 'assets'), courseDir = process.env.COURSE_DIR ?? path.join(contentDir, 'agentware/course'), compatFile = defaultCompatFile } = {}) {
   markdown.renderer.rules.link_open = (tokens, index, options, env, self) => {
     const token = tokens[index];
     const href = token.attrGet('href');
@@ -444,7 +447,8 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     return self.renderToken(tokens, index, options);
   };
   const pages = await loadDocs(contentDir);
-  const course = existsSync(path.join(courseDir, 'index.md')) ? loadCourse(courseDir) : null;
+  const course = existsSync(path.join(courseDir, 'index.md')) ? loadCourse(courseDir, { latest: readLatestAgentware(compatFile) }) : null;
+  for (const warning of course?.warnings ?? []) console.warn(formatWarning(warning));
   if (course && !pages.some(page => page.relativePath === 'agentware/course/index.md')) pages.push(validatePage('agentware/course/index.md', await readFile(path.join(courseDir, 'index.md'), 'utf8')));
   checkNavOrder(pages);
   await checkLinks(contentDir);
@@ -458,17 +462,20 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   // The share card arrives from design-system; until then og:image points at the C5 path.
   if (existsSync(path.join(assetsDir, 'social'))) await cp(path.join(assetsDir, 'social'), path.join(outputDir, 'assets/social'), { recursive: true });
   const links = siteLinks(pages);
-  if (course) { await cp(path.join(assetsDir, 'course'), path.join(outputDir, 'assets/course'), { recursive: true }); await cp(path.join(courseDir, 'data'), path.join(outputDir, 'agentware/course/data'), { recursive: true }); }
+  if (course) { await cp(path.join(assetsDir, 'course'), path.join(outputDir, 'assets/course'), { recursive: true }); await cp(path.join(courseDir, 'data'), path.join(outputDir, 'agentware/course/data'), { recursive: true, filter: (source) => path.basename(source) !== 'manifest.json' }); }
   const lessonPaths = [];
+  const lastmod = new Map();
   for (const page of pages) {
     let result = renderPage(page, pages, links);
     if (page.course === 'agentware' && course) {
       result = renderCourseHubPage(page, course, links);
+      if (newestUpdated(course.lessons)) lastmod.set(pageHref(page), newestUpdated(course.lessons));
       for (const lesson of course.lessons) {
         const lessonPage = renderLessonPage(page, course, lesson, links);
         await mkdir(path.dirname(path.join(outputDir, lessonPage.outputPath)), { recursive: true });
         await writeFile(path.join(outputDir, lessonPage.outputPath), lessonPage.html);
         lessonPaths.push(lessonHref(lesson.id));
+        if (lesson.updated) lastmod.set(lessonHref(lesson.id), lesson.updated);
       }
     }
     const { outputPath, html } = result;
@@ -514,7 +521,7 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   // Page manifest consumed by `kei docs` (HAI-735). Keep this shape stable.
   const manifest = orderedPages(pages).map((page) => ({ slug: pageSlug(page), title: page.title, path: pageHref(page), product: page.product }));
   await writeFile(path.join(outputDir, 'index.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-  await writeFile(path.join(outputDir, 'sitemap.xml'), sitemapXml(manifest, lessonPaths));
+  await writeFile(path.join(outputDir, 'sitemap.xml'), sitemapXml(manifest, lessonPaths, lastmod));
   await writeFile(path.join(outputDir, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${docsUrl}/sitemap.xml\n`);
   await writeFile(path.join(outputDir, '_headers'), markdownCopyHeaders(orderedPages(pages)));
   const notFoundLinks = siteLinks(pages);

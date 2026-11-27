@@ -2,16 +2,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 import { createMarkdown, escapeHtml, highlight, slugify } from './render.mjs';
-import { validateCourse } from './course-validate.mjs';
+import { checkCourse } from './course-validate.mjs';
+import { compareVersions, formatDate, newestUpdated } from './course-version.mjs';
 
-export function loadCourse(dir) {
-  const hub = validateCourse(dir);
+// latest: the vendored current Agentware release, for the behind-latest note and warnings.
+export function loadCourse(dir, { latest } = {}) {
+  const { hub, warnings } = checkCourse(dir, { latest });
   const lessons = hub.lessons.map(id => {
     const raw = fs.readFileSync(path.join(dir, 'lessons', `${id}.md`), 'utf8');
     const match = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
     return { ...YAML.parse(match[1]), body: match[2] };
   });
-  return { hub, lessons };
+  return { hub, lessons, latest, warnings };
 }
 function renderItems(text, lesson) {
   const md = createMarkdown();
@@ -63,6 +65,21 @@ export function lessonMeta(lesson) {
   };
 }
 
+// dateModified only: no datePublished (there is no first-publish date) and no softwareVersion.
+const dateModified = date => (date ? { dateModified: date } : {});
+const time = date => `<time datetime="${escapeHtml(date)}">${formatDate(date)}</time>`;
+
+// Under the lesson line: "Updated <date> · Agentware <version>", each part only when
+// the front matter has it, then the change note and a note when the lesson is behind
+// the latest release. Versions come from front matter, never from lesson prose.
+export function renderLessonVersion(lesson, latest) {
+  const parts = [lesson.updated && `<span>Updated ${time(lesson.updated)}</span>`, lesson.agentware && `<span>Agentware ${escapeHtml(lesson.agentware)}</span>`].filter(Boolean);
+  const line = parts.length ? `<p class="course-version">${parts.join(' · ')}</p>` : '';
+  const note = lesson.change_note ? `<p class="course-change-note">What changed: ${createMarkdown().renderInline(lesson.change_note)}</p>` : '';
+  const behind = lesson.agentware && latest && compareVersions(lesson.agentware, latest) < 0 ? `<p class="course-behind">Written for Agentware ${escapeHtml(lesson.agentware)}. The current release is ${escapeHtml(latest)}.</p>` : '';
+  return line + note + behind;
+}
+
 function courseRef(course) {
   return { '@type': 'Course', name: course.hub.title, url: `${docsOrigin}${courseBase}` };
 }
@@ -77,6 +94,7 @@ export function courseJsonLd(course) {
     educationalLevel: 'Beginner',
     inLanguage: 'en',
     isAccessibleForFree: true,
+    ...dateModified(newestUpdated(course.lessons)),
     hasPart: course.lessons.map(lesson => ({ '@type': 'LearningResource', name: lesson.title, url: `${docsOrigin}${lessonHref(lesson.id)}` })),
   };
 }
@@ -95,6 +113,7 @@ export function lessonJsonLd(course, lesson) {
     isAccessibleForFree: true,
     position: lesson.num,
     timeRequired: `PT${lesson.mins}M`,
+    ...dateModified(lesson.updated),
     isPartOf: courseRef(course),
   };
 }
@@ -116,7 +135,7 @@ export function renderCourseHub(course, introHtml) {
     const items = course.lessons.slice(from, to).map(lesson => `<li><a href="${lessonHref(lesson.id)}" data-lesson-link="${escapeHtml(lesson.id)}"><strong><span data-check></span>${lesson.num}. ${escapeHtml(lesson.title)}</strong><span>${escapeHtml(plainText(lesson.lede))} · ${lesson.mins} min</span></a></li>`).join('');
     return `<h2>${escapeHtml(group.label)}</h2><ul class="tutorial-list">${items}</ul>`;
   }).join('');
-  return `<div class="course-hub" data-course-hub><p class="eyebrow">Course · ${course.lessons.length} lessons · ${minutes} min</p><h1>${escapeHtml(course.hub.title)}</h1><article class="prose">${introHtml}</article><p><a class="button-primary" href="${lessonHref(course.lessons[0].id)}">Start the course</a></p><div class="prose">${groups}</div></div>`;
+  return `<div class="course-hub" data-course-hub><p class="eyebrow"><span>Course · ${course.lessons.length} lessons · ${minutes} min${newestUpdated(course.lessons) ? ` · Updated ${time(newestUpdated(course.lessons))}` : ''}</span></p><h1>${escapeHtml(course.hub.title)}</h1><article class="prose">${introHtml}</article><p><a class="button-primary" href="${lessonHref(course.lessons[0].id)}">Start the course</a></p><div class="prose">${groups}</div></div>`;
 }
 
 // One lesson page: the lesson server-rendered and visible, prev/next as real links.
@@ -128,5 +147,5 @@ export function renderLesson(course, lesson) {
   const previous = course.lessons[index - 1], next = course.lessons[index + 1];
   const nav = `<nav class="course-pager" aria-label="Lesson navigation">${previous ? `<a href="${lessonHref(previous.id)}" rel="prev">Previous: ${escapeHtml(previous.title)}</a>` : '<span></span>'}${next ? `<a href="${lessonHref(next.id)}" rel="next">Next: ${escapeHtml(next.title)}</a>` : ''}</nav>`;
   const finish = lesson.finish ? `<div class="course-finish"><a class="button-primary" href="${escapeHtml(course.hub.finish.primary.href)}">${escapeHtml(course.hub.finish.primary.label)}</a><a href="${escapeHtml(course.hub.finish.secondary.href)}">${escapeHtml(course.hub.finish.secondary.label)}</a></div>` : '';
-  return `<section class="lesson" id="${escapeHtml(lesson.id)}"><p>Lesson ${lesson.num} of ${course.lessons.length} · ${lesson.mins} min</p><h1>${escapeHtml(lesson.title)}</h1><p>${createMarkdown().renderInline(lesson.lede)}</p><article class="prose">${renderItems(steps, lesson)}${reference ? `<details class="course-reference"><summary>Reference</summary>${renderItems(reference, lesson)}</details>` : ''}${quiz}${finish}${nav}</article></section>`;
+  return `<section class="lesson" id="${escapeHtml(lesson.id)}"><p>Lesson ${lesson.num} of ${course.lessons.length} · ${lesson.mins} min</p>${renderLessonVersion(lesson, course.latest)}<h1>${escapeHtml(lesson.title)}</h1><p>${createMarkdown().renderInline(lesson.lede)}</p><article class="prose">${renderItems(steps, lesson)}${reference ? `<details class="course-reference"><summary>Reference</summary>${renderItems(reference, lesson)}</details>` : ''}${quiz}${finish}${nav}</article></section>`;
 }

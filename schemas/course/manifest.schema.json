@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "content/agentware/course/data/manifest.json: one entry per data file, written by tools/course-data/generate.py and never edited by hand. Not served in dist.",
+  "type": "object",
+  "properties": {
+    "files": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z0-9-]+\\.json$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "generated_with": {
+            "type": "object",
+            "properties": {
+              "agentware": {
+                "description": "The Agentware SDK version installed when the file was generated, or null for a file that does not depend on the SDK. A non-null value makes the file SDK-derived.",
+                "anyOf": [
+                  { "type": "null" },
+                  { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+                ]
+              },
+              "generator": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The generator and its version, for example \"generate.py 0.1.0\"."
+              }
+            },
+            "required": ["agentware", "generator"],
+            "additionalProperties": false
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "sha256 over the generator inputs (scripts, sources, lock file) that produced the file. The generator compares it to find stale files."
+          }
+        },
+        "required": ["generated_with", "source_sha256"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["files"],
+  "additionalProperties": false
+}
