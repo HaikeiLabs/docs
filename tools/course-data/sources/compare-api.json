@@ -1,0 +1,91 @@
+{
+  "tabs": [
+    {
+      "id": "declare",
+      "name": "1. Declare the tool",
+      "sub": "",
+      "note": "Same JSON Schema. OpenAI wraps it in `{type, function}` and calls it `parameters`. Anthropic calls it `input_schema`.",
+      "panes": [
+        {
+          "label": "OpenAI-compatible",
+          "file": "tools[0]",
+          "lang": "json",
+          "src": "{\n  \"type\": \"function\",\n  \"function\": {\n    \"name\": \"get_weather\",\n    \"description\": \"Get the current weather for a city.\",\n    \"parameters\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"city\": {\n          \"type\": \"string\"\n        }\n      },\n      \"required\": [\n        \"city\"\n      ]\n    }\n  }\n}",
+          "hl": [
+            2,
+            3,
+            6
+          ]
+        },
+        {
+          "label": "Anthropic",
+          "file": "tools[0]",
+          "lang": "json",
+          "src": "{\n  \"name\": \"get_weather\",\n  \"description\": \"Get the current weather for a city.\",\n  \"input_schema\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"city\": {\n        \"type\": \"string\"\n      }\n    },\n    \"required\": [\n      \"city\"\n    ]\n  }\n}",
+          "hl": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ask",
+      "name": "2. Model asks for it",
+      "sub": "",
+      "note": "OpenAI puts calls in `tool_calls`, and `arguments` is a **string**. Anthropic puts a `tool_use` block in `content`, and `input` is an **object**.",
+      "panes": [
+        {
+          "label": "OpenAI-compatible",
+          "file": "choices[0]",
+          "lang": "json",
+          "src": "{\n  \"message\": {\n    \"role\": \"assistant\",\n    \"content\": null,\n    \"tool_calls\": [\n      {\n        \"id\": \"call_1\",\n        \"type\": \"function\",\n        \"function\": {\n          \"name\": \"get_weather\",\n          \"arguments\": \"{\\\"city\\\": \\\"Tokyo\\\"}\"\n        }\n      }\n    ]\n  },\n  \"finish_reason\": \"tool_calls\"\n}",
+          "hl": [
+            5,
+            11,
+            16
+          ]
+        },
+        {
+          "label": "Anthropic",
+          "file": "response",
+          "lang": "json",
+          "src": "{\n  \"stop_reason\": \"tool_use\",\n  \"content\": [\n    {\n      \"type\": \"tool_use\",\n      \"id\": \"toolu_01A\",\n      \"name\": \"get_weather\",\n      \"input\": {\n        \"city\": \"Tokyo\"\n      }\n    }\n  ]\n}",
+          "hl": [
+            2,
+            5,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "result",
+      "name": "3. Send the result",
+      "sub": "",
+      "note": "OpenAI has a `tool` role, one message per result. Anthropic has no tool role: results go in a **user** message, all together, as `tool_result` blocks.",
+      "panes": [
+        {
+          "label": "OpenAI-compatible",
+          "file": "messages (appended)",
+          "lang": "json",
+          "src": "[\n  {\n    \"role\": \"assistant\",\n    \"content\": null,\n    \"tool_calls\": [\n      {\n        \"id\": \"call_1\",\n        \"type\": \"function\",\n        \"function\": {\n          \"name\": \"get_weather\",\n          \"arguments\": \"{\\\"city\\\": \\\"Tokyo\\\"}\"\n        }\n      }\n    ]\n  },\n  {\n    \"role\": \"tool\",\n    \"tool_call_id\": \"call_1\",\n    \"content\": \"{\\\"temp\\\": 22, \\\"sky\\\": \\\"rain\\\"}\"\n  }\n]",
+          "hl": [
+            17,
+            18
+          ]
+        },
+        {
+          "label": "Anthropic",
+          "file": "messages (appended)",
+          "lang": "json",
+          "src": "[\n  {\n    \"role\": \"assistant\",\n    \"content\": [\n      {\n        \"type\": \"tool_use\",\n        \"id\": \"toolu_01A\",\n        \"name\": \"get_weather\",\n        \"input\": {\n          \"city\": \"Tokyo\"\n        }\n      }\n    ]\n  },\n  {\n    \"role\": \"user\",\n    \"content\": [\n      {\n        \"type\": \"tool_result\",\n        \"tool_use_id\": \"toolu_01A\",\n        \"content\": \"{\\\"temp\\\": 22, \\\"sky\\\": \\\"rain\\\"}\"\n      }\n    ]\n  }\n]",
+          "hl": [
+            16,
+            19,
+            20
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "code": "def agent_loop(question):\n    history = start(SYSTEM, question, TOOLS)\n    for lap in range(1, MAX_LAPS + 1):\n        request = build_request(history)\n        response = call_model(request)\n        calls = parse_tool_calls(response)\n        if not calls:\n            return final_text(response)\n        history.append(assistant_turn(response))\n        results = []\n        for call in calls:\n            output = run_tool(call.name, call.args)\n            results.append((call, output))\n        history += tool_results(results)",
+  "help": {
+    "anthropic": {
+      "build_request": "JSON body for POST /v1/messages: system, tools, messages",
+      "call_model": "POST /v1/messages",
+      "parse_tool_calls": "content blocks where type == \"tool_use\"",
+      "assistant_turn": "the assistant message, content blocks unchanged (thinking included)",
+      "tool_results": "ONE user message with a tool_result block per call"
+    },
+    "gpt-oss": {
+      "build_request": "render Harmony: system, developer (tools), user, history, then <|start|>assistant",
+      "call_model": "POST /v1/completions with the rendered prompt",
+      "parse_tool_calls": "regex: commentary to=functions.NAME … <|call|>",
+      "assistant_turn": "the model's tokens, analysis included, verbatim",
+      "tool_results": "<|start|>functions.NAME to=assistant<|channel|>commentary … <|end|>"
+    },
+    "qwen": {
+      "build_request": "render ChatML: system (+ <tools>), user, history, then <|im_start|>assistant",
+      "call_model": "POST /v1/completions with the rendered prompt",
+      "parse_tool_calls": "regex: <tool_call>{json}</tool_call>",
+      "assistant_turn": "the model's tokens, <think> included",
+      "tool_results": "ONE user turn with a <tool_response> block per call"
+    }
+  },
+  "fns": {
+    "anthropic": [
+      "def anthropic_request(messages):\n    return {\n        \"model\": \"claude-model-id\",\n        \"max_tokens\": 1024,\n        \"system\": SYSTEM,\n        \"thinking\": {\"type\": \"enabled\", \"budget_tokens\": 2048},\n        \"tools\": anthropic_tools(),\n        \"messages\": messages,\n    }",
+      "def anthropic_step(messages, response):\n    \"\"\"Append the assistant turn, run tools, append results. Returns done?\"\"\"\n    messages.append({\"role\": \"assistant\", \"content\": response[\"content\"]})\n    if response[\"stop_reason\"] != \"tool_use\":\n        return True, None\n    results, ran = [], []\n    for block in response[\"content\"]:\n        if block[\"type\"] == \"tool_use\":\n            out = run_tool(block[\"name\"], block[\"input\"])\n            ran.append({\"name\": block[\"name\"], \"args\": block[\"input\"], \"result\": out})\n            results.append({\"type\": \"tool_result\", \"tool_use_id\": block[\"id\"],\n                            \"content\": out})\n    # all results from one turn go back together, in ONE user message\n    messages.append({\"role\": \"user\", \"content\": results})\n    return False, ran"
+    ],
+    "gpt-oss": [
+      "def harmony_render(history):\n    \"\"\"history: list of already-rendered message strings (assistant/tool).\"\"\"\n    system = (\"<|start|>system<|message|>You are ChatGPT, a large language model trained by OpenAI.\\n\"\n              \"Knowledge cutoff: 2024-06\\nCurrent date: 2026-11-20\\n\\n\"\n              \"Reasoning: medium\\n\\n\"\n              \"# Valid channels: analysis, commentary, final. Channel must be included for every message.\\n\"\n              \"Calls to these tools must go to the commentary channel: 'functions'.<|end|>\")\n    developer = (f\"<|start|>developer<|message|># Instructions\\n\\n{SYSTEM}\\n\\n\"\n                 f\"{harmony_tools_block()}<|end|>\")\n    user = f\"<|start|>user<|message|>{QUESTION}<|end|>\"\n    return system + developer + user + \"\".join(history) + \"<|start|>assistant\"",
+      "def harmony_step(history, completion):\n    # the completion continues after \"<|start|>assistant\"\n    call = HARMONY_CALL.search(completion)\n    if call is None:\n        final = HARMONY_FINAL.search(completion).group(1)\n        return True, None, final\n    name, args = call.group(1), json.loads(call.group(2))\n    out = run_tool(name, args)\n    # keep the model's own tokens (incl. analysis) while the task is unfinished\n    history.append(\"<|start|>assistant\" + completion)\n    history.append(f\"<|start|>functions.{name} to=assistant<|channel|>commentary\"\n                   f\"<|message|>{out}<|end|>\")\n    return False, [{\"name\": name, \"args\": args, \"result\": out}], None"
+    ],
+    "qwen": [
+      "def qwen_render(history):\n    tool_json = json.dumps({\"type\": \"function\", \"function\": TOOL})\n    system = (f\"<|im_start|>system\\n{SYSTEM}\\n\\n# Tools\\n\\n\"\n              \"You may call one or more functions to assist with the user query.\\n\\n\"\n              \"You are provided with function signatures within <tools></tools> XML tags:\\n\"\n              f\"<tools>\\n{tool_json}\\n</tools>\\n\\n\"\n              \"For each function call, return a json object with function name and arguments \"\n              \"within <tool_call></tool_call> XML tags:\\n<tool_call>\\n\"\n              '{\"name\": <function-name>, \"arguments\": <args-json-object>}\\n</tool_call><|im_end|>\\n')\n    user = f\"<|im_start|>user\\n{QUESTION}<|im_end|>\\n\"\n    return system + user + \"\".join(history) + \"<|im_start|>assistant\\n\"",
+      "def qwen_step(history, completion):\n    calls = [json.loads(m) for m in QWEN_CALL.findall(completion)]\n    if not calls:\n        return True, None, QWEN_THINK.sub(\"\", completion).replace(\"<|im_end|>\", \"\").strip()\n    history.append(\"<|im_start|>assistant\\n\" + completion + \"\\n\")\n    ran, responses = [], []\n    for c in calls:\n        out = run_tool(c[\"name\"], c[\"arguments\"])\n        ran.append({\"name\": c[\"name\"], \"args\": c[\"arguments\"], \"result\": out})\n        responses.append(f\"<tool_response>\\n{out}\\n</tool_response>\")\n    # consecutive tool results are grouped into ONE user turn\n    history.append(\"<|im_start|>user\\n\" + \"\\n\".join(responses) + \"<|im_end|>\\n\")\n    return False, ran, None"
+    ]
+  }
+}

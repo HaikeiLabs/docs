@@ -1,0 +1,26 @@
+{
+  "code": "def agent_loop(question):\n    history = start(SYSTEM, question, TOOLS)\n    for lap in range(1, MAX_LAPS + 1):\n        request = build_request(history)\n        response = call_model(request)\n        calls = parse_tool_calls(response)\n        if not calls:\n            return final_text(response)\n        history.append(assistant_turn(response))\n        results = []\n        for call in calls:\n            output = run_tool(call.name, call.args)\n            results.append((call, output))\n        history += tool_results(results)",
+  "help": {
+    "anthropic": {
+      "build_request": "JSON body for POST /v1/messages: system, tools, messages",
+      "call_model": "POST /v1/messages",
+      "parse_tool_calls": "content blocks where type == \"tool_use\"",
+      "assistant_turn": "the assistant message, content blocks unchanged (thinking included)",
+      "tool_results": "ONE user message with a tool_result block per call"
+    },
+    "gpt-oss": {
+      "build_request": "render Harmony: system, developer (tools), user, history, then <|start|>assistant",
+      "call_model": "POST /v1/completions with the rendered prompt",
+      "parse_tool_calls": "regex: commentary to=functions.NAME … <|call|>",
+      "assistant_turn": "the model's tokens, analysis included, verbatim",
+      "tool_results": "<|start|>functions.NAME to=assistant<|channel|>commentary … <|end|>"
+    },
+    "qwen": {
+      "build_request": "render ChatML: system (+ <tools>), user, history, then <|im_start|>assistant",
+      "call_model": "POST /v1/completions with the rendered prompt",
+      "parse_tool_calls": "regex: <tool_call>{json}</tool_call>",
+      "assistant_turn": "the model's tokens, <think> included",
+      "tool_results": "ONE user turn with a <tool_response> block per call"
+    }
+  }
+}

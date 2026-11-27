@@ -1,0 +1,106 @@
+{
+  "tabs": [
+    {
+      "id": "claude",
+      "name": "Claude",
+      "sub": "",
+      "note": "Reasoning is a `thinking` content block with an opaque `signature`. During a tool-use turn, send it back **unchanged**. If you edit or drop it, the API rejects the request.",
+      "src": "Anthropic extended thinking docs",
+      "panes": [
+        {
+          "label": "Turn it on",
+          "file": "request",
+          "lang": "json",
+          "src": "{\n  \"thinking\": {\n    \"type\": \"enabled\",\n    \"budget_tokens\": 2048\n  }\n}"
+        },
+        {
+          "label": "Where it shows up",
+          "file": "response.content",
+          "lang": "json",
+          "src": "[\n  {\n    \"type\": \"thinking\",\n    \"thinking\": \"Need weather for both cities…\",\n    \"signature\": \"EuYBCkQYAiJA…\"\n  },\n  {\n    \"type\": \"tool_use\",\n    \"id\": \"toolu_01A\",\n    \"name\": \"get_weather\",\n    \"input\": {\n      \"city\": \"Tokyo\"\n    }\n  }\n]",
+          "hl": [
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "label": "Send it back",
+          "file": "next request: messages[]",
+          "lang": "json",
+          "src": "{\n  \"role\": \"assistant\",\n  \"content\": [\n    {\n      \"type\": \"thinking\",\n      \"thinking\": \"Need weather for both cities…\",\n      \"signature\": \"EuYBCkQYAiJA…\"\n    },\n    {\n      \"type\": \"tool_use\",\n      \"id\": \"toolu_01A\",\n      \"name\": \"get_weather\",\n      \"input\": {\n        \"city\": \"Tokyo\"\n      }\n    }\n  ]\n}",
+          "hl": [
+            5,
+            6,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gptoss",
+      "name": "GPT-OSS",
+      "sub": "",
+      "note": "Reasoning goes on the `analysis` channel. Keep analysis messages while tool calls are still in progress. Once the model gives a `final` answer, drop the earlier analysis from the next prompt.",
+      "src": "openai/harmony docs/format.md",
+      "panes": [
+        {
+          "label": "Turn it on",
+          "file": "system message",
+          "lang": "tokens",
+          "src": "<|start|>system<|message|>You are ChatGPT, a large language model trained by OpenAI.\n\nReasoning: high\n\n# Valid channels: analysis, commentary, final.<|end|>\n\n(chat API: \"reasoning_effort\": \"high\")",
+          "hl": [
+            3
+          ]
+        },
+        {
+          "label": "Where it shows up",
+          "file": "model output",
+          "lang": "tokens",
+          "src": "<|channel|>analysis<|message|>Need weather for Tokyo.<|end|>\n<|start|>assistant<|channel|>commentary to=functions.get_weather <|constrain|>json<|message|>{\"city\":\"Tokyo\"}<|call|>",
+          "hl": [
+            1
+          ]
+        },
+        {
+          "label": "Send it back",
+          "file": "next prompt",
+          "lang": "tokens",
+          "src": "During tool calls: keep it\n<|start|>assistant<|channel|>analysis<|message|>Need weather for Tokyo.<|end|>…\n\nAfter a final answer: drop it\n<|start|>assistant<|channel|>final<|message|>Bring an umbrella.<|end|>"
+        }
+      ]
+    },
+    {
+      "id": "qwen3",
+      "name": "Qwen3",
+      "sub": "",
+      "note": "Reasoning sits inside `think` tags. With `--reasoning-parser qwen3` the server moves it to `reasoning_content`. The template keeps thinking only for assistant turns after the latest user message.",
+      "src": "Qwen3 chat template, vLLM qwen3 reasoning parser",
+      "panes": [
+        {
+          "label": "Turn it on",
+          "file": "request",
+          "lang": "json",
+          "src": "{\n  \"chat_template_kwargs\": {\n    \"enable_thinking\": true\n  }\n}\n\n// or put /think or /no_think in the user turn"
+        },
+        {
+          "label": "Where it shows up",
+          "file": "model output",
+          "lang": "tokens",
+          "src": "<think>\nI need the weather in both cities.\n</think>\n\n<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Tokyo\"}}\n</tool_call>",
+          "hl": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "label": "Send it back",
+          "file": "next prompt",
+          "lang": "tokens",
+          "src": "<|im_start|>user\nIs it warmer in Tokyo or Seoul?<|im_end|>\n<|im_start|>assistant\n<think>\nI need the weather in both cities.\n</think>\n\n<tool_call>…</tool_call><|im_end|>\n\n(kept, because it's after the latest user message)"
+        }
+      ]
+    }
+  ]
+}
