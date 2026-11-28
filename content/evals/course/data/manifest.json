@@ -1,0 +1,39 @@
+{
+  "files": {
+    "compare-graders.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "evals-course-data 0.1.0"
+      },
+      "source_sha256": "9bbf89f5b06ac40edb3584a4cfcbc2c4799c54ccc198a3e0764bd6adbb501bb6"
+    },
+    "compare-profiles.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "evals-course-data 0.1.0"
+      },
+      "source_sha256": "5ce9ffb347245af26b819e0cd301e7ce2b35601c53ab97694c008d41bbbb5818"
+    },
+    "compare-reports.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "evals-course-data 0.1.0"
+      },
+      "source_sha256": "ae73429f9494f38cc03fc98bac35528fdeadad7cc1312bc4bea7b481907e8ba1"
+    },
+    "compare-skill-runs.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "evals-course-data 0.1.0"
+      },
+      "source_sha256": "57b29d2d1c2d8dd3c15594360bc3ddee3911f194cfd3b9cfc9666a54262cb2bb"
+    },
+    "support-agent-suite.json": {
+      "generated_with": {
+        "agentware": null,
+        "generator": "evals-course-data 0.1.0"
+      },
+      "source_sha256": "5002bfd9c59f46b8b45008eabf1c5266c9d117a9aabb4486343b2cdcfe7548cc"
+    }
+  }
+}
