@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import YAML from 'yaml';
 import { newestUpdated, readLatestAgentware } from './course-version.mjs';
 import { defaultCompatFile, formatWarning } from './course-validate.mjs';
-import { courseJsonLd, lessonHref, lessonJsonLd, lessonMeta, loadCourse, renderCourseHub, renderCourseRail, renderLesson } from './course.mjs';
+import { courseConfigs, courseJsonLd, lessonHref, lessonJsonLd, lessonMeta, loadCourse, renderCourseHub, renderCourseRail, renderLesson } from './course.mjs';
 import { createMarkdown, escapeHtml, neighbours, renderToc, stripHtmlComments, stripLeadingTitle } from './render.mjs';
 import { checkBuiltRoutes, checkLinks } from './check-links.mjs';
 
@@ -78,7 +78,7 @@ function validatePage(relativePath, raw) {
   if (parts[0] === 'agentware' && data.product !== 'agentware') throw new Error(`${relativePath}: agentware pages require product: agentware`);
   if (parts[0] === 'tutorials' && parts.length !== 2) throw new Error(`${relativePath}: tutorials must use content/tutorials/<slug>.md`);
   if (parts[0] === 'research' && parts.length !== 2) throw new Error(`${relativePath}: research pages must use content/research/<slug>.md`);
-  if (!['kei', 'agentware', 'tutorials', 'research'].includes(parts[0]) && relativePath !== 'skills.md') throw new Error(`${relativePath}: use content/kei, content/agentware, content/tutorials, content/research, or content/skills.md`);
+  if (!['kei', 'agentware', 'evals', 'tutorials', 'research'].includes(parts[0]) && relativePath !== 'skills.md') throw new Error(`${relativePath}: use content/kei, content/agentware, content/evals, content/tutorials, content/research, or content/skills.md`);
 
   const validated = isoDate(data.validated);
   const validatedWith = typeof data.validated_with === 'string' ? data.validated_with.trim() : '';
@@ -96,7 +96,7 @@ async function markdownFiles(directory, root = directory) {
   const files = [];
   for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
     const absolute = path.join(directory, entry.name);
-    if (entry.isDirectory() && path.relative(root, absolute).split(path.sep).join('/') !== 'agentware/course/lessons') files.push(...await markdownFiles(absolute, root));
+    if (entry.isDirectory() && !['agentware/course/lessons', 'evals/course/lessons'].includes(path.relative(root, absolute).split(path.sep).join('/'))) files.push(...await markdownFiles(absolute, root));
     else if (entry.isFile() && entry.name.endsWith('.md')) files.push({ absolute, relativePath: path.relative(root, absolute).split(path.sep).join('/') });
   }
   return files;
@@ -134,7 +134,7 @@ function navSections(pages) {
     label,
     group,
     pages: pages
-      .filter((page) => navProduct(page) === product && page.nav_group === group)
+      .filter((page) => page.course !== 'evals' && navProduct(page) === product && page.nav_group === group)
       .sort((a, b) => (a.nav_order ?? a.order ?? Number.MAX_SAFE_INTEGER) - (b.nav_order ?? b.order ?? Number.MAX_SAFE_INTEGER) || a.relativePath.localeCompare(b.relativePath)),
   }))).filter((section) => section.pages.length);
 }
@@ -373,7 +373,7 @@ function renderCourseHubPage(page, course, links) {
 }
 
 function renderLessonPage(page, course, lesson, links) {
-  const meta = lessonMeta(lesson);
+  const meta = lessonMeta(lesson, course.config);
   return { outputPath: `${meta.path.slice(1)}index.html`, html: layout(lesson.title, renderCourseRail(course, lesson.id), renderLesson(course, lesson), { variant: 'course', description: meta.description, canonical: meta.path, ogType: 'article', fullTitle: meta.fullTitle, links, currentPath: page.relativePath, image: courseCard, jsonLd: lessonJsonLd(course, lesson) }) };
 }
 
@@ -447,9 +447,17 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     return self.renderToken(tokens, index, options);
   };
   const pages = await loadDocs(contentDir);
-  const course = existsSync(path.join(courseDir, 'index.md')) ? loadCourse(courseDir, { latest: readLatestAgentware(compatFile) }) : null;
-  for (const warning of course?.warnings ?? []) console.warn(formatWarning(warning));
-  if (course && !pages.some(page => page.relativePath === 'agentware/course/index.md')) pages.push(validatePage('agentware/course/index.md', await readFile(path.join(courseDir, 'index.md'), 'utf8')));
+  const courses = new Map();
+  for (const config of Object.values(courseConfigs)) {
+    const dir = config.id === 'agentware' ? courseDir : path.join(contentDir, config.id, 'course');
+    if (!existsSync(path.join(dir, 'index.md'))) continue;
+    const course = loadCourse(dir, { latest: readLatestAgentware(compatFile) });
+    if (course.hub.course !== config.id) throw new Error(`${dir}: expected course: ${config.id}`);
+    courses.set(config.id, { course, dir });
+    for (const warning of course.warnings) console.warn(formatWarning(warning));
+    const relativePath = `${config.id}/course/index.md`;
+    if (!pages.some(page => page.relativePath === relativePath)) pages.push(validatePage(relativePath, await readFile(path.join(dir, 'index.md'), 'utf8')));
+  }
   checkNavOrder(pages);
   await checkLinks(contentDir);
   await rm(outputDir, { recursive: true, force: true });
@@ -462,20 +470,23 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   // The share card arrives from design-system; until then og:image points at the C5 path.
   if (existsSync(path.join(assetsDir, 'social'))) await cp(path.join(assetsDir, 'social'), path.join(outputDir, 'assets/social'), { recursive: true });
   const links = siteLinks(pages);
-  if (course) { await cp(path.join(assetsDir, 'course'), path.join(outputDir, 'assets/course'), { recursive: true }); await cp(path.join(courseDir, 'data'), path.join(outputDir, 'agentware/course/data'), { recursive: true, filter: (source) => path.basename(source) !== 'manifest.json' }); }
+  if (courses.size) await cp(path.join(assetsDir, 'course'), path.join(outputDir, 'assets/course'), { recursive: true });
+  for (const { course, dir } of courses.values()) await cp(path.join(dir, 'data'), path.join(outputDir, course.config.dataPath.slice(1)), { recursive: true, filter: source => path.basename(source) !== 'manifest.json' });
   const lessonPaths = [];
   const lastmod = new Map();
   for (const page of pages) {
     let result = renderPage(page, pages, links);
-    if (page.course === 'agentware' && course) {
+    const entry = courses.get(page.course);
+    const course = entry && page.relativePath === `${page.course}/course/index.md` ? entry.course : null;
+    if (course) {
       result = renderCourseHubPage(page, course, links);
       if (newestUpdated(course.lessons)) lastmod.set(pageHref(page), newestUpdated(course.lessons));
       for (const lesson of course.lessons) {
         const lessonPage = renderLessonPage(page, course, lesson, links);
         await mkdir(path.dirname(path.join(outputDir, lessonPage.outputPath)), { recursive: true });
         await writeFile(path.join(outputDir, lessonPage.outputPath), lessonPage.html);
-        lessonPaths.push(lessonHref(lesson.id));
-        if (lesson.updated) lastmod.set(lessonHref(lesson.id), lesson.updated);
+        lessonPaths.push(lessonHref(lesson.id, course.config));
+        if (lesson.updated) lastmod.set(lessonHref(lesson.id, course.config), lesson.updated);
       }
     }
     const { outputPath, html } = result;
@@ -484,7 +495,7 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
     await mkdir(path.dirname(htmlFile), { recursive: true });
     await writeFile(htmlFile, html);
     await mkdir(path.dirname(markdownFile), { recursive: true });
-    await cp(page.course === 'agentware' && course ? path.join(courseDir, 'index.md') : path.join(contentDir, page.relativePath), markdownFile);
+    await cp(course ? path.join(entry.dir, 'index.md') : path.join(contentDir, page.relativePath), markdownFile);
   }
   const overview = pages.find((page) => page.relativePath === 'agentware/build/overview.md');
   if (!overview) throw new Error('Missing content/agentware/build/overview.md required by Agentware section routes');
@@ -521,7 +532,7 @@ export async function buildDocs({ contentDir = path.join(repoRoot, 'content'), o
   // Page manifest consumed by `kei docs` (HAI-735). Keep this shape stable.
   const manifest = orderedPages(pages).map((page) => ({ slug: pageSlug(page), title: page.title, path: pageHref(page), product: page.product }));
   await writeFile(path.join(outputDir, 'index.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-  await writeFile(path.join(outputDir, 'sitemap.xml'), sitemapXml(manifest, lessonPaths, lastmod));
+  await writeFile(path.join(outputDir, 'sitemap.xml'), sitemapXml([...manifest, ...pages.filter(page => page.course === 'evals').map(page => ({ path: pageHref(page) }))], lessonPaths, lastmod));
   await writeFile(path.join(outputDir, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${docsUrl}/sitemap.xml\n`);
   await writeFile(path.join(outputDir, '_headers'), markdownCopyHeaders(orderedPages(pages)));
   const notFoundLinks = siteLinks(pages);

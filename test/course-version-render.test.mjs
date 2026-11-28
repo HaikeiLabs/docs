@@ -68,7 +68,7 @@ test('build: sitemap lastmod for course URLs only, the manifest is not served, t
   assert.match(sitemap, new RegExp(`<url><loc>${docs}/agentware/course/runtime/</loc><lastmod>2026-11-20</lastmod></url>`));
   assert.match(sitemap, new RegExp(`<url><loc>${docs}/agentware/course/steps/</loc></url>`), 'a lesson without updated has no lastmod');
   const withLastmod = [...sitemap.matchAll(/<loc>([^<]+)<\/loc><lastmod>/g)].map(m => m[1]);
-  assert.ok(withLastmod.length > 0 && withLastmod.every(url => url.startsWith(`${docs}/agentware/course/`)), 'lastmod only on course URLs');
+  assert.ok(withLastmod.length > 0 && withLastmod.every(url => ['agentware', 'evals'].some(id => url.startsWith(`${docs}/${id}/course/`))), 'lastmod only on course URLs');
   assert.equal(fs.existsSync(path.join(outputDir, 'agentware/course/data/manifest.json')), false);
   assert.equal(fs.existsSync(path.join(outputDir, 'agentware/course/data/gaps.json')), true);
   assert.match(await read('agentware/course/runtime/index.html'), /The current release is 0\.3\.0\./);
