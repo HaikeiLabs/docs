@@ -3,21 +3,29 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import YAML from 'yaml';
+import { compareVersions, isRealDate, readLatestAgentware } from './course-version.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ajv = new Ajv2020({ allErrors: true, allowUnionTypes: true });
-const validators = Object.fromEntries(['hub', 'lesson-front-matter', 'compare', 'api', 'logs', 'debugger', 'runtime-trace', 'gaps'].map(name => [name, ajv.compile(JSON.parse(fs.readFileSync(path.join(root, 'schemas/course', `${name}.schema.json`))))]));
+const validators = Object.fromEntries(['hub', 'lesson-front-matter', 'compare', 'api', 'logs', 'debugger', 'runtime-trace', 'gaps', 'manifest'].map(name => [name, ajv.compile(JSON.parse(fs.readFileSync(path.join(root, 'schemas/course', `${name}.schema.json`))))]));
 const anchors = {
   debugger: ['build_request(', 'call_model(', 'return final_text(', 'run_tool(', 'tool_results('],
   'runtime-trace': ['backend.complete(', 'reasoning.strip(', 'validator.validate(', 'check.nudge', 'policy.evaluate(', 'auditor.record(', 'denied by policy', 'tool(**call.args)', 'tool_message(', 'return answer'],
 };
 const widgets = { cycle: ['logs'], compare: null, api: null, debugger: ['logs', 'debugger'], rtdebugger: null, gaps: ['gaps'] };
 const schemaFor = { cycle: 'logs', compare: 'compare', api: 'api', debugger: 'debugger', rtdebugger: 'runtime-trace', gaps: 'gaps' };
-function frontmatter(file) {
-  const text = fs.readFileSync(file, 'utf8');
+export function parseFrontMatter(text, file = 'lesson') {
   const match = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
   if (!match) throw new Error(`${file}: missing front matter`);
   return [YAML.parse(match[1]), match[2]];
+}
+function frontmatter(file) { return parseFrontMatter(fs.readFileSync(file, 'utf8'), file); }
+const directivePattern = /^\[widget:([a-z-]+)(?: data=([a-z0-9-]+))?\]\s*$/gm;
+// The data stems a lesson body reads: each directive's data= stem, or the data an
+// implicit widget always loads (cycle: logs; debugger: logs and debugger; gaps: gaps).
+// One grammar for the validator, check:updated and generate.py (--data-for).
+export function lessonDataStems(body) {
+  return [...body.matchAll(directivePattern)].flatMap(([, name, stem]) => stem ? [stem] : widgets[name] ?? []);
 }
 function checkSchema(name, value, file) {
   if (!validators[name](value)) throw new Error(`${file}: ${ajv.errorsText(validators[name].errors)}`);
@@ -33,7 +41,44 @@ function checkInlineMarkdown(raw, field) {
     throw new Error(`${field}: use inline Markdown instead of HTML tags or entities`);
   }
 }
-export function validateCourse(dir) {
+// Content versioning (updated, agentware, change_note, data/manifest.json). Errors
+// are internal inconsistencies and fail the build. Being behind (or ahead of) the
+// vendored latest Agentware release is only a warning: a new SDK release must
+// never block the docs deploy. The manifest rules apply only once the manifest exists.
+function checkVersioning(dir, hub, { latest, today }) {
+  const manifestFile = path.join(dir, 'data', 'manifest.json');
+  const manifest = fs.existsSync(manifestFile) ? JSON.parse(fs.readFileSync(manifestFile, 'utf8')) : null;
+  if (manifest) {
+    checkSchema('manifest', manifest, manifestFile);
+    const onDisk = fs.readdirSync(path.join(dir, 'data')).filter(f => f.endsWith('.json') && f !== 'manifest.json');
+    for (const file of onDisk) if (!manifest.files[file]) throw new Error(`data/${file} has no entry in data/manifest.json; regenerate it with tools/course-data/generate.py`);
+    for (const file of Object.keys(manifest.files)) if (!onDisk.includes(file)) throw new Error(`data/manifest.json: ${file} names no such data file`);
+  }
+  const warnings = [];
+  for (const id of hub.lessons) {
+    const file = path.join(dir, 'lessons', `${id}.md`); const [lesson, body] = frontmatter(file);
+    if (lesson.updated !== undefined) {
+      if (!isRealDate(lesson.updated)) throw new Error(`${file}: updated ${lesson.updated} is not a real date`);
+      if (lesson.updated > today) throw new Error(`${file}: updated ${lesson.updated} is after the build date ${today}`);
+    }
+    if (lesson.change_note !== undefined) checkInlineMarkdown(lesson.change_note, `${file}: change_note`);
+    if (manifest) {
+      const sdk = [...new Set(lessonDataStems(body))].map(stem => [`${stem}.json`, manifest.files[`${stem}.json`]?.generated_with.agentware]).filter(([, version]) => version);
+      if (sdk.length && !lesson.agentware) throw new Error(`${file}: shows SDK-derived data (${sdk.map(([f]) => f).join(', ')}); add agentware: ${sdk[0][1]} to the front matter`);
+      for (const [data, version] of sdk) if (version !== lesson.agentware) throw new Error(`${file}: agentware ${lesson.agentware} but ${data} was generated with ${version}; regenerate the data or change the lesson`);
+    }
+    if (latest && lesson.agentware) {
+      const order = compareVersions(lesson.agentware, latest);
+      if (order < 0) warnings.push({ lesson: id, file, message: `${id}: written for Agentware ${lesson.agentware}; the latest release is ${latest}. Review the lesson, regenerate its data and bump agentware and updated.` });
+      if (order > 0) warnings.push({ lesson: id, file, message: `${id}: Agentware ${lesson.agentware} is newer than the vendored latest ${latest}; run npm run sync:compat` });
+    }
+  }
+  return warnings;
+}
+export function validateCourse(dir) { return checkCourse(dir).hub; }
+// Full check: throws on an error and returns { hub, warnings }. latest is the vendored
+// current Agentware release (no freshness warnings without it); today is the build date.
+export function checkCourse(dir, { latest, today = new Date().toISOString().slice(0, 10) } = {}) {
   const [hub] = frontmatter(path.join(dir, 'index.md')); checkSchema('hub', hub, 'index.md');
   const files = fs.readdirSync(path.join(dir, 'lessons')).filter(f => f.endsWith('.md')).map(f => f.slice(0, -3));
   if (files.length !== hub.lessons.length || files.some(f => !hub.lessons.includes(f))) throw new Error('lessons and files differ');
@@ -67,7 +112,7 @@ export function validateCourse(dir) {
       let count = 0;
       for (const step of steps) {
         const fences = [...step.matchAll(/^```([^\n]*)\n([\s\S]*?)^```\s*$/gm)];
-        const directives = [...step.matchAll(/^\[widget:([a-z-]+)(?: data=([a-z0-9-]+))?\]\s*$/gm)];
+        const directives = [...step.matchAll(directivePattern)];
         if (fences.length + directives.length !== 1) throw new Error(`${file}: step requires one code block or widget`);
         count += directives.length;
         for (const match of directives) {
@@ -83,11 +128,28 @@ export function validateCourse(dir) {
     }
     items(parts[0], false); if (parts[1]) items(parts[1], true);
   });
-  return hub;
+  return { hub, warnings: checkVersioning(dir, hub, { latest, today }) };
 }
+// A warning as a line for a terminal, or as a GitHub Actions annotation in CI.
+export function formatWarning({ file, message }) {
+  return process.env.GITHUB_ACTIONS === 'true' ? `::warning file=${path.relative(process.cwd(), file).split(path.sep).join('/')}::${message}` : `warning: ${message}`;
+}
+export const defaultCompatFile = path.join(root, 'scripts/data/agentware-compat.json');
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const dir = process.argv[2] ?? process.env.COURSE_DIR ?? 'content/agentware/course';
+  const args = process.argv.slice(2); const flag = name => { const at = args.indexOf(name); return at < 0 ? undefined : args.splice(at, 2)[1]; };
+  const compatFile = flag('--compat') ?? defaultCompatFile; const dataFor = flag('--data-for');
+  const dir = args[0] ?? process.env.COURSE_DIR ?? 'content/agentware/course';
+  if (dataFor) {
+    // Used by tools/course-data/generate.py --lesson <id>: the data stems that lesson reads, one per line.
+    const file = path.join(dir, 'lessons', `${dataFor}.md`);
+    if (!fs.existsSync(file)) throw new Error(`No lesson ${dataFor} at ${file}`);
+    for (const stem of new Set(lessonDataStems(frontmatter(file)[1]))) console.log(stem);
   // Same rule as the build: without a hub page the course is skipped, so there is nothing to validate.
-  if (fs.existsSync(dir) && !fs.existsSync(path.join(dir, 'index.md'))) console.log(`No hub page at ${path.join(dir, 'index.md')}; course not built, nothing to validate.`);
-  else if (fs.existsSync(dir)) { validateCourse(dir); console.log(`Course valid: ${dir}`); } else if (process.argv[2]) { throw new Error(`Course directory not found: ${dir}`); }
+  } else if (fs.existsSync(dir) && !fs.existsSync(path.join(dir, 'index.md'))) console.log(`No hub page at ${path.join(dir, 'index.md')}; course not built, nothing to validate.`);
+  else if (fs.existsSync(dir)) {
+    // Warnings go to stderr locally; annotations go to stdout, where GitHub Actions reads them.
+    const { warnings } = checkCourse(dir, { latest: readLatestAgentware(compatFile) });
+    for (const warning of warnings) (process.env.GITHUB_ACTIONS === 'true' ? console.log : console.error)(formatWarning(warning));
+    console.log(`Course valid: ${dir}${warnings.length ? ` (${warnings.length} warning${warnings.length === 1 ? '' : 's'})` : ''}`);
+  } else if (args[0]) { throw new Error(`Course directory not found: ${dir}`); }
 }

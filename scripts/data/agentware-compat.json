@@ -1,7 +1,22 @@
 {
-  "source": "HaikeiLabs/agentware@main",
-  "version": "0.16.0",
+  "source": "HaikeiLabs/agentware@agentware-v0.18.1",
+  "version": "0.18.1",
   "rows": [
+    {
+      "sdk": "0.18.1",
+      "keiProxy": "v0.11.0",
+      "keiCli": "0.9.1"
+    },
+    {
+      "sdk": "0.18.0",
+      "keiProxy": "v0.11.0",
+      "keiCli": "0.9.1"
+    },
+    {
+      "sdk": "0.17.0",
+      "keiProxy": "v0.6.5",
+      "keiCli": "0.3.6"
+    },
     {
       "sdk": "0.16.0",
       "keiProxy": "v0.6.5",

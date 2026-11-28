@@ -3,6 +3,7 @@ id: basics
 num: 1
 title: Basics
 mins: 4
+updated: 2026-11-01
 lede: Fixture lesson.
 quiz:
   q: Which answer is correct?
